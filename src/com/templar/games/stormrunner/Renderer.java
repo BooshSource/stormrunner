@@ -13,6 +13,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -50,6 +52,8 @@ public class Renderer extends ImageContainer
   protected Component InternalFocus;
   protected KeyHandler kh;
   private Object BlitLock = new Object();
+  ////
+  Object localObject;
 
   public Renderer(GameState paramGameState)
   {
@@ -248,6 +252,7 @@ public class Renderer extends ImageContainer
 
   public void setVisible(boolean paramBoolean)
   {
+	  Enumeration localEnumeration;
     String str;
     PhysicalObject localPhysicalObject;
     int i;
@@ -266,7 +271,6 @@ public class Renderer extends ImageContainer
           this.CurrentlyLooping.addElement(localPhysicalObject);
 
           localObject = localPhysicalObject.getLoopList();
-
           for (i = 0; i < ((Vector)localObject).size(); ++i)
           {
             str = (String)((Vector)localObject).elementAt(i);
@@ -277,7 +281,7 @@ public class Renderer extends ImageContainer
       return;
     }
 
-    Enumeration localEnumeration = this.Players.elements();
+    localEnumeration = this.Players.elements();
 
     while (localEnumeration.hasMoreElements())
     {
@@ -690,5 +694,184 @@ public class Renderer extends ImageContainer
     return localStringBuffer.toString(); }
 
   public OrderedTable getLayers() { return this.Layers;
+  }
+  
+  
+  class GroundComponent extends Component
+  {
+    private final Renderer this$0;
+    private final Rectangle DEFAULT_GROUND_TAINT;
+    private boolean GroundBufferTainted;
+    private Rectangle GroundTaintArea;
+    private Point GroundBlit;
+
+    public void taintGround()
+    {
+      taintGround(this.DEFAULT_GROUND_TAINT);
+    }
+
+    public void taintGround(Rectangle paramRectangle)
+    {
+      Rectangle localRectangle = new Rectangle(paramRectangle);
+
+      this.GroundBufferTainted = true;
+      if (this.GroundTaintArea == null) {
+        this.GroundTaintArea = localRectangle;
+
+        return;
+      }
+
+      this.GroundTaintArea.add(localRectangle);
+    }
+
+    public void setGroundBlit(int paramInt1, int paramInt2)
+    {
+      this.GroundBlit = new Point(paramInt1, paramInt2);
+    }
+
+    public Point getGroundBlit()
+    {
+      return this.GroundBlit;
+    }
+
+    public void update(Graphics paramGraphics)
+    {
+      paint(paramGraphics);
+    }
+
+    public void paint(Graphics paramGraphics)
+    {
+      if (this.GroundBufferTainted)
+      {
+        if (this.GroundTaintArea == null) {
+          this.GroundTaintArea = this.DEFAULT_GROUND_TAINT;
+        }
+
+        if (this.GroundBlit != null)
+        {
+          Rectangle localRectangle = this.this$0.GroundBufferGraphics.getClipBounds();
+          this.this$0.GroundBufferGraphics.setClip(0, 0, 500, 400);
+          this.this$0.GroundBufferGraphics.copyArea(0, 0, 500, 400, this.GroundBlit.x, this.GroundBlit.y);
+          this.this$0.GroundBufferGraphics.setClip(localRectangle);
+
+          this.GroundBlit = null;
+        }
+
+        int i = this.this$0.Offset.x + (int)Math.floor(this.GroundTaintArea.x / 50.0F);
+        int j = i + (int)Math.ceil(this.GroundTaintArea.width / 50.0F);
+        int k = this.this$0.Offset.y + (int)Math.floor(this.GroundTaintArea.y / 50.0F);
+        int l = k + (int)Math.ceil(this.GroundTaintArea.height / 50.0F);
+
+        j = Math.min(this.this$0.MapSize.width - 1, j);
+        l = Math.min(this.this$0.MapSize.height - 1, l);
+
+        int i1 = (i - this.this$0.Offset.x) * 50;
+        int i2 = (k - this.this$0.Offset.y) * 50;
+        for (int i3 = k; i3 <= l; )
+        {
+          for (int i4 = i; i4 <= j; )
+          {
+            Image localImage = this.this$0.map.getCell(i4, i3).getAppearance();
+            GameApplet.thisApplet.hitCache(localImage);
+            this.this$0.GroundBufferGraphics.drawImage(localImage, i1, i2, null);
+
+            ++i4; i1 += 50;
+          }
+
+          i1 = (i - this.this$0.Offset.x) * 50;
+
+          ++i3; i2 += 50;
+        }
+
+        this.GroundBufferTainted = false;
+        this.GroundTaintArea = null;
+      }
+
+      paramGraphics.drawImage(this.this$0.GroundBufferImage, 0, 0, null);
+    }
+
+    protected GroundComponent(Renderer paramRenderer)
+    {
+      this.this$0 = paramRenderer;
+
+      this.DEFAULT_GROUND_TAINT = new Rectangle(0, 0, 480, 360);
+      this.GroundBufferTainted = true;
+      this.GroundTaintArea = this.DEFAULT_GROUND_TAINT;
+    }
+  }
+  
+  
+  
+  class KeyHandler extends KeyAdapter
+  {
+    private final Renderer this$0;
+
+    public void keyPressed(KeyEvent paramKeyEvent)
+    {
+      Point localPoint = new Point(this.this$0.getOffset());
+      int i = 1;
+      switch (paramKeyEvent.getKeyCode())
+      {
+      case 36:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(-i, -i);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 35:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(-i, i);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 33:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(i, -i);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 34:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(i, i);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 40:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(0, i);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 38:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(0, -i);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 37:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(-i, 0);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 39:
+        this.this$0.setObjectToFollow(null);
+        localPoint.translate(i, 0);
+        this.this$0.setOffset(localPoint);
+        return;
+      case 32:
+        if (this.this$0.State == null) return;
+        this.this$0.setObjectToFollow(this.this$0.State.getCurrentRobot());
+        return;
+      case 71:
+        GameApplet localGameApplet = GameApplet.thisApplet;
+        if (localGameApplet.getGrid().isOn()) {
+          localGameApplet.getGrid().burnGridOff();
+
+          return;
+        }
+
+        localGameApplet.getGrid().burnGridOn();
+        return;
+      }
+    }
+
+    protected KeyHandler(Renderer paramRenderer)
+    {
+      this.this$0 = paramRenderer;
+    }
   }
 }

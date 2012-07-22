@@ -47,8 +47,8 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import netscape.security.ForbiddenTargetException;
-import netscape.security.PrivilegeManager;
+//import netscape.security.ForbiddenTargetException;
+//import netscape.security.PrivilegeManager;
 
 public class GameApplet extends TApplet
   implements ImageRetriever, com.templar.games.stormrunner.templarutil.gui.ImagePaintListener, ImageFilenameProvider
@@ -84,7 +84,7 @@ public class GameApplet extends TApplet
   protected int State = 2;
   protected int LastState;
   protected boolean[] StatusMinimized;
-  protected MediaTracker CacheTracker = new MediaTracker(???);
+  protected MediaTracker CacheTracker = new MediaTracker(modalComp); ////
   protected Hashtable images = new Hashtable();
   protected Hashtable imageFilename = new Hashtable();
   protected Vector ImageCacheActiveList = new Vector();
@@ -584,6 +584,7 @@ public class GameApplet extends TApplet
   {
     hitCache(paramImage, null); } 
   // ERROR //
+  ////
   public synchronized void hitCache(Image paramImage, ImageComponent paramImageComponent) { // Byte code:
     //   0: aload_1
     //   1: ifnonnull +9 -> 10
@@ -991,9 +992,10 @@ public class GameApplet extends TApplet
 
     try
     {
-      PrivilegeManager.revertPrivilege("UniversalFileAccess");
-      PrivilegeManager.revertPrivilege("UniversalPropertyRead");
-      PolicyEngine.revertPermission(PermissionID.FILEIO);
+      ////
+    	//PrivilegeManager.revertPrivilege("UniversalFileAccess");
+      //PrivilegeManager.revertPrivilege("UniversalPropertyRead");
+      //PolicyEngine.revertPermission(PermissionID.FILEIO);
     }
     catch (Exception localException3)
     {
@@ -1008,11 +1010,12 @@ public class GameApplet extends TApplet
   {
     try
     {
-      PrivilegeManager.enablePrivilege("UniversalFileAccess");
-      PrivilegeManager.enablePrivilege("UniversalPropertyRead");
-      PolicyEngine.assertPermission(PermissionID.FILEIO);
+////
+    //	PrivilegeManager.enablePrivilege("UniversalFileAccess");
+      //PrivilegeManager.enablePrivilege("UniversalPropertyRead");
+      //PolicyEngine.assertPermission(PermissionID.FILEIO);
     }
-    catch (ForbiddenTargetException localForbiddenTargetException)
+    catch (SystemException e)//ForbiddenTargetException localForbiddenTargetException)
     {
       System.err.println("Stormrunner: loadGame(): User clicked Deny.");
       return;
@@ -1083,9 +1086,10 @@ public class GameApplet extends TApplet
 
     try
     {
-      PrivilegeManager.revertPrivilege("UniversalFileAccess");
-      PrivilegeManager.revertPrivilege("UniversalPropertyRead");
-      PolicyEngine.revertPermission(PermissionID.FILEIO);
+     ////
+    	//PrivilegeManager.revertPrivilege("UniversalFileAccess");
+      //PrivilegeManager.revertPrivilege("UniversalPropertyRead");
+      //PolicyEngine.revertPermission(PermissionID.FILEIO);
     }
     catch (Exception localException3)
     {
@@ -1104,5 +1108,38 @@ public class GameApplet extends TApplet
   static UtilityThread access$0(GameApplet paramGameApplet)
   {
     return paramGameApplet.cacheThread;
+  }
+  
+  
+  
+  
+  class ImageTrack
+  {
+    private final GameApplet this$0;
+    public Image image;
+    public long time;
+
+    public ImageTrack(GameApplet paramGameApplet, Image paramImage)
+    {
+      this.this$0 = paramGameApplet;
+
+      this.this$0 = 
+        paramGameApplet;
+
+      this.image = paramImage;
+      this.time = -1L;
+    }
+
+    public String toString() {
+      StringBuffer localStringBuffer = new StringBuffer("ImageTrack[");
+      if (this.this$0.imageFilename.containsKey(this.image))
+        localStringBuffer.append(this.this$0.imageFilename.get(this.image));
+      else
+        localStringBuffer.append("null");
+      localStringBuffer.append(",");
+      localStringBuffer.append(this.time);
+      localStringBuffer.append("]");
+      return localStringBuffer.toString();
+    }
   }
 }

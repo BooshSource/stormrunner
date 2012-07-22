@@ -13,7 +13,9 @@ import java.awt.TextArea;
 import java.awt.TextComponent;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.ActionAdapter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
 
@@ -67,7 +69,7 @@ public class Debug
         debugFrame.setVisible(true);
         Dimension localDimension = Toolkit.getDefaultToolkit().getScreenSize();
         debugFrame.setLocation(0, localDimension.height - debugFrame.getSize().height - 12);
-        debugFrame.addWindowListener(new 1());
+        debugFrame.addWindowListener(new one());
       }
     }
   }
@@ -201,4 +203,36 @@ public class Debug
     localStringBuffer.append("]");
     return localStringBuffer.toString();
   }
+  
+  final class one extends WindowAdapter
+  {
+    public void windowClosing()
+    {
+      Debug.debugFrame.setVisible(false); Debug.debugFrame.dispose();
+    }
+  }
+  class ActionAdapter
+  implements ActionListener
+{
+  private final Debug thisdebug;
+
+  public void actionPerformed(ActionEvent arg0)
+  {
+    String str = arg0.getActionCommand();
+    if (str.compareTo("Close") == 0)
+    {
+      Debug.debugFrame.setVisible(false);
+    }
+    if (str.compareTo("Clear") == 0)
+    {
+      Debug.text.setText("");
+    }
+  }
+
+  ActionAdapter(Debug paramDebug)
+  {
+    this.thisdebug = paramDebug;
+
+  }
+}
 }

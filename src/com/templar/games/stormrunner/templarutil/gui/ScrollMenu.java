@@ -12,8 +12,11 @@ import java.awt.ItemSelectable;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -582,6 +585,47 @@ public class ScrollMenu extends Container
     {
       ImageListener localImageListener = (ImageListener)this.ImageListeners.elementAt(i);
       localImageListener.imageChanged(new ImageEvent(this, 6));
+    }
+  }
+  
+  
+  class ComponentHandler extends ComponentAdapter
+  {
+    private final ScrollMenu this$0;
+
+    public void componentResized()
+    {
+      this.this$0.refreshScrollSize();
+    }
+
+    protected ComponentHandler(ScrollMenu paramScrollMenu)
+    {
+      this.this$0 = paramScrollMenu;
+    }
+  }
+  
+  class MouseHandler extends MouseAdapter
+  {
+    private final ScrollMenu this$0;
+
+    public void mousePressed(MouseEvent paramMouseEvent)
+    {
+      Component localComponent = this.this$0.ScrollPane.getComponentAt(paramMouseEvent.getX(), paramMouseEvent.getY());
+
+      if (localComponent != null)
+      {
+        this.this$0.deselect();
+
+        if (localComponent != this.this$0.ScrollPane)
+        {
+          this.this$0.select(localComponent);
+        }
+      }
+    }
+
+    protected MouseHandler(ScrollMenu paramScrollMenu)
+    {
+      this.this$0 = paramScrollMenu;
     }
   }
 }
