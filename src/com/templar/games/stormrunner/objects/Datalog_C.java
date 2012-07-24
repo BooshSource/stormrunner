@@ -48,8 +48,8 @@ public class Datalog_C extends Datalog
 
     if ((this.state != null) && 
       (this.state.getSecurityLevel() < 3))
-      this.state.setSecurityLevel(3);  }
-
+      this.state.setSecurityLevel(3); 
+  }
   public String toString() {
     return "Datalog C";
   }

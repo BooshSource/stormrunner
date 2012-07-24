@@ -1,6 +1,5 @@
 package com.templar.games.stormrunner.objects;
 
-import [Z;
 import com.templar.games.stormrunner.GameApplet;
 import com.templar.games.stormrunner.PhysicalObject;
 import com.templar.games.stormrunner.Position;
@@ -74,11 +73,11 @@ public class FoundHermes extends FoundRobot
     String[] arrayOfString = { "sensor.VidSensor" };
     this.parts = arrayOfString;
     this.clearAnimations = new AnimationComponent[4];
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < 4; i++)
     {
       Image[] arrayOfImage = new Image[9];
       int[] arrayOfInt = new int[9];
-      for (int j = 0; j < 9; ++j)
+      for (int j = 0; j < 9; j++)
       {
         arrayOfInt[j] = j;
         arrayOfImage[j] = GameApplet.thisApplet.getImage(
@@ -95,34 +94,40 @@ public class FoundHermes extends FoundRobot
   {
     if (this.clearAnimations != null)
     {
-      if ((this.clear) || (this.active)) return;
+      if ((!this.clear) && (!this.active))
+      {
+        this.active = true;
 
-      this.active = true;
+        return;
+      }
 
-      return;
     }
-
-    this.clear = true;
+    else
+    {
+      this.clear = true;
+    }
   }
 
   public void tick() {
-    if ((this.active) && 
-      (!(this.clearAnimations[this.whichAnimationComponent].nextImage())))
+    if (this.active)
     {
-      [Z[] arrayOf[Z = { { true } };
-      getEnvironment().removeObject(this);
-      setShape(arrayOf[Z);
-      ImageComponent[] arrayOfImageComponent = new ImageComponent[2];
-      arrayOfImageComponent[1] = new ImageComponent(
-        GameApplet.thisApplet.getImage(
-        "com/templar/games/stormrunner/media/images/robot/chassis/Hermes/walk0_90C.gif"), true, false);
-      arrayOfImageComponent[0] = this.clearAnimations[this.whichAnimationComponent];
-      setImages(arrayOfImageComponent);
-      this.clear = true;
-      this.active = false;
-      setPosition(new Position(this.endingPoint.x, this.endingPoint.y, 0, 0));
-      getEnvironment().addObject(this);
-      getEnvironment().getRenderer().repaint();
+      if (!this.clearAnimations[this.whichAnimationComponent].nextImage())
+      {
+        boolean[][] arrayOfBoolean = { { true } };
+        getEnvironment().removeObject(this);
+        setShape(arrayOfBoolean);
+        ImageComponent[] arrayOfImageComponent = new ImageComponent[2];
+        arrayOfImageComponent[1] = new ImageComponent(
+          GameApplet.thisApplet.getImage(
+          "com/templar/games/stormrunner/media/images/robot/chassis/Hermes/walk0_90C.gif"), true, false);
+        arrayOfImageComponent[0] = this.clearAnimations[this.whichAnimationComponent];
+        setImages(arrayOfImageComponent);
+        this.clear = true;
+        this.active = false;
+        setPosition(new Position(this.endingPoint.x, this.endingPoint.y, 0, 0));
+        getEnvironment().addObject(this);
+        getEnvironment().getRenderer().repaint();
+      }
     }
   }
 
@@ -161,8 +166,8 @@ public class FoundHermes extends FoundRobot
     case 270:
       localPoint1.x -= 2;
       localPoint2.x = localPoint1.x;
+      break;
     }
-
     if (paramRobot.getEnvironment().isObstructed(localPoint1)) {
       return true;
     }
@@ -170,25 +175,25 @@ public class FoundHermes extends FoundRobot
     this.whichAnimationComponent = (i / 90);
 
     Image[] arrayOfImage = this.clearAnimations[this.whichAnimationComponent].getCells();
-    for (int j = 0; j < arrayOfImage.length; ++j)
+    for (int j = 0; j < arrayOfImage.length; j++)
       GameApplet.thisApplet.hitCache(arrayOfImage[j]);
     AnimationComponent[] arrayOfAnimationComponent = new AnimationComponent[1];
     arrayOfAnimationComponent[0] = this.clearAnimations[this.whichAnimationComponent];
     arrayOfAnimationComponent[0].reset();
     setImages(arrayOfAnimationComponent);
     paramRobot.getEnvironment().removeObject(this);
-    boolean[][] arrayOfBoolean = new boolean[(i % 180 == 0) ? 1 : 2][(i % 180 == 0) ? 2 : 1];
-    for (int k = 0; k < ((i % 180 == 0) ? 1 : 2); ++k)
-      for (int l = 0; l < ((i % 180 == 0) ? 2 : 1); ++l)
-        arrayOfBoolean[k][l] = 1;
-
+    boolean[][] arrayOfBoolean = new boolean[i % 180 == 0 ? 1 : 2][i % 180 == 0 ? 2 : 1];
+    for (int k = 0; k < (i % 180 == 0 ? 1 : 2); k++) {
+      for (int m = 0; m < (i % 180 == 0 ? 2 : 1); m++)
+        arrayOfBoolean[k][m] = true;
+    }
     setPosition(new Position(localPoint2.x, localPoint2.y, 0, 0));
     setShape(arrayOfBoolean);
     this.endingPoint = localPoint1;
     paramRobot.getEnvironment().addObject(this);
     paramRobot.getEnvironment().getRenderer().repaint();
-    return false; }
-
+    return false;
+  }
   public int activateOnEvent() {
     return 0; } 
   public int getThreshold() { return 45;

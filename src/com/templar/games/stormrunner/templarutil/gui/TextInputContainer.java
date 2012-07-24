@@ -81,11 +81,11 @@ public class TextInputContainer extends Container
   {
     appearanceChanged();
 
-    super.setLayout(null);
+    setLayout(null);
     this.Prompt = new TextContainer();
     this.ActionRecipients = new Vector();
     this.Prompt.setLocation(this.Padding.left, this.Padding.top);
-    super.add(this.Prompt);
+    add(this.Prompt);
     this.Response = new StringBuffer();
     addKeyListener(this);
   }
@@ -124,9 +124,9 @@ public class TextInputContainer extends Container
 
     if (this.CursorOn)
       this.CursorOn = false;
-    else
+    else {
       this.CursorOn = true;
-
+    }
     repaint();
 
     return true;
@@ -299,18 +299,20 @@ public class TextInputContainer extends Container
       return;
     }
 
-    if ((paramKeyEvent.getKeyCode() != 16) && (((this.MaxResponseLength < 0) || (this.Response.length() < this.MaxResponseLength))))
+    if ((paramKeyEvent.getKeyCode() != 16) && ((this.MaxResponseLength < 0) || (this.Response.length() < this.MaxResponseLength)))
     {
       this.CursorOn = true;
 
       char c = paramKeyEvent.getKeyChar();
-      if ((((this.DeniedChars == null) || (this.DeniedChars.indexOf(c, 0) == -1))) && ((
-        (this.AllowedChars == null) || (this.AllowedChars.indexOf(c, 0) != -1))))
+      if ((this.DeniedChars == null) || (this.DeniedChars.indexOf(c, 0) == -1))
       {
-        this.Response.append(c);
+        if ((this.AllowedChars == null) || (this.AllowedChars.indexOf(c, 0) != -1))
+        {
+          this.Response.append(c);
+        }
       }
-
-      updateSize(); }
+      updateSize();
+    }
   }
 
   public void keyReleased(KeyEvent paramKeyEvent) {
@@ -354,7 +356,7 @@ public class TextInputContainer extends Container
 
   public void appearanceChanged()
   {
-    for (int i = 0; i < this.ImageListeners.size(); ++i)
+    for (int i = 0; i < this.ImageListeners.size(); i++)
     {
       ImageListener localImageListener = (ImageListener)this.ImageListeners.elementAt(i);
       localImageListener.imageChanged(new ImageEvent(this, 4));

@@ -65,7 +65,7 @@ public class DigitalGauge extends Component
 
       this.Value = paramDouble;
       this.FinalSegment = (int)Math.round(this.Value * this.Steps / this.Max);
-      super.repaint();
+      repaint();
     }
   }
 
@@ -86,14 +86,13 @@ public class DigitalGauge extends Component
 
   protected void calculateArc()
   {
-    int i;
     appearanceChanged();
-
+    int i;
     if (this.EndAngle > this.StartAngle)
-      i = this.StartAngle + 360 - this.EndAngle;
-    else
+      i = this.StartAngle + (360 - this.EndAngle);
+    else {
       i = this.StartAngle - this.EndAngle;
-
+    }
     this.ArcLength = (int)Math.ceil(i / this.Steps);
   }
 
@@ -104,13 +103,13 @@ public class DigitalGauge extends Component
 
   public void paint(Graphics paramGraphics)
   {
-    Dimension localDimension = super.getSize();
+    Dimension localDimension = getSize();
 
     paramGraphics.setColor(this.Background);
     paramGraphics.fillRect(0, 0, localDimension.width, localDimension.height);
 
     int i = this.StartAngle;
-    for (int j = 0; j < this.FinalSegment; ++j)
+    for (int j = 0; j < this.FinalSegment; j++)
     {
       paramGraphics.setColor(this.SegmentColors[j]);
       paramGraphics.fillArc(0, 0, localDimension.width, localDimension.height, i, -this.ArcLength);
@@ -130,7 +129,7 @@ public class DigitalGauge extends Component
 
   public void appearanceChanged()
   {
-    for (int i = 0; i < this.ImageListeners.size(); ++i)
+    for (int i = 0; i < this.ImageListeners.size(); i++)
     {
       ImageListener localImageListener = (ImageListener)this.ImageListeners.elementAt(i);
       localImageListener.imageChanged(new ImageEvent(this, 5));

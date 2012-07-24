@@ -55,6 +55,7 @@ public class TextContainer extends Component
   protected Color[] LineColors;
   protected int[] LineDelays;
   public boolean Added = false;
+
   protected boolean StreakEffect = false;
   protected int StreakCharacterDelay = 25;
   protected int StreakLength = 5;
@@ -108,9 +109,9 @@ public class TextContainer extends Component
 
   public void setText(String paramString)
   {
-    if (this.StreakThread != null)
+    if (this.StreakThread != null) {
       this.StreakThread.politeStop();
-
+    }
     if (this.BurnThread != null) {
       this.BurnThread.politeStop();
     }
@@ -132,7 +133,7 @@ public class TextContainer extends Component
       textEffects();
     }
 
-    super.repaint();
+    repaint();
   }
 
   public int getHardWidth()
@@ -205,7 +206,7 @@ public class TextContainer extends Component
 
     this.TextColor = paramColor;
 
-    super.repaint();
+    repaint();
   }
 
   public Color getBackgroundColor()
@@ -224,7 +225,7 @@ public class TextContainer extends Component
 
     this.BackgroundColor = paramColor;
 
-    super.repaint();
+    repaint();
   }
 
   public Font getFont()
@@ -236,7 +237,7 @@ public class TextContainer extends Component
   {
     this.TextFont = paramFont;
 
-    this.TextFontMetrics = super.getToolkit().getFontMetrics(this.TextFont);
+    this.TextFontMetrics = getToolkit().getFontMetrics(this.TextFont);
 
     updateSize();
   }
@@ -322,9 +323,9 @@ public class TextContainer extends Component
 
   public void resetEffects()
   {
-    if (this.StreakThread != null)
+    if (this.StreakThread != null) {
       this.StreakThread.politeStop();
-
+    }
     if (this.BurnThread != null) {
       this.BurnThread.politeStop();
     }
@@ -344,13 +345,10 @@ public class TextContainer extends Component
 
   protected void updateSize()
   {
-    int i;
-    int j;
-    int k;
     appearanceChanged();
 
-    this.ActualWidth = ((this.Text == null) ? 0 : this.TextFontMetrics.stringWidth(this.Text));
-
+    this.ActualWidth = (this.Text == null ? 0 : this.TextFontMetrics.stringWidth(this.Text));
+    int i;
     if (this.HardWidth < 0)
       i = this.ActualWidth;
     else {
@@ -359,22 +357,20 @@ public class TextContainer extends Component
 
     if (this.BurnLineEffect)
     {
-      if (this.BurnLineLength > i)
+      if (this.BurnLineLength > i) {
         i = this.BurnLineLength;
-
+      }
       if (this.BurnLineLength < 0)
       {
         this.BurnLineLength = i;
       }
-
     }
-
+    int j;
     if (this.HardWidth < 0)
       this.ActualWidth = (j = i + this.Padding.left + this.Padding.right);
-    else {
+    else
       j = this.HardWidth;
-    }
-
+    int k;
     if ((this.HardWidth > 0) && (this.Text != null))
     {
       calculateLines();
@@ -385,27 +381,27 @@ public class TextContainer extends Component
     }
     this.TextAscent = (this.TextFontMetrics.getMaxAscent() + this.VerticalLineSpacing);
     this.MaxLineHeight = (this.TextAscent + this.TextFontMetrics.getMaxDescent() + this.TextFontMetrics.getLeading());
-    int l = this.TextAscent * k + this.TextFontMetrics.getMaxDescent() + this.TextFontMetrics.getLeading();
-    this.BurnYOffset = l;
-    this.ActualHeight = l;
+    int m = this.TextAscent * k + this.TextFontMetrics.getMaxDescent() + this.TextFontMetrics.getLeading();
+    this.BurnYOffset = m;
+    this.ActualHeight = m;
 
     if (this.HardHeight < 0)
     {
-      this.ActualHeight = (l += this.Padding.top + this.Padding.bottom);
+      this.ActualHeight = (m += this.Padding.top + this.Padding.bottom);
 
       if (this.BurnLineEffect)
-        this.ActualHeight = (l += this.BurnLineThickness + this.BurnVerticalPadding);
+        this.ActualHeight = (m += this.BurnLineThickness + this.BurnVerticalPadding);
     }
     else
     {
-      l = this.HardHeight;
+      m = this.HardHeight;
 
       this.ScrollStepHeight = (int)Math.floor(this.TextAscent / 5.0F);
 
       this.LinesDisplayable = (int)Math.floor((this.HardHeight - this.Padding.top - this.Padding.bottom) / this.TextAscent);
     }
 
-    super.setSize(j, l);
+    setSize(j, m);
   }
 
   protected void calculateLines()
@@ -417,12 +413,12 @@ public class TextContainer extends Component
     Vector localVector5 = new Vector();
     StringTokenizer localStringTokenizer = new StringTokenizer(this.Text, " \n\t]", true);
     int i = this.HardWidth;
-    if (this.Padding != null)
+    if (this.Padding != null) {
       i -= this.Padding.left + this.Padding.right;
-
+    }
     int j = 0;
     Object localObject = new String();
-    int l = 0;
+    int m = 0;
     while (localStringTokenizer.hasMoreTokens())
     {
       String str = localStringTokenizer.nextToken();
@@ -430,7 +426,7 @@ public class TextContainer extends Component
       if (str.compareTo(" ") == 0)
       {
         localObject = localObject + " ";
-        label583: j += this.TextFontMetrics.charWidth(' ');
+        j += this.TextFontMetrics.charWidth(' ');
       }
       else if (str.compareTo("\n") == 0)
       {
@@ -440,9 +436,9 @@ public class TextContainer extends Component
       }
       else if (str.compareTo("]") == 0)
       {
-        if (l != 0)
+        if (m != 0)
         {
-          l = 0;
+          m = 0;
         }
         else
         {
@@ -452,9 +448,9 @@ public class TextContainer extends Component
       }
       else if (str.compareTo("\t") == 0)
       {
-        l = 1;
+        m = 1;
       }
-      else if (l != 0)
+      else if (m != 0)
       {
         try
         {
@@ -465,15 +461,15 @@ public class TextContainer extends Component
             localVector3.addElement(new Integer(str.substring(1, str.length())));
             break;
           case 'c':
-            i1 = str.indexOf(44) + 1;
-            i2 = str.indexOf(44, i1) + 1;
-            if ((i1 <= 0) || (i2 <= 0))
-              break label583;
-            int i3 = Integer.parseInt(str.substring(1, i1 - 1));
-            int i4 = Integer.parseInt(str.substring(i1, i2 - 1));
-            int i5 = Integer.parseInt(str.substring(i2, str.length()));
+            int n = str.indexOf(',') + 1;
+            int i1 = str.indexOf(',', n) + 1;
+            if ((n <= 0) || (i1 <= 0))
+              continue;
+            int i2 = Integer.parseInt(str.substring(1, n - 1));
+            int i3 = Integer.parseInt(str.substring(n, i1 - 1));
+            int i4 = Integer.parseInt(str.substring(i1, str.length()));
             localVector4.addElement(new Integer(localVector1.size()));
-            localVector5.addElement(new Color(i3, i4, i5));
+            localVector5.addElement(new Color(i2, i3, i4));
 
             break;
           default:
@@ -506,28 +502,28 @@ public class TextContainer extends Component
 
     }
 
-    if (((String)localObject).length() > 0)
+    if (((String)localObject).length() > 0) {
       localVector1.addElement(localObject);
-
+    }
     this.Lines = new String[Math.max(1, localVector1.size())];
     this.LineDelays = new int[this.Lines.length];
     this.LineColors = new Color[this.Lines.length];
 
     if (localVector1.size() < 1)
       this.Lines[0] = "";
-    else
-      for (i1 = 0; i1 < this.Lines.length; ++i1)
-        this.Lines[i1] = ((String)localVector1.elementAt(i1));
-
-
-    for (int i1 = 0; i1 < localVector2.size(); ++i1)
+    else {
+      for (int n = 0; n < this.Lines.length; n++) {
+        this.Lines[n] = ((String)localVector1.elementAt(n));
+      }
+    }
+    for (int n = 0; n < localVector2.size(); n++)
     {
-      this.LineDelays[((Integer)localVector2.elementAt(i1)).intValue()] = ((Integer)localVector3.elementAt(i1)).intValue();
+      this.LineDelays[((Integer)localVector2.elementAt(n)).intValue()] = ((Integer)localVector3.elementAt(n)).intValue();
     }
 
-    for (int i2 = 0; i2 < localVector4.size(); ++i2)
+    for (int i1 = 0; i1 < localVector4.size(); i1++)
     {
-      this.LineColors[((Integer)localVector4.elementAt(i2)).intValue()] = ((Color)localVector5.elementAt(i2));
+      this.LineColors[((Integer)localVector4.elementAt(i1)).intValue()] = ((Color)localVector5.elementAt(i1));
     }
   }
 
@@ -557,7 +553,7 @@ public class TextContainer extends Component
   {
     if ((this.Text != null) && (this.Text.length() > 0))
     {
-      if ((this.BurnLineEffect) && (!(this.StreakEffect)))
+      if ((this.BurnLineEffect) && (!this.StreakEffect))
       {
         startBurn();
       }
@@ -625,7 +621,7 @@ public class TextContainer extends Component
     else {
       if (this.LastStreakedCharacter >= this.Lines[this.CurrentStreakLine].length() + this.StreakLength - 1)
       {
-        if (this.LineDelays[this.CurrentStreakLine] > 0)
+        if (this.LineDelays[this.CurrentStreakLine] > 0) {
           try
           {
             Thread.currentThread(); Thread.sleep(this.LineDelays[this.CurrentStreakLine]);
@@ -634,7 +630,7 @@ public class TextContainer extends Component
           {
             localInterruptedException.printStackTrace();
           }
-
+        }
 
         this.LastStreakedCharacter = (-this.StreakLength);
         i = 1;
@@ -674,13 +670,13 @@ public class TextContainer extends Component
 
       if (this.BurnLineEffect)
         startBurn();
-      else
+      else {
         notifyEffectsComplete();
-
+      }
       return false;
     }
 
-    super.repaint(this.StreakCharacterDelay);
+    repaint(this.StreakCharacterDelay);
 
     return true;
   }
@@ -702,7 +698,7 @@ public class TextContainer extends Component
       return false;
     }
 
-    super.repaint(this.BurnRate);
+    repaint(this.BurnRate);
     return true;
   }
 
@@ -725,8 +721,6 @@ public class TextContainer extends Component
   {
     if ((this.Text != null) && (this.Text.length() > 0))
     {
-      int k;
-      int l;
       paramGraphics.setFont(this.TextFont);
 
       if (this.BackgroundColor != null)
@@ -734,37 +728,36 @@ public class TextContainer extends Component
         paramGraphics.setColor(this.BackgroundColor);
         paramGraphics.fillRect(0, 0, getSize().width - 1, getSize().height - 1);
       }
-
-      if ((this.StreakEffect) && (!(this.StreakComplete)))
+      int m;
+      if ((this.StreakEffect) && (!this.StreakComplete))
       {
         String str1;
-        int i1;
         if (this.HardWidth < 0)
           str1 = this.Text;
-        else
+        else {
           str1 = this.Lines[this.CurrentStreakLine];
-
+        }
         if (this.HardHeight > 0)
         {
           paramGraphics.translate(this.ScrollTranslation.x, this.ScrollTranslation.y);
         }
-
+        int n;
         if (this.CurrentStreakLine > 0)
         {
-          int j = this.TextAscent + this.Padding.top; l = 0;
-          for (i1 = 0; i1 < this.CurrentStreakLine; ++i1)
+          int j = this.TextAscent + this.Padding.top; m = 0;
+          for (n = 0; n < this.CurrentStreakLine; n++)
           {
-            String str2 = this.Lines[i1];
+            String str2 = this.Lines[n];
 
-            if (this.CenterAligned)
-              l = centeringOffset(str2);
-
-            if (this.LineColors[i1] != null)
-              paramGraphics.setColor(this.LineColors[i1]);
-            else
+            if (this.CenterAligned) {
+              m = centeringOffset(str2);
+            }
+            if (this.LineColors[n] != null)
+              paramGraphics.setColor(this.LineColors[n]);
+            else {
               paramGraphics.setColor(this.TextColor);
-
-            paramGraphics.drawString(str2, this.Padding.left + l, j);
+            }
+            paramGraphics.drawString(str2, this.Padding.left + m, j);
             j += this.TextAscent;
           }
 
@@ -775,38 +768,37 @@ public class TextContainer extends Component
           Color localColor1;
           if ((this.LineColors != null) && (this.LineColors[this.CurrentStreakLine] != null))
             paramGraphics.setColor(localColor1 = this.LineColors[this.CurrentStreakLine]);
-          else
+          else {
             paramGraphics.setColor(localColor1 = this.TextColor);
-
-          l = 0;
-          i1 = 0;
+          }
+          m = 0;
+          n = 0;
           if (this.CenterAligned)
-            l = i1 = centeringOffset(str1);
-          int i2 = Math.max(this.LastStreakedCharacter - this.StreakLength + 1, -this.StreakLength);
+            m = n = centeringOffset(str1);
+          int i1 = Math.max(this.LastStreakedCharacter - this.StreakLength + 1, -this.StreakLength);
 
           if (this.LastStreakedCharacter >= this.StreakLength)
           {
-            localObject = str1.substring(0, i2);
-            l += this.TextFontMetrics.stringWidth((String)localObject);
+            String localObject = str1.substring(0, i1);
+            m += this.TextFontMetrics.stringWidth((String)localObject);
 
-            paramGraphics.drawString((String)localObject, this.Padding.left + i1, this.TextAscent * (this.CurrentStreakLine + 1) + this.Padding.top);
+            paramGraphics.drawString((String)localObject, this.Padding.left + n, this.TextAscent * (this.CurrentStreakLine + 1) + this.Padding.top);
           }
 
-          this.LastXOffset = l;
+          this.LastXOffset = m;
 
           Object localObject = localColor1;
           char[] arrayOfChar = new char[1];
-          int i3 = Math.min(i2 + this.StreakLength, str1.length());
-          for (int i4 = i2; i4 < i3; ++i4)
+          int i2 = Math.min(i1 + this.StreakLength, str1.length());
+          for (int i3 = i1; i3 < i2; i3++)
           {
             localObject = streakBright((Color)localObject, this.StreakBrighteningWeight);
-            if (i4 >= 0)
-            {
-              paramGraphics.setColor((Color)localObject);
-              arrayOfChar[0] = str1.charAt(i4);
-              paramGraphics.drawChars(arrayOfChar, 0, 1, this.Padding.left + l, this.TextAscent * (this.CurrentStreakLine + 1) + this.Padding.top);
-              l += this.TextFontMetrics.charsWidth(arrayOfChar, 0, 1);
-            }
+            if (i3 < 0)
+              continue;
+            paramGraphics.setColor((Color)localObject);
+            arrayOfChar[0] = str1.charAt(i3);
+            paramGraphics.drawChars(arrayOfChar, 0, 1, this.Padding.left + m, this.TextAscent * (this.CurrentStreakLine + 1) + this.Padding.top);
+            m += this.TextFontMetrics.charsWidth(arrayOfChar, 0, 1);
           }
         }
         return;
@@ -820,6 +812,7 @@ public class TextContainer extends Component
       }
 
       int i = this.TextAscent + this.Padding.top;
+      int k;
       if (this.HardWidth < 0)
       {
         k = 0;
@@ -829,19 +822,19 @@ public class TextContainer extends Component
       }
       else
       {
-        for (k = 0; k < this.Lines.length; ++k)
+        for (k = 0; k < this.Lines.length; k++)
         {
-          l = 0;
+          m = 0;
 
-          if (this.CenterAligned)
-            l = centeringOffset(this.Lines[k]);
-
+          if (this.CenterAligned) {
+            m = centeringOffset(this.Lines[k]);
+          }
           if (this.LineColors[k] != null)
             paramGraphics.setColor(this.LineColors[k]);
-          else
+          else {
             paramGraphics.setColor(this.TextColor);
-
-          paramGraphics.drawString(this.Lines[k], this.Padding.left + l, i);
+          }
+          paramGraphics.drawString(this.Lines[k], this.Padding.left + m, i);
           i += this.TextAscent;
         }
       }
@@ -849,9 +842,9 @@ public class TextContainer extends Component
       if (this.BurnLineEffect)
       {
         Color localColor2 = this.BurnColor;
-        if (!(this.BurnComplete))
+        if (!this.BurnComplete) {
           localColor2 = streakBright(localColor2, this.BurnBrighteningWeight * (this.BurnSteps - this.BurnStep));
-
+        }
         paramGraphics.setColor(localColor2);
         paramGraphics.fillRect(this.Padding.left, this.BurnYOffset + this.BurnVerticalPadding + this.Padding.top, this.BurnLineLength, this.BurnLineThickness);
       }
@@ -860,12 +853,12 @@ public class TextContainer extends Component
 
   private int centeringOffset(String paramString)
   {
-    return (this.HardWidth / 2 - this.TextFontMetrics.stringWidth(paramString) / 2); }
-
-  public boolean getStreakComplete() { return this.StreakComplete;
+    return this.HardWidth / 2 - this.TextFontMetrics.stringWidth(paramString) / 2;
   }
+  public boolean getStreakComplete() { return this.StreakComplete; }
 
-  public void addImageListener(ImageListener paramImageListener) {
+  public void addImageListener(ImageListener paramImageListener)
+  {
     this.ImageListeners.addElement(paramImageListener);
   }
 
@@ -876,7 +869,7 @@ public class TextContainer extends Component
 
   public void appearanceChanged()
   {
-    for (int i = 0; i < this.ImageListeners.size(); ++i)
+    for (int i = 0; i < this.ImageListeners.size(); i++)
     {
       ImageListener localImageListener = (ImageListener)this.ImageListeners.elementAt(i);
       localImageListener.imageChanged(new ImageEvent(this, 4));
@@ -895,10 +888,11 @@ public class TextContainer extends Component
 
   public void notifyEffectsComplete()
   {
-    for (int i = 0; i < this.ActionListeners.size(); ++i)
+    for (int i = 0; i < this.ActionListeners.size(); i++)
     {
       ActionListener localActionListener = (ActionListener)this.ActionListeners.elementAt(i);
-      localActionListener.actionPerformed(new ActionEvent(this, 1001, "Text Effects Complete")); }
+      localActionListener.actionPerformed(new ActionEvent(this, 1001, "Text Effects Complete"));
+    }
   }
 
   public Dimension getMaximumSize() {
@@ -909,26 +903,24 @@ public class TextContainer extends Component
 
   public Dimension getMinimumSize()
   {
-    int i;
-    int j;
     Dimension localDimension = super.getSize();
-
+    int j;
     if (this.HeightPacked)
     {
-      j = ((this.HardHeight > -1) && (this.HardHeight < this.ActualHeight)) ? this.HardHeight : this.ActualHeight;
+      j = (this.HardHeight > -1) && (this.HardHeight < this.ActualHeight) ? this.HardHeight : this.ActualHeight;
     } else if (this.HardHeight > -1)
       j = this.HardHeight;
     else
       j = localDimension.height;
-
+    int i;
     if (this.WidthPacked)
     {
-      i = ((this.HardWidth > -1) && (this.HardWidth < this.ActualWidth)) ? this.HardWidth : this.ActualWidth;
+      i = (this.HardWidth > -1) && (this.HardWidth < this.ActualWidth) ? this.HardWidth : this.ActualWidth;
     } else if (this.HardWidth > -1)
       i = this.HardWidth;
-    else
+    else {
       i = localDimension.width;
-
+    }
     return new Dimension(i, j);
   }
 }

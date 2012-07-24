@@ -58,9 +58,9 @@ public class OrderedTable extends Dictionary
   {
     int i = this.Keys.indexOf(paramObject);
 
-    if (i == -1)
+    if (i == -1) {
       return null;
-
+    }
     return this.Values.elementAt(i);
   }
 
@@ -73,9 +73,9 @@ public class OrderedTable extends Dictionary
   {
     int i = this.Values.indexOf(paramObject);
 
-    if (i == -1)
+    if (i == -1) {
       return null;
-
+    }
     return this.Keys.elementAt(i);
   }
 
@@ -96,7 +96,7 @@ public class OrderedTable extends Dictionary
 
   public boolean isEmpty()
   {
-    return (this.Keys.size() == 0);
+    return this.Keys.size() == 0;
   }
 
   public Object put(Object paramObject1, Object paramObject2)

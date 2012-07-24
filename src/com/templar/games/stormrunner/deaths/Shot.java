@@ -1,6 +1,5 @@
 package com.templar.games.stormrunner.deaths;
 
-import [Z;
 import com.templar.games.stormrunner.GameApplet;
 import com.templar.games.stormrunner.PhysicalObject;
 import com.templar.games.stormrunner.Position;
@@ -35,15 +34,14 @@ public class Shot extends Death
   {
     if (this.dyingFrame == 0)
     {
-      Object localObject;
       this.explode = new AnimationComponent();
       AnimationComponent[] arrayOfAnimationComponent = new AnimationComponent[1];
       arrayOfAnimationComponent[0] = this.explode;
       Image[] arrayOfImage1 = new Image[23];
-      for (int i = 1; i <= 23; ++i)
+      for (int i = 1; i <= 23; i++)
         arrayOfImage1[(i - 1)] = GameApplet.thisApplet.getImage(
-          "com/templar/games/stormrunner/media/images/robot/Explosion/r_explode_" + 
-          ((java.lang.Integer.toString(i).length() < 2) ? "0" + i : String.valueOf(i)) + ".gif");
+          "com/templar/games/stormrunner/media/images/robot/Explosion/r_explode_" + (
+          Integer.toString(i).length() < 2 ? "0" + i : String.valueOf(i)) + ".gif");
       arrayOfAnimationComponent[0].setCells(arrayOfImage1);
       arrayOfAnimationComponent[0].setSequence(Falling.EXPLOSION_SEQUENCE, null, false);
       arrayOfAnimationComponent[0].reset();
@@ -61,10 +59,11 @@ public class Shot extends Death
       Image[] arrayOfImage2 = new Image[1];
       arrayOfImage2[0] = GameApplet.thisApplet.getImage(
         "com/templar/games/stormrunner/media/images/objects/g_crater.gif");
-      [Z[] arrayOf[Z = { { true } };
+      boolean[][] arrayOfBoolean = { { true } };
       Vector localVector = paramRobot.getEnvironment().getObjectOfTypeAt(
         paramRobot.getPosition(), new Mask().getClass());
       int j = 0;
+      Object localObject;
       if (localVector != null)
       {
         localObject = localVector.elements();
@@ -72,19 +71,19 @@ public class Shot extends Death
         {
           Mask localMask = (Mask)((Enumeration)localObject).nextElement();
 
-          if (localMask.getID().compareTo("crater") == 0)
-          {
-            localMask.setVisible(true);
-            j = 1;
-            break;
-          }
+          if (localMask.getID().compareTo("crater") != 0)
+            continue;
+          localMask.setVisible(true);
+          j = 1;
+          break;
         }
       }
+
       if (j == 0)
       {
         localObject = new Mask(paramRobot.getEnvironment(), 
           new Position(paramRobot.getPosition()), 
-          arrayOfImage2, arrayOf[Z, false);
+          arrayOfImage2, arrayOfBoolean, false);
         ((PhysicalObject)localObject).setLayer("Ground Effects");
         ((PhysicalObject)localObject).setID("crater");
         paramRobot.getEnvironment().addObject((PhysicalObject)localObject);
@@ -95,7 +94,7 @@ public class Shot extends Death
       return;
     }
 
-    if (!(this.explode.nextImage()))
+    if (!this.explode.nextImage())
     {
       paramRobot.setDead(true);
       paramRobot.getEnvironment().getShroud().setVisible(

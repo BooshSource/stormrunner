@@ -26,15 +26,15 @@ public class MapPreview extends Component
   {
     this.mapref = paramScene;
     this.screenSize = paramDimension;
-    this.cache = new Hashtable(); }
-
+    this.cache = new Hashtable();
+  }
   public Dimension getMinimumSize() {
     return this.mySize; } 
   public Dimension getPreferredSize() { return this.mySize; } 
-  public Dimension getMaximumSize() { return this.mySize;
-  }
+  public Dimension getMaximumSize() { return this.mySize; }
 
-  public void setSize(int paramInt1, int paramInt2) {
+  public void setSize(int paramInt1, int paramInt2)
+  {
     this.mySize = new Dimension(paramInt1, paramInt2);
     super.setSize(paramInt1, paramInt2);
   }
@@ -47,7 +47,7 @@ public class MapPreview extends Component
   {
     if (this.dblbuffer == null)
     {
-      this.dblbuffer = super.createImage(super.getSize().width, super.getSize().height);
+      this.dblbuffer = createImage(getSize().width, getSize().height);
     }
   }
 
@@ -66,23 +66,23 @@ public class MapPreview extends Component
   {
     nullCheck();
     Graphics localGraphics = this.dblbuffer.getGraphics();
-    int i = super.getSize().width / 50;
-    int j = super.getSize().height / 50;
+    int i = getSize().width / 50;
+    int j = getSize().height / 50;
 
     Map localMap = this.mapref.getMap();
 
-    for (int k = 0; k < localMap.getSize().width; ++k)
+    for (int k = 0; k < localMap.getSize().width; k++)
     {
-      for (int l = 0; l < localMap.getSize().height; ++l)
+      for (int m = 0; m < localMap.getSize().height; m++)
       {
-        if (this.mapref.getObjectAt(k, l) != null)
+        if (this.mapref.getObjectAt(k, m) != null)
         {
           localGraphics.setColor(new Color(255, 255, 0));
-          localGraphics.fillRect(k * i, l * j, i, j);
+          localGraphics.fillRect(k * i, m * j, i, j);
         }
         else
         {
-          Object localObject = localMap.getCell(k, l).getAppearance();
+          Object localObject = localMap.getCell(k, m).getAppearance();
           if (this.cache.containsKey(localObject)) {
             localObject = (Image)this.cache.get(localObject);
           }
@@ -91,15 +91,15 @@ public class MapPreview extends Component
             this.cache.put(localObject, localImage);
             localObject = localImage;
           }
-          localGraphics.drawImage((Image)localObject, k * i, l * j, null);
+          localGraphics.drawImage((Image)localObject, k * i, m * j, null);
         }
       }
     }
     localGraphics.setColor(new Color(255, 255, 255));
 
     localGraphics.drawRect(this.scrollpos.x * i, this.scrollpos.y * j, 
-      this.screenSize.width / super.getSize().width, 
-      this.screenSize.height / super.getSize().height);
+      this.screenSize.width / getSize().width, 
+      this.screenSize.height / getSize().height);
     paramGraphics.drawImage(this.dblbuffer, 0, 0, null);
     localGraphics.dispose();
   }
@@ -112,7 +112,7 @@ public class MapPreview extends Component
   public void setScrollPosition(Point paramPoint)
   {
     this.scrollpos = paramPoint;
-    super.repaint();
+    repaint();
   }
 
   public void setScrollPosition(Position paramPosition)

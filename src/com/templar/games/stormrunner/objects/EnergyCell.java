@@ -58,14 +58,15 @@ public class EnergyCell extends PhysicalObject
     if (this.value == -1)
     {
       Random localRandom = new Random(System.currentTimeMillis());
-      this.value = (Math.abs(localRandom.nextInt() % 11) + 15); } }
-
+      this.value = (Math.abs(localRandom.nextInt() % 11) + 15);
+    }
+  }
   public int getEnergyUnits() {
     return this.value; } 
-  public boolean isObstructing(Robot paramRobot) { return true;
-  }
+  public boolean isObstructing(Robot paramRobot) { return true; }
 
-  public String toString() {
+  public String toString()
+  {
     return "Energy Cell at " + (int)(this.value / 25.0D * 100.0D) + "% capacity";
   }
 }

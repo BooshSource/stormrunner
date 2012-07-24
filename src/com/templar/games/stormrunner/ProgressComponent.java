@@ -46,15 +46,15 @@ public class ProgressComponent extends SimpleContainer
 
   public void setValue(int paramInt) {
     this.Bar.setValue(paramInt);
-    this.Bar.repaint(); }
-
+    this.Bar.repaint();
+  }
   public int getValue() { return this.Bar.getValue(); } 
   public int getMaximum() { return this.Bar.getMaximum();
   }
 
   public void addNotify()
   {
-    addNotify();
+    super.addNotify();
 
     repaint();
   }

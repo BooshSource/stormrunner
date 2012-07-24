@@ -42,18 +42,18 @@ public class TurnAway extends Instruction
   public boolean verifyRobot(Robot paramRobot)
   {
     Vector localVector = paramRobot.getSensors();
-    int i = 0;
+    boolean b = false;
 
-    for (int j = 0; j < localVector.size(); ++j)
-      if (localVector.elementAt(j) instanceof DirectionalSensor)
-        i = 1;
-
-    return i;
+    for (int j = 0; j < localVector.size(); j++) {
+      if ((localVector.elementAt(j) instanceof DirectionalSensor))
+        b = true;
+    }
+    return b;
   }
 
   public boolean checkContext(Object paramObject)
   {
-    return ((paramObject instanceof Conditional) && (((Conditional)paramObject).getSensor() instanceof DirectionalSensor));
+    return ((paramObject instanceof Conditional)) && ((((Conditional)paramObject).getSensor() instanceof DirectionalSensor));
   }
 
   public void setContext(Object paramObject)
@@ -75,12 +75,11 @@ public class TurnAway extends Instruction
 
   public boolean execute(Robot paramRobot)
   {
-    if (!(this.animating))
+    if (!this.animating)
     {
       int i = this.where.getDirection(paramRobot);
 
-      switch (i)
-      {
+      switch (i) {
       case 0:
         i = 180; break;
       case 180:
@@ -88,13 +87,13 @@ public class TurnAway extends Instruction
       case 90:
         i = 270; break;
       case 270:
-        i = 90;
+        i = 90; break;
       }
       paramRobot.setState(2, i);
     }
     this.animating = TurnInstruction.updateState(paramRobot);
     paramRobot.repaint();
-    return (!(this.animating));
+    return !this.animating;
   }
 
   public void terminate(Robot paramRobot)

@@ -29,20 +29,20 @@ public class GeolabSensor extends DirectionalSensor
   public boolean check(Robot paramRobot)
   {
     this.lastDirection = -1;
-    boolean bool = super.checkRadius(paramRobot, 5, new Salvage().getClass());
+    boolean bool = checkRadius(paramRobot, 5, new Salvage().getClass());
 
     Debug.println("Result: " + bool + "," + this.lastDirection);
-    return bool; }
-
+    return bool;
+  }
   public String getID() {
-    return "GeolabSensor"; }
-
+    return "GeolabSensor";
+  }
   public String getDescription() {
-    return "Geolab Sensor:\n\nPolymetals: 3\nEnergy Units: 6\nSecurity Level: 2\nWeight. 0.05\n\td4000]\n"; }
-
+    return "Geolab Sensor:\n\nPolymetals: 3\nEnergy Units: 6\nSecurity Level: 2\nWeight. 0.05\n\td4000]\n";
+  }
   public String toString() {
     return "Geolab Sensor"; } 
-  public double getWeight() { return 0.050000000000000003D; } 
+  public double getWeight() { return 0.05D; } 
   public int getSalvageCost() { return 3; } 
   public int getEnergyCost() { return 6; } 
   public int getSecurityLevel() { return 2; } 

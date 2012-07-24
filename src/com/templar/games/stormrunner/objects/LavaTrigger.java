@@ -53,8 +53,8 @@ public class LavaTrigger extends PhysicalObject
   public void activate(Robot paramRobot, int paramInt)
   {
     paramRobot.stop();
-    paramRobot.setDeath(new Melted()); }
-
+    paramRobot.setDeath(new Melted());
+  }
   public int activateOnEvent() { return 4;
   }
 }

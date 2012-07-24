@@ -34,35 +34,34 @@ public abstract class SceneBuilder
   public static Scene readScene(ImageRetriever paramImageRetriever, InputStream paramInputStream, ProgressListener paramProgressListener)
     throws IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, StreamCorruptedException, OptionalDataException, InvocationTargetException, MalformedURLException
   {
-    ObjectInputStream localObjectInputStream;
     Scene localScene = new Scene();
-
-    if (paramInputStream instanceof ObjectInputStream)
+    ObjectInputStream localObjectInputStream;
+    if ((paramInputStream instanceof ObjectInputStream))
       localObjectInputStream = (ObjectInputStream)paramInputStream;
-    else
+    else {
       localObjectInputStream = new ObjectInputStream(paramInputStream);
-
+    }
     double d = localObjectInputStream.readDouble();
-    if (d == 0.40000000000000002D)
-      d = 0.29999999999999999D;
-    if (d == 0.29999999999999999D)
+    if (d == 0.4D)
+      d = 0.3D;
+    if (d == 0.3D)
     {
       Debug.println("reading start point");
       localScene.setRobotStart((Point)localObjectInputStream.readObject());
-      d = 0.20000000000000001D;
+      d = 0.2D;
     }
     else
     {
       localScene.setRobotStart(new Point(172, 141));
-      d = 0.20000000000000001D;
+      d = 0.2D;
     }
-    if (d == 0.20000000000000001D)
+    if (d == 0.2D)
     {
       Debug.println("reading layers");
       localScene.setLayers((Vector)localObjectInputStream.readObject());
-      d = 0.10000000000000001D;
+      d = 0.1D;
     }
-    if (d == 0.10000000000000001D)
+    if (d == 0.1D)
     {
       Map localMap = MapBuilder.readMap(paramImageRetriever, localObjectInputStream);
       objectlist = (Vector)localObjectInputStream.readObject();
@@ -130,9 +129,9 @@ public abstract class SceneBuilder
         }
         catch (InvocationTargetException localInvocationTargetException)
         {
-          if (localInvocationTargetException.getTargetException() instanceof ThreadDeath)
+          if ((localInvocationTargetException.getTargetException() instanceof ThreadDeath)) {
             throw ((ThreadDeath)localInvocationTargetException.getTargetException());
-
+          }
           throw localInvocationTargetException;
         }
 

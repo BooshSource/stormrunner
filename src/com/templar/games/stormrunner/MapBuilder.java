@@ -20,63 +20,62 @@ public abstract class MapBuilder
     throws IOException, StreamCorruptedException, ClassNotFoundException
   {
     ObjectInputStream localObjectInputStream;
-    int i;
-    int j;
-    int k;
-    if (paramInputStream instanceof ObjectInputStream)
+    if ((paramInputStream instanceof ObjectInputStream))
       localObjectInputStream = (ObjectInputStream)paramInputStream;
-    else
+    else {
       localObjectInputStream = new ObjectInputStream(paramInputStream);
-
+    }
     double d = localObjectInputStream.readDouble();
 
     Dimension localDimension = (Dimension)localObjectInputStream.readObject();
     Vector localVector1 = (Vector)localObjectInputStream.readObject();
 
     Map localMap = new Map(localDimension);
-
-    if (d == 0.20000000000000001D)
+    int i;
+    int j;
+    int k;
+    if (d == 0.2D)
     {
       Vector localVector2 = (Vector)localObjectInputStream.readObject();
-      for (i = 0; i < localDimension.width; ++i)
-        for (j = 0; j < localDimension.height; ++j)
+      for (i = 0; i < localDimension.width; i++)
+        for (j = 0; j < localDimension.height; j++)
         {
           k = localObjectInputStream.readInt();
-          int l = localObjectInputStream.readInt();
+          int m = localObjectInputStream.readInt();
           boolean bool = localObjectInputStream.readBoolean();
-          int i1 = localObjectInputStream.readInt();
+          int n = localObjectInputStream.readInt();
           if (k == -1)
           {
             Debug.println("Cell at " + i + "," + j + " has no url");
             k = 0;
           }
-          if (i1 == -1)
+          if (n == -1)
           {
             Debug.println("Cell at " + i + "," + j + " has no category");
-            i1 = 0;
+            n = 0;
           }
           localMap.setCell(i, j, 
-            new MapCell(paramImageRetriever, (String)localVector1.elementAt(k), l, bool, 
-            (String)localVector2.elementAt(i1)));
+            new MapCell(paramImageRetriever, (String)localVector1.elementAt(k), m, bool, 
+            (String)localVector2.elementAt(n)));
         }
-      if (!(((String)localObjectInputStream.readObject()).equals("EOF"))) {
+      if (!((String)localObjectInputStream.readObject()).equals("EOF")) {
         System.err.println("MapBuilder Error: End of file marker not found.\n                  Could be wrong version?");
       }
 
     }
-    else if (d == 0.10000000000000001D)
+    else if (d == 0.1D)
     {
-      for (i = 0; i < localDimension.width; ++i)
-        for (j = 0; j < localDimension.height; ++j)
+      for (i = 0; i < localDimension.width; i++) {
+        for (j = 0; j < localDimension.height; j++)
         {
           k = localObjectInputStream.readInt();
           Image localImage = paramImageRetriever.getImage((String)localVector1.elementAt(k));
           localMap.setCell(i, j, new MapCell(localImage, localObjectInputStream.readInt()));
         }
-
-      if (!(((String)localObjectInputStream.readObject()).equals("EOF")))
+      }
+      if (!((String)localObjectInputStream.readObject()).equals("EOF")) {
         System.err.println("MapBuilder Error: End of file marker not found.\n                  Could be wrong version?");
-
+      }
     }
     else
     {
@@ -90,28 +89,28 @@ public abstract class MapBuilder
 
   public static void writeMap(Map paramMap, OutputStream paramOutputStream) throws IOException
   {
-    ObjectOutputStream localObjectOutputStream;
     Dimension localDimension = paramMap.getSize();
-    if (paramOutputStream instanceof ObjectOutput)
+    ObjectOutputStream localObjectOutputStream;
+    if ((paramOutputStream instanceof ObjectOutput))
       localObjectOutputStream = (ObjectOutputStream)paramOutputStream;
     else
       localObjectOutputStream = new ObjectOutputStream(paramOutputStream);
-    localObjectOutputStream.writeDouble(0.20000000000000001D);
+    localObjectOutputStream.writeDouble(0.2D);
     localObjectOutputStream.writeObject(localDimension);
     Vector localVector1 = new Vector(); Vector localVector2 = new Vector();
-    for (int i = 0; i < localDimension.width; ++i)
-      for (j = 0; j < localDimension.height; ++j)
+    for (int i = 0; i < localDimension.width; i++)
+      for (int j = 0; j < localDimension.height; j++)
       {
         MapCell localMapCell1 = paramMap.getCell(i, j);
-        if (!(localVector1.contains(localMapCell1.getFilename())))
+        if (!localVector1.contains(localMapCell1.getFilename()))
           localVector1.addElement(localMapCell1.getFilename());
-        if (!(localVector2.contains(localMapCell1.getCategory())))
+        if (!localVector2.contains(localMapCell1.getCategory()))
           localVector2.addElement(localMapCell1.getCategory());
       }
     localObjectOutputStream.writeObject(localVector1);
     localObjectOutputStream.writeObject(localVector2);
-    for (int j = 0; j < localDimension.width; ++j)
-      for (int k = 0; k < localDimension.height; ++k)
+    for (int j = 0; j < localDimension.width; j++)
+      for (int k = 0; k < localDimension.height; k++)
       {
         MapCell localMapCell2 = paramMap.getCell(j, k);
         localObjectOutputStream.writeInt(localVector1.indexOf(localMapCell2.getFilename()));

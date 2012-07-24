@@ -1,7 +1,10 @@
 package com.templar.games.stormrunner;
 
+//import com.ms.security.PermissionID;
+//import com.ms.security.PolicyEngine;
 import com.templar.games.stormrunner.build.BuildPanel;
 import com.templar.games.stormrunner.build.CargoBay;
+import com.templar.games.stormrunner.objects.Trigger;
 import com.templar.games.stormrunner.program.editor.Editor;
 import com.templar.games.stormrunner.templarutil.Debug;
 import com.templar.games.stormrunner.templarutil.applet.TApplet;
@@ -11,6 +14,7 @@ import com.templar.games.stormrunner.templarutil.audio.NullAudioDevice;
 import com.templar.games.stormrunner.templarutil.audio.SunAudioDevice;
 import com.templar.games.stormrunner.templarutil.gui.ImageComponent;
 import com.templar.games.stormrunner.templarutil.gui.ImageFilenameProvider;
+import com.templar.games.stormrunner.templarutil.gui.ImagePaintListener;
 import com.templar.games.stormrunner.templarutil.gui.MessageDialog;
 import com.templar.games.stormrunner.templarutil.gui.SimpleContainer;
 import com.templar.games.stormrunner.templarutil.util.ImageRetriever;
@@ -32,6 +36,7 @@ import java.awt.Window;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +44,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -51,11 +57,11 @@ import java.util.zip.GZIPOutputStream;
 //import netscape.security.PrivilegeManager;
 
 public class GameApplet extends TApplet
-  implements ImageRetriever, com.templar.games.stormrunner.templarutil.gui.ImagePaintListener, ImageFilenameProvider
+  implements ImageRetriever, ImagePaintListener, ImageFilenameProvider
 {
-  public static final double VERSION = 1.1000000000000001D;
+  public static final double VERSION = 1.1D;
   public static final double SAVE_FORMAT_VERSION = 0.5D;
-  public static final double MINIMUM_SAVE_FORMAT_VERSION = 0.40000000000000002D;
+  public static final double MINIMUM_SAVE_FORMAT_VERSION = 0.4D;
   public static final String NEWGAME_SCENE = "com/templar/games/stormrunner/media/scenes/newgame.pac";
   public static final int IMAGECACHE_DELAY = 20000;
   public static final int BAY_STATE = 0;
@@ -84,7 +90,8 @@ public class GameApplet extends TApplet
   protected int State = 2;
   protected int LastState;
   protected boolean[] StatusMinimized;
-  protected MediaTracker CacheTracker = new MediaTracker(modalComp); ////
+  protected MediaTracker CacheTracker = new MediaTracker(this);
+
   protected Hashtable images = new Hashtable();
   protected Hashtable imageFilename = new Hashtable();
   protected Vector ImageCacheActiveList = new Vector();
@@ -256,9 +263,9 @@ public class GameApplet extends TApplet
     this.optionspanel.setLocation(0, 0);
     if (i != 0)
       this.optionspanel.setEnabled(false);
-    if (j != 0)
+    if (j != 0) {
       this.optionspanel.add(this.progressDialog, 0);
-
+    }
     this.bay = new CargoBay(this);
     this.bay.setLocation(0, 0);
 
@@ -375,7 +382,7 @@ public class GameApplet extends TApplet
         this.FocusFixer.setFocusTarget(this.buildpanel);
       this.buildpanel.requestFocus();
       this.statpanel.setMinimized(this.StatusMinimized[0]);
-      return;
+      break;
     case 1:
       this.ImageCacheActiveList.removeAllElements();
       this.ImageCacheActiveList.addElement("opspanel");
@@ -386,30 +393,31 @@ public class GameApplet extends TApplet
         this.FocusFixer.setFocusTarget(this.CurrentRenderer);
       this.CurrentRenderer.requestFocus();
       this.statpanel.setMinimized(this.StatusMinimized[1]);
-      return;
+      break;
     case 2:
       this.CurrentGameState.stop();
       this.TopLayer.remove(this.statpanel);
       this.TopLayer.remove(this.opspanel);
       this.TopLayer.add(this.OptionsScreen, 0);
-      return;
+      
 
       switch (paramInt)
       {
       case 0:
         this.TopLayer.remove(this.BayScreen);
-        return;
+       break;
       case 1:
         this.TopLayer.remove(this.ViewScreen);
         this.CurrentRenderer.setVisible(false);
-        return;
+       break;
       case 2:
         this.CurrentGameState.start();
         this.TopLayer.remove(this.OptionsScreen);
         this.TopLayer.add(this.statpanel, 0);
         this.TopLayer.add(this.opspanel, 0);
-        return;
+       break;
       }
+      break;
     }
   }
 
@@ -475,25 +483,23 @@ public class GameApplet extends TApplet
     Enumeration localEnumeration = this.images.elements();
     while (localEnumeration.hasMoreElements())
     {
-      String str1;
       ImageTrack localImageTrack = (ImageTrack)localEnumeration.nextElement();
 
       int i = checkImage(localImageTrack.image, this);
-      int j = ((i & 0x20) != 0) ? 1 : 0;
-
-      if ((str1 = (String)this.imageFilename.get(localImageTrack.image)) != null)
-        for (int k = 0; (j != 0) && (k < this.ImageCacheActiveList.size()); ++k)
+      int j = (i & 0x20) != 0 ? 1 : 0;
+      String str1;
+      if ((str1 = (String)this.imageFilename.get(localImageTrack.image)) != null) {
+        for (int k = 0; (j != 0) && (k < this.ImageCacheActiveList.size()); k++)
         {
           String str2 = (String)this.ImageCacheActiveList.elementAt(k);
           if (str1.indexOf(str2) >= 0)
             j = 0;
         }
-
-      if (j != 0)
-      {
-        localImageTrack.time = -1L;
-        localImageTrack.image.flush();
       }
+      if (j == 0)
+        continue;
+      localImageTrack.time = -1L;
+      localImageTrack.image.flush();
     }
 
     System.gc();
@@ -506,27 +512,27 @@ public class GameApplet extends TApplet
     Enumeration localEnumeration = this.images.elements();
     while (localEnumeration.hasMoreElements())
     {
-      String str1;
       ImageTrack localImageTrack = (ImageTrack)localEnumeration.nextElement();
 
       int i = checkImage(localImageTrack.image, this);
 
-      int j = ((i & 0x20) != 0) ? 1 : 0;
-
-      if ((str1 = (String)this.imageFilename.get(localImageTrack.image)) != null)
-        for (int k = 0; (j != 0) && (k < this.ImageCacheActiveList.size()); ++k)
+      int j = (i & 0x20) != 0 ? 1 : 0;
+      String str1;
+      if ((str1 = (String)this.imageFilename.get(localImageTrack.image)) != null) {
+        for (int k = 0; (j != 0) && (k < this.ImageCacheActiveList.size()); k++)
         {
           String str2 = (String)this.ImageCacheActiveList.elementAt(k);
           if (str1.indexOf(str2) >= 0)
             j = 0;
         }
-
-      if ((localImageTrack.time != -1L) && (j != 0) && (localImageTrack.time + 20000L < l))
+      }
+      if ((localImageTrack.time == -1L) || (j == 0) || (localImageTrack.time + 20000L >= l))
       {
-        localImageTrack.time = -1L;
-        localImageTrack.image.flush();
+        continue;
       }
 
+      localImageTrack.time = -1L;
+      localImageTrack.image.flush();
     }
 
     Runtime.getRuntime().gc();
@@ -544,7 +550,7 @@ public class GameApplet extends TApplet
     Object localObject1 = this.images.get(paramString);
     if (localObject1 != null)
     {
-      localObject2 = (ImageTrack)localObject1;
+     ImageTrack localObject2 = (ImageTrack)localObject1;
 
       return ((ImageTrack)localObject2).image;
     }
@@ -556,11 +562,11 @@ public class GameApplet extends TApplet
     }
     else
     {
-      ImageTrack localImageTrack = new ImageTrack(this, (Image)localObject2);
+      ImageTrack localImageTrack = new ImageTrack((Image)localObject2);
       this.images.put(paramString, localImageTrack);
       this.imageFilename.put(localObject2, paramString);
     }
-    return ((Image)localObject2);
+    return (Image)localObject2;
   }
 
   public Image getImage(String paramString)
@@ -572,7 +578,7 @@ public class GameApplet extends TApplet
 
   public String getImageFilename(Image paramImage)
   {
-    return ((String)this.imageFilename.get(paramImage));
+    return (String)this.imageFilename.get(paramImage);
   }
 
   public void imagePainted(ImageComponent paramImageComponent, Image paramImage)
@@ -582,227 +588,113 @@ public class GameApplet extends TApplet
 
   public void hitCache(Image paramImage)
   {
-    hitCache(paramImage, null); } 
-  // ERROR //
-  ////
-  public synchronized void hitCache(Image paramImage, ImageComponent paramImageComponent) { // Byte code:
-    //   0: aload_1
-    //   1: ifnonnull +9 -> 10
-    //   4: ldc 67
-    //   6: invokestatic 394	com/templar/games/stormrunner/templarutil/Debug:println	(Ljava/lang/String;)V
-    //   9: return
-    //   10: aload_0
-    //   11: getfield 373	com/templar/games/stormrunner/GameApplet:imageFilename	Ljava/util/Hashtable;
-    //   14: aload_1
-    //   15: invokevirtual 342	java/util/Hashtable:get	(Ljava/lang/Object;)Ljava/lang/Object;
-    //   18: astore_3
-    //   19: aload_3
-    //   20: ifnull +441 -> 461
-    //   23: aload_3
-    //   24: checkcast 238	java/lang/String
-    //   27: astore 4
-    //   29: aload_0
-    //   30: getfield 374	com/templar/games/stormrunner/GameApplet:images	Ljava/util/Hashtable;
-    //   33: aload 4
-    //   35: invokevirtual 342	java/util/Hashtable:get	(Ljava/lang/Object;)Ljava/lang/Object;
-    //   38: checkcast 180	com/templar/games/stormrunner/GameApplet$ImageTrack
-    //   41: astore 5
-    //   43: aload 5
-    //   45: ifnonnull +36 -> 81
-    //   48: ldc 105
-    //   50: invokestatic 394	com/templar/games/stormrunner/templarutil/Debug:println	(Ljava/lang/String;)V
-    //   53: new 239	java/lang/StringBuffer
-    //   56: dup
-    //   57: aload 4
-    //   59: invokestatic 444	java/lang/String:valueOf	(Ljava/lang/Object;)Ljava/lang/String;
-    //   62: invokespecial 288	java/lang/StringBuffer:<init>	(Ljava/lang/String;)V
-    //   65: ldc 22
-    //   67: invokevirtual 321	java/lang/StringBuffer:append	(Ljava/lang/String;)Ljava/lang/StringBuffer;
-    //   70: aload 5
-    //   72: invokevirtual 320	java/lang/StringBuffer:append	(Ljava/lang/Object;)Ljava/lang/StringBuffer;
-    //   75: invokevirtual 441	java/lang/StringBuffer:toString	()Ljava/lang/String;
-    //   78: invokestatic 394	com/templar/games/stormrunner/templarutil/Debug:println	(Ljava/lang/String;)V
-    //   81: aload_2
-    //   82: ifnull +279 -> 361
-    //   85: aload_2
-    //   86: astore 6
-    //   88: aload 6
-    //   90: monitorenter
-    //   91: aload 5
-    //   93: getfield 439	com/templar/games/stormrunner/GameApplet$ImageTrack:time	J
-    //   96: ldc2_w 449
-    //   99: lcmp
-    //   100: ifne +251 -> 351
-    //   103: aload_0
-    //   104: aload 5
-    //   106: getfield 372	com/templar/games/stormrunner/GameApplet$ImageTrack:image	Ljava/awt/Image;
-    //   109: aload_2
-    //   110: invokevirtual 390	java/awt/Component:prepareImage	(Ljava/awt/Image;Ljava/awt/image/ImageObserver;)Z
-    //   113: pop
-    //   114: iconst_0
-    //   115: istore 8
-    //   117: aload_0
-    //   118: aload 5
-    //   120: getfield 372	com/templar/games/stormrunner/GameApplet$ImageTrack:image	Ljava/awt/Image;
-    //   123: aload_2
-    //   124: invokevirtual 329	java/awt/Component:checkImage	(Ljava/awt/Image;Ljava/awt/image/ImageObserver;)I
-    //   127: istore 9
-    //   129: goto +192 -> 321
-    //   132: iload 8
-    //   134: iconst_2
-    //   135: if_icmple +164 -> 299
-    //   138: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   141: ldc 74
-    //   143: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   146: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   149: aload 4
-    //   151: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   154: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   157: ldc 62
-    //   159: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   162: iload 9
-    //   164: sipush 128
-    //   167: iand
-    //   168: ifeq +11 -> 179
-    //   171: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   174: ldc 8
-    //   176: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   179: iload 9
-    //   181: bipush 64
-    //   183: iand
-    //   184: ifeq +11 -> 195
-    //   187: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   190: ldc 10
-    //   192: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   195: iload 9
-    //   197: bipush 32
-    //   199: iand
-    //   200: ifeq +11 -> 211
-    //   203: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   206: ldc 9
-    //   208: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   211: iload 9
-    //   213: bipush 16
-    //   215: iand
-    //   216: ifeq +11 -> 227
-    //   219: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   222: ldc 11
-    //   224: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   227: iload 9
-    //   229: bipush 8
-    //   231: iand
-    //   232: ifeq +11 -> 243
-    //   235: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   238: ldc 14
-    //   240: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   243: iload 9
-    //   245: iconst_2
-    //   246: iand
-    //   247: ifeq +11 -> 258
-    //   250: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   253: ldc 12
-    //   255: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   258: iload 9
-    //   260: iconst_1
-    //   261: iand
-    //   262: ifeq +11 -> 273
-    //   265: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   268: ldc 15
-    //   270: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   273: iload 9
-    //   275: iconst_4
-    //   276: iand
-    //   277: ifeq +11 -> 288
-    //   280: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   283: ldc 13
-    //   285: invokevirtual 391	java/io/PrintStream:print	(Ljava/lang/String;)V
-    //   288: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   291: ldc 1
-    //   293: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   296: goto +55 -> 351
-    //   299: iinc 8 1
-    //   302: aload_2
-    //   303: ldc2_w 459
-    //   306: invokevirtual 445	java/lang/Object:wait	(J)V
-    //   309: aload_0
-    //   310: aload 5
-    //   312: getfield 372	com/templar/games/stormrunner/GameApplet$ImageTrack:image	Ljava/awt/Image;
-    //   315: aload_2
-    //   316: invokevirtual 329	java/awt/Component:checkImage	(Ljava/awt/Image;Ljava/awt/image/ImageObserver;)I
-    //   319: istore 9
-    //   321: iload 9
-    //   323: sipush 240
-    //   326: iand
-    //   327: ifeq -195 -> 132
-    //   330: goto +21 -> 351
-    //   333: astore 10
-    //   335: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   338: ldc 94
-    //   340: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   343: aload 10
-    //   345: invokevirtual 392	java/lang/Throwable:printStackTrace	()V
-    //   348: goto +3 -> 351
-    //   351: aload 6
-    //   353: monitorexit
-    //   354: goto +55 -> 409
-    //   357: aload 6
-    //   359: monitorexit
-    //   360: athrow
-    //   361: aload_0
-    //   362: getfield 294	com/templar/games/stormrunner/GameApplet:CacheTracker	Ljava/awt/MediaTracker;
-    //   365: aload 5
-    //   367: getfield 372	com/templar/games/stormrunner/GameApplet$ImageTrack:image	Ljava/awt/Image;
-    //   370: iconst_0
-    //   371: invokevirtual 317	java/awt/MediaTracker:addImage	(Ljava/awt/Image;I)V
-    //   374: aload_0
-    //   375: getfield 294	com/templar/games/stormrunner/GameApplet:CacheTracker	Ljava/awt/MediaTracker;
-    //   378: iconst_0
-    //   379: ldc2_w 459
-    //   382: invokevirtual 446	java/awt/MediaTracker:waitForID	(IJ)Z
-    //   385: pop
-    //   386: goto +10 -> 396
-    //   389: astore 6
-    //   391: aload 6
-    //   393: invokevirtual 392	java/lang/Throwable:printStackTrace	()V
-    //   396: aload_0
-    //   397: getfield 294	com/templar/games/stormrunner/GameApplet:CacheTracker	Ljava/awt/MediaTracker;
-    //   400: aload 5
-    //   402: getfield 372	com/templar/games/stormrunner/GameApplet$ImageTrack:image	Ljava/awt/Image;
-    //   405: iconst_0
-    //   406: invokevirtual 402	java/awt/MediaTracker:removeImage	(Ljava/awt/Image;I)V
-    //   409: aload 5
-    //   411: invokestatic 331	java/lang/System:currentTimeMillis	()J
-    //   414: putfield 439	com/templar/games/stormrunner/GameApplet$ImageTrack:time	J
-    //   417: return
-    //   418: astore_3
-    //   419: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   422: ldc 16
-    //   424: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   427: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   430: ldc 16
-    //   432: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   435: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   438: ldc 7
-    //   440: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   443: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   446: ldc 16
-    //   448: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   451: getstatic 385	java/lang/System:out	Ljava/io/PrintStream;
-    //   454: ldc 16
-    //   456: invokevirtual 395	java/io/PrintStream:println	(Ljava/lang/String;)V
-    //   459: aload_3
-    //   460: athrow
-    //   461: return
-    //
-    // Exception table:
-    //   from	to	target	type
-    //   114	330	333	java/lang/InterruptedException
-    //   91	351	357	finally
-    //   374	386	389	java/lang/InterruptedException
-    //   10	417	418	java/lang/OutOfMemoryError } 
-  protected void setupBuffer() { this.buffer = createImage(getSize().width, getSize().height);
-    this.graphics = this.buffer.getGraphics(); }
+    hitCache(paramImage, null);
+  }
 
+  public synchronized void hitCache(Image paramImage, ImageComponent paramImageComponent)
+  {
+    if (paramImage == null)
+    {
+      Debug.println("Image passed to hitCache is null");
+      return;
+    }
+
+    try
+    {
+      Object localObject = this.imageFilename.get(paramImage);
+      if (localObject != null)
+      {
+        String str = (String)localObject;
+        ImageTrack localImageTrack = (ImageTrack)this.images.get(str);
+        if (localImageTrack == null)
+        {
+          Debug.println("There's a null entry in the ImageCache.");
+          Debug.println(str + "==" + localImageTrack);
+        }
+
+        if (paramImageComponent != null)
+        {
+          synchronized (paramImageComponent)
+          {
+            if (localImageTrack.time == -1L)
+            {
+              prepareImage(localImageTrack.image, paramImageComponent);
+              try
+              {
+                int i = 0;
+                int j = checkImage(localImageTrack.image, paramImageComponent);
+                while ((j & 0xF0) == 0)
+                {
+                  if (i > 2)
+                  {
+                    System.out.println("Potential deadlock waiting for Image:");
+                    System.out.println(str);
+                    System.out.print("Flags: ");
+                    if ((j & 0x80) != 0) System.out.print(" ABORT ");
+                    if ((j & 0x40) != 0) System.out.print(" ERROR ");
+                    if ((j & 0x20) != 0) System.out.print(" ALLBITS ");
+                    if ((j & 0x10) != 0) System.out.print(" FRAMEBITS ");
+                    if ((j & 0x8) != 0) System.out.print(" SOMEBITS ");
+                    if ((j & 0x2) != 0) System.out.print(" HEIGHT ");
+                    if ((j & 0x1) != 0) System.out.print(" WIDTH ");
+                    if ((j & 0x4) != 0) System.out.print(" PROPERTIES ");
+                    System.out.println("");
+                    break;
+                  }
+
+                  i++;
+
+                  paramImageComponent.wait(1000L);
+
+                  j = checkImage(localImageTrack.image, paramImageComponent);
+                }
+              }
+              catch (InterruptedException localInterruptedException2)
+              {
+                System.out.println("Someday I'd like to meet the kind of thread that interrupts this sort of thing.");
+                localInterruptedException2.printStackTrace();
+              }
+
+            }
+
+          }
+
+        }
+
+        this.CacheTracker.addImage(localImageTrack.image, 0);
+        try
+        {
+          this.CacheTracker.waitForID(0, 1000L);
+        }
+        catch (InterruptedException localInterruptedException1)
+        {
+          localInterruptedException1.printStackTrace();
+        }
+        this.CacheTracker.removeImage(localImageTrack.image, 0);
+
+        localImageTrack.time = System.currentTimeMillis();
+
+        return;
+      }
+
+    }
+    catch (OutOfMemoryError localOutOfMemoryError)
+    {
+      System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+      System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+      System.out.println("           OOME Exception caught in hitcache!");
+      System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+      System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+
+      throw localOutOfMemoryError;
+    }
+  }
+
+  protected void setupBuffer()
+  {
+    this.buffer = createImage(getSize().width, getSize().height);
+    this.graphics = this.buffer.getGraphics();
+  }
   public Object getPaintLock() {
     return this.PaintLock;
   }
@@ -826,7 +718,7 @@ public class GameApplet extends TApplet
       }
 
       this.graphics.setClip(paramGraphics.getClip());
-      paint(this.graphics);
+      super.paint(this.graphics);
       paramGraphics.drawImage(this.buffer, 0, 0, null);
 
       getToolkit().sync();
@@ -849,7 +741,7 @@ public class GameApplet extends TApplet
 
   public void unMute()
   {
-    if (!(this.wasMuted))
+    if (!this.wasMuted)
       audio.unMute(); 
   }
 
@@ -897,7 +789,7 @@ public class GameApplet extends TApplet
 
       BufferedInputStream localBufferedInputStream = new BufferedInputStream(new MonitoredInputStream(
         new ByteArrayInputStream(arrayOfByte), this.progressDialog));
-      Loader localLoader = new Loader(this, this, localBufferedInputStream);
+      Loader localLoader = new Loader(this, localBufferedInputStream);
       UtilityThread localUtilityThread = new UtilityThread(0, localLoader, localLoader.getClass().getMethod("newgame", null), false);
       localUtilityThread.start();
       Debug.println(localUtilityThread);
@@ -913,7 +805,7 @@ public class GameApplet extends TApplet
 
   public void saveGame()
   {
-    if (!(this.playing))
+    if (!this.playing)
     {
       Debug.println("Can't save if you're not playing.");
       audio.play("ButtonError");
@@ -922,14 +814,14 @@ public class GameApplet extends TApplet
 
     try
     {
-     // PrivilegeManager.enablePrivilege("UniversalFileAccess");
-     // PrivilegeManager.enablePrivilege("UniversalPropertyRead");
+      //PrivilegeManager.enablePrivilege("UniversalFileAccess");
+      //PrivilegeManager.enablePrivilege("UniversalPropertyRead");
       //PolicyEngine.assertPermission(PermissionID.FILEIO);
     }
     //catch (ForbiddenTargetException localForbiddenTargetException)
     //{
-     // System.err.println("Stormrunner: saveGame(): User clicked Deny.");
-     // return;
+    //  System.err.println("Stormrunner: saveGame(): User clicked Deny.");
+    //  return;
     //}
     catch (Exception localException1)
     {
@@ -947,9 +839,9 @@ public class GameApplet extends TApplet
     Frame localFrame = null;
     Object localObject = this;
 
-    while ((localObject != null) && (!(localObject instanceof Frame)))
+    while ((localObject != null) && (!(localObject instanceof Frame))) {
       localObject = ((Component)localObject).getParent();
-
+    }
     if (localObject == null)
     {
       Debug.println("cant find a frame");
@@ -979,7 +871,7 @@ public class GameApplet extends TApplet
         new GZIPOutputStream(
         new FileOutputStream(localFile))));
 
-      Loader localLoader = new Loader(this, this, localObjectOutputStream, this.CurrentGameState.getTickCount(), this.savegameWindow.getDescription());
+      Loader localLoader = new Loader(this, localObjectOutputStream, this.CurrentGameState.getTickCount(), this.savegameWindow.getDescription());
       localLoader.activate();
     }
     catch (Exception localException2)
@@ -992,8 +884,7 @@ public class GameApplet extends TApplet
 
     try
     {
-      ////
-    	//PrivilegeManager.revertPrivilege("UniversalFileAccess");
+      //PrivilegeManager.revertPrivilege("UniversalFileAccess");
       //PrivilegeManager.revertPrivilege("UniversalPropertyRead");
       //PolicyEngine.revertPermission(PermissionID.FILEIO);
     }
@@ -1010,15 +901,14 @@ public class GameApplet extends TApplet
   {
     try
     {
-////
-    //	PrivilegeManager.enablePrivilege("UniversalFileAccess");
-      //PrivilegeManager.enablePrivilege("UniversalPropertyRead");
-      //PolicyEngine.assertPermission(PermissionID.FILEIO);
-    }
-    catch (SystemException e)//ForbiddenTargetException localForbiddenTargetException)
-    {
-      System.err.println("Stormrunner: loadGame(): User clicked Deny.");
-      return;
+     // PrivilegeManager.enablePrivilege("UniversalFileAccess");
+     // PrivilegeManager.enablePrivilege("UniversalPropertyRead");
+     // PolicyEngine.assertPermission(PermissionID.FILEIO);
+    //}
+    //catch (ForbiddenTargetException localForbiddenTargetException)
+    //{
+     // System.err.println("Stormrunner: loadGame(): User clicked Deny.");
+     // return;
     }
     catch (Exception localException1)
     {
@@ -1038,9 +928,9 @@ public class GameApplet extends TApplet
     localFrame = (Frame)localObject;
     if (this.savegameWindow == null)
       this.savegameWindow = new LoadSaveFrame(localFrame, 0);
-    else
+    else {
       this.savegameWindow.toFront();
-
+    }
     File localFile = this.savegameWindow.getResponse();
     if (localFile == null)
     {
@@ -1065,7 +955,7 @@ public class GameApplet extends TApplet
         new MonitoredInputStream(
         new FileInputStream(localFile), this.progressDialog))));
 
-      localLoader = new Loader(this, this, localObjectInputStream);
+      localLoader = new Loader(this, localObjectInputStream);
       new UtilityThread(0, localLoader, localLoader.getClass().getMethod("activate", null), false).start();
     }
     catch (Exception localException2)
@@ -1086,11 +976,10 @@ public class GameApplet extends TApplet
 
     try
     {
-     ////
-    	//PrivilegeManager.revertPrivilege("UniversalFileAccess");
+     // PrivilegeManager.revertPrivilege("UniversalFileAccess");
       //PrivilegeManager.revertPrivilege("UniversalPropertyRead");
-      //PolicyEngine.revertPermission(PermissionID.FILEIO);
-    }
+     // PolicyEngine.revertPermission(PermissionID.FILEIO);
+   }
     catch (Exception localException3)
     {
       System.err.println("Stormrunner: Sanity check: failure during revertPrivilege following load.");
@@ -1105,41 +994,265 @@ public class GameApplet extends TApplet
     return this.VersionOfCurrentSavegame;
   }
 
-  static UtilityThread access$0(GameApplet paramGameApplet)
-  {
-    return paramGameApplet.cacheThread;
-  }
-  
-  
-  
-  
   class ImageTrack
   {
-    private final GameApplet this$0;
     public Image image;
     public long time;
 
-    public ImageTrack(GameApplet paramGameApplet, Image paramImage)
+    public ImageTrack(Image arg2)
     {
-      this.this$0 = paramGameApplet;
-
-      this.this$0 = 
-        paramGameApplet;
-
-      this.image = paramImage;
+      this.image = arg2;
       this.time = -1L;
     }
 
     public String toString() {
       StringBuffer localStringBuffer = new StringBuffer("ImageTrack[");
-      if (this.this$0.imageFilename.containsKey(this.image))
-        localStringBuffer.append(this.this$0.imageFilename.get(this.image));
+      if (GameApplet.this.imageFilename.containsKey(this.image))
+        localStringBuffer.append(GameApplet.this.imageFilename.get(this.image));
       else
         localStringBuffer.append("null");
       localStringBuffer.append(",");
       localStringBuffer.append(this.time);
       localStringBuffer.append("]");
       return localStringBuffer.toString();
+    }
+  }
+
+  public class Loader
+  {
+    int which;
+    InputStream inp;
+    OutputStream out;
+    GameApplet applet;
+    long tick;
+    String desc;
+
+    public Loader(GameApplet paramInputStream, InputStream arg3)
+    {
+      this.inp = arg3;
+      this.applet = paramInputStream;
+      this.which = 1;
+    }
+
+    public Loader(GameApplet paramOutputStream, OutputStream paramLong, long arg4, String arg6)
+    {////
+      this.out = paramLong;
+      this.which = 0;
+      this.applet = paramOutputStream;
+      this.desc = arg6;
+      this.tick = arg4;
+    }
+
+    public boolean newgame()
+    {
+      Scene localScene = null;
+      try
+      {
+        localScene = SceneBuilder.readScene(this.applet, this.inp, GameApplet.this.progressDialog);
+      }
+      catch (Exception localException)
+      {
+        localException.printStackTrace();
+      }
+      GameState localGameState = new GameState(this.applet);
+      World localWorld = new World();
+      localWorld.addScene(localScene);
+      Debug.println("adding scene to empty world");
+      localGameState.setWorld(localWorld);
+      Debug.println("adding 2048 here");
+      GameApplet.this.progressDialog.notifyProgress(25000);
+
+      if (GameApplet.this.CurrentGameState != null)
+      {
+        GameApplet.this.CurrentGameState.dispose();
+
+        GameApplet.this.CurrentGameState = null;
+      }
+      this.applet.removeAll();
+      GameApplet.this.CurrentGrid = null;
+      GameApplet.this.statpanel = null;
+      GameApplet.this.CurrentRenderer = null;
+      GameApplet.this.CurrentEditor = null;
+      GameApplet.this.opspanel = null;
+      GameApplet.this.bay.clearRamp();
+      GameApplet.this.bay = null;
+      GameApplet.this.buildpanel = null;
+      System.gc();
+      GameApplet.this.cacheThread.politeStop();
+
+      GameApplet.this.startup(localGameState);
+      GameApplet.this.progressDialog.setValue(GameApplet.this.progressDialog.getMaximum());
+
+      String str = GameApplet.this.getParameter("username");
+      if (str == null)
+        localGameState.setUsername("Unknown");
+      else {
+        localGameState.setUsername(str);
+      }
+      localGameState.setUserRank("Maint. Spec. 5th Class");
+
+      if (GameApplet.this.getParameter("cheats") == null)
+      {
+        localGameState.setSecurityLevel(1);
+        localGameState.setPolymetals(80);
+        localGameState.setEnergyUnits(80);
+      }
+      else
+      {
+        localGameState.setSecurityLevel(5);
+        localGameState.setPolymetals(999);
+        localGameState.setEnergyUnits(999);
+      }
+
+      GameApplet.this.setState(0);
+
+      GameApplet.this.playing = true;
+      GameApplet.this.optionspanel.setEnabled(true);
+      GameApplet.this.optionspanel.remove(GameApplet.this.progressDialog);
+      GameApplet.this.progressDialog = null;
+      return false;
+    }
+
+    public boolean activate()
+    {
+      String str = null;
+      try
+      {
+        Object localObject;
+        if (this.which == 0)
+        {
+          str = "Error saving game! Contact bugs@legomindstorm.com for assistance.";
+
+          localObject = new ByteArrayOutputStream();
+          ObjectOutputStream localObjectOutputStream;
+          if (!(this.out instanceof ObjectOutputStream))
+            localObjectOutputStream = new ObjectOutputStream((OutputStream)localObject);
+          else {
+            localObjectOutputStream = (ObjectOutputStream)this.out;
+          }
+          localObjectOutputStream.writeDouble(0.5D);
+          localObjectOutputStream.writeDouble(1.1D);
+          localObjectOutputStream.writeObject(this.desc);
+          localObjectOutputStream.writeLong(this.tick);
+          localObjectOutputStream.writeObject(GameApplet.this.CurrentGameState);
+          localObjectOutputStream.writeInt(GameApplet.this.statpanel.getPanelState());
+          localObjectOutputStream.writeInt(GameApplet.this.LastState);
+          localObjectOutputStream.close();
+        }
+        else
+        {
+          str = "Error loading game! Contact bugs@legomindstorm.com for assistance.";
+
+          if (!(this.inp instanceof ObjectInputStream))
+            localObject = new ObjectInputStream(this.inp);
+          else {
+            localObject = (ObjectInputStream)this.inp;
+          }
+
+          double d = ((ObjectInputStream)localObject).readDouble();
+
+          if (d < 0.4D)
+          {
+            failout("That save file doesn't work with this version of the game.", "Save file version (" + d + ") < MINIMUM_SAVE_FORMAT_VERSION (" + 0.4D + ")\nUnable to load.", null);
+            return false;
+          }
+
+          GameApplet.this.VersionOfCurrentSavegame = ((ObjectInputStream)localObject).readDouble();
+          ((ObjectInputStream)localObject).readObject();
+          this.tick = ((ObjectInputStream)localObject).readLong();
+          GameState localGameState = (GameState)((ObjectInputStream)localObject).readObject();
+          ((ObjectInputStream)localObject).readInt();
+          int i = ((ObjectInputStream)localObject).readInt();
+          ((ObjectInputStream)localObject).close();
+
+          localGameState.setTickCount(this.tick);
+
+          if (GameApplet.this.CurrentGameState != null) {
+            GameApplet.this.CurrentGameState.dispose();
+          }
+          GameApplet.this.CurrentGameState = null;
+          GameApplet.this.CurrentRenderer = null;
+
+          GameApplet.thisApplet.removeAll();
+
+          GameApplet.this.CurrentGrid = null;
+          GameApplet.this.statpanel = null;
+          GameApplet.this.CurrentEditor = null;
+          GameApplet.this.opspanel = null;
+          GameApplet.this.bay.clearRamp();
+          GameApplet.this.bay = null;
+          GameApplet.this.buildpanel = null;
+          System.gc();
+          GameApplet.this.cacheThread.politeStop();
+
+          GameApplet.this.progressDialog.notifyProgress(4096);
+
+          GameApplet.this.startup(localGameState);
+
+          GameApplet.this.buildpanel.setUsername(localGameState.getUsername());
+          GameApplet.this.buildpanel.setUserRank(localGameState.getUserRank());
+          GameApplet.this.buildpanel.setSecurityLevel(localGameState.getSecurityLevel());
+          GameApplet.this.buildpanel.setPolymetals(localGameState.getPolymetals());
+          GameApplet.this.buildpanel.setEnergyUnits(localGameState.getEnergyUnits());
+
+          Enumeration localEnumeration = localGameState.getCurrentScene().getObjects().elements();
+          while (localEnumeration.hasMoreElements())
+          {
+            PhysicalObject localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
+            if ((localPhysicalObject instanceof Trigger)) {
+              ((Trigger)localPhysicalObject).setGameState(localGameState);
+            }
+          }
+          GameApplet.this.progressDialog.notifyProgress(2048);
+
+          GameApplet.this.statpanel.reportNewCurrentRobot(GameApplet.this.CurrentGameState.getCurrentRobot());
+
+          GameApplet.this.CurrentEditor.setRobot(GameApplet.this.CurrentGameState.getCurrentRobot());
+
+          this.applet.setState(i);
+
+          GameApplet.this.playing = true;
+
+          GameApplet.this.progressDialog.notifyProgress(2048);
+          GameApplet.this.optionspanel.remove(GameApplet.this.progressDialog);
+          GameApplet.this.progressDialog = null;
+          GameApplet.this.optionspanel.setEnabled(true);
+        }
+      }
+      catch (Exception localException)
+      {
+        failout(str, str, localException);
+      }
+
+      return false;
+    }
+
+    public void failout(String paramString1, String paramString2, Throwable paramThrowable)
+    {
+      System.err.println(paramString2);
+      if (paramThrowable != null) {
+        paramThrowable.printStackTrace();
+      }
+
+      Frame localFrame = null;
+      Object localObject = GameApplet.thisApplet;
+      while ((localObject != null) && (!(localObject instanceof Frame)))
+        localObject = ((Component)localObject).getParent();
+      if (localObject == null)
+      {
+        System.err.println("Stormrunner: Loader: failout(): Cant find a frame!");
+        return;
+      }
+      localFrame = (Frame)localObject;
+      new MessageDialog(localFrame, "Error!", paramString1, "Abort");
+
+      if (GameApplet.this.progressDialog != null)
+      {
+        GameApplet.this.optionspanel.remove(GameApplet.this.progressDialog);
+        GameApplet.this.progressDialog = null;
+      }
+      GameApplet.this.optionspanel.setEnabled(true);
+      GameApplet.this.optionspanel.repaint();
     }
   }
 }

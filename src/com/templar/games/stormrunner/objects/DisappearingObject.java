@@ -47,27 +47,28 @@ public class DisappearingObject extends PhysicalObject
   }
 
   public void activate(Robot paramRobot, int paramInt) {
-    Vector[][] arrayOfVector = super.getEnvironment().getObjectMap();
+    Vector[][] arrayOfVector = getEnvironment().getObjectMap();
     boolean bool = true;
-    int i = this.location.x; for (int j = 0; j < this.shape.length; )
+    int i = this.location.x; for (int j = 0; j < this.shape.length; j++)
     {
-      int k = this.location.y; for (int l = 0; l < this.shape[0].length; )
+      int k = this.location.y; for (int m = 0; m < this.shape[0].length; m++)
       {
-        if ((this.shape[j][l] == this) && 
-          (arrayOfVector[i][k] != null))
+        if (this.shape[j][m] == this)
         {
-          Enumeration localEnumeration = arrayOfVector[i][k].elements();
-          while (localEnumeration.hasMoreElements())
+          if (arrayOfVector[i][k] != null)
           {
-            if (localEnumeration.nextElement() instanceof Robot)
+            Enumeration localEnumeration = arrayOfVector[i][k].elements();
+            while (localEnumeration.hasMoreElements())
             {
+              if (!(localEnumeration.nextElement() instanceof Robot))
+                continue;
               bool = false;
             }
           }
         }
-        ++k; ++l;
+        k++;
       }
-      ++i; ++j;
+      i++;
     }
 
     setVisible(bool);

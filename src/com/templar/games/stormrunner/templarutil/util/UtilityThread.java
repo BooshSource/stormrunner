@@ -13,6 +13,7 @@ public class UtilityThread extends Thread
   protected boolean InclusiveDelay = false;
   protected long StartTime;
   protected boolean InitialDelay = false;
+
   protected boolean Stopped = false;
 
   public UtilityThread(int paramInt, Object paramObject, Method paramMethod, boolean paramBoolean)
@@ -50,76 +51,76 @@ public class UtilityThread extends Thread
       try {
         Thread.sleep(this.Delay);
       }
-      catch (InterruptedException localInterruptedException2)
-      {
+      catch (InterruptedException localInterruptedException2) {
       }
-    if (this.Stopped) return;
+    while (true) {
+      if (this.Stopped) return;
 
-    try
-    {
-      this.StartTime = System.currentTimeMillis();
-
-      localBoolean = (Boolean)this.TargetMethod.invoke(this.Target, null);
-    }
-    catch (IllegalAccessException localIllegalAccessException)
-    {
-      localIllegalAccessException.printStackTrace();
-      return;
-    }
-    catch (IllegalArgumentException localIllegalArgumentException)
-    {
-      localIllegalArgumentException.printStackTrace();
-      return;
-    }
-    catch (InvocationTargetException localInvocationTargetException)
-    {
-      if (localInvocationTargetException.getTargetException() instanceof ThreadDeath)
+      try
       {
-        throw ((ThreadDeath)localInvocationTargetException.getTargetException());
+        this.StartTime = System.currentTimeMillis();
+
+        localBoolean = (Boolean)this.TargetMethod.invoke(this.Target, null);
       }
+      catch (IllegalAccessException localIllegalAccessException)
+      {
+        localIllegalAccessException.printStackTrace();
+        return;
+      }
+      catch (IllegalArgumentException localIllegalArgumentException)
+      {
+        localIllegalArgumentException.printStackTrace();
+        return;
+      }
+      catch (InvocationTargetException localInvocationTargetException)
+      {
+        if ((localInvocationTargetException.getTargetException() instanceof ThreadDeath))
+        {
+          throw ((ThreadDeath)localInvocationTargetException.getTargetException());
+        }
 
-      System.out.println(localInvocationTargetException);
-      localInvocationTargetException.getTargetException().printStackTrace();
+        System.out.println(localInvocationTargetException);
+        localInvocationTargetException.getTargetException().printStackTrace();
 
-      return;
-    }
-    catch (ClassCastException localClassCastException)
-    {
-      localClassCastException.printStackTrace();
-      System.err.println("All methods called by UtilityThread must return a boolean!");
-      return;
-    }
-
-    if (this.Stopped) return;
-
-    if (localBoolean.booleanValue())
-    {
-      Thread.yield();
+        return;
+      }
+      catch (ClassCastException localClassCastException)
+      {
+        localClassCastException.printStackTrace();
+        System.err.println("All methods called by UtilityThread must return a boolean!");
+        return;
+      }
 
       if (this.Stopped) return;
-    }
-    try
-    {
-      do {
-        int i;
-        if (this.InclusiveDelay)
-          i = this.Delay - (int)(System.currentTimeMillis() - this.StartTime);
-        else
-          i = this.Delay;
 
-        if (i > 0)
-          Thread.sleep(i);
-      }
-      while (!(this.Stopped)); return;
-    }
-    catch (InterruptedException localInterruptedException1)
-    {
-      while (true) {
-        localInterruptedException1.printStackTrace();
+      if (localBoolean.booleanValue())
+      {
+        Thread.yield();
+
+        if (this.Stopped) return;
+        try
+        {
+          int i;
+          if (this.InclusiveDelay)
+            i = this.Delay - (int)(System.currentTimeMillis() - this.StartTime);
+          else {
+            i = this.Delay;
+          }
+          if (i > 0) {
+            Thread.sleep(i);
+          }
+          if (this.Stopped) return;
+
+        }
+        catch (InterruptedException localInterruptedException1)
+        {
+          localInterruptedException1.printStackTrace();
+        }
+        continue;
       }
 
-      if (!(this.SuspendOnFalse)) return;
-      super.suspend();
+      if (!this.SuspendOnFalse) break;
+      suspend();
     }
   }
 }

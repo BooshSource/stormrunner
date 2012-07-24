@@ -13,7 +13,7 @@ public class Redirector extends Applet
 
   public void start()
   {
-    String str = super.getParameter("URL");
+    String str = getParameter("URL");
     if (str == null) {
       System.err.println("Redirector: Unable to redirect - no URL specified.");
 
@@ -22,7 +22,7 @@ public class Redirector extends Applet
 
     try
     {
-      super.getAppletContext().showDocument(new URL(str));
+      getAppletContext().showDocument(new URL(str));
 
       return;
     }

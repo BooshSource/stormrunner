@@ -53,15 +53,15 @@ public class Datalog_2 extends Datalog
       Vector localVector = this.state.getSpecialProgramParts();
       Enumeration localEnumeration = localVector.elements();
       while (localEnumeration.hasMoreElements())
-        if (localEnumeration.nextElement() instanceof Launch)
+        if ((localEnumeration.nextElement() instanceof Launch))
           return;
       localVector.addElement(new Launch());
     }
   }
 
   public void setGameState(GameState paramGameState) {
-    this.state = paramGameState; }
-
+    this.state = paramGameState;
+  }
   public String toString() { return "Datalog 2";
   }
 }

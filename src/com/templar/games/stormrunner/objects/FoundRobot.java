@@ -52,8 +52,8 @@ public class FoundRobot extends Actor
     this.parts = ((String[])paramObjectInput.readObject());
     Vector localVector = (Vector)paramObjectInput.readObject();
     ImageComponent[] arrayOfImageComponent = new ImageComponent[localVector.size()];
-    for (int i = 0; i < localVector.size(); ++i)
-      if (localVector.elementAt(i) instanceof AnimationComponent)
+    for (int i = 0; i < localVector.size(); i++)
+      if ((localVector.elementAt(i) instanceof AnimationComponent))
         arrayOfImageComponent[i] = ((ImageComponent)localVector.elementAt(i));
       else
         arrayOfImageComponent[i] = new ImageComponent(GameApplet.thisApplet, 
@@ -73,8 +73,8 @@ public class FoundRobot extends Actor
     paramObjectOutput.writeObject(this.parts);
     Vector localVector = new Vector();
     ImageComponent[] arrayOfImageComponent = getImageComponents();
-    for (int i = 0; i < arrayOfImageComponent.length; ++i)
-      if (arrayOfImageComponent[i] instanceof AnimationComponent)
+    for (int i = 0; i < arrayOfImageComponent.length; i++)
+      if ((arrayOfImageComponent[i] instanceof AnimationComponent))
         localVector.addElement(arrayOfImageComponent[i]);
       else
         localVector.addElement(GameApplet.thisApplet.getImageFilename(arrayOfImageComponent[i].getImage()));
@@ -114,41 +114,51 @@ public class FoundRobot extends Actor
     this.clearAnimations = null;
     this.parts = new String[1];
     this.whichAnimation = -1;
-    this.active = false; }
-
+    this.active = false;
+  }
   public int activateOnEvent() { return 16; } 
   public void setGameState(GameState paramGameState) { this.state = paramGameState; }
 
   public void activate(Robot paramRobot, int paramInt) {
     if (this.clearAnimations != null)
     {
-      if (this.clear) return;
+      if (!this.clear)
+      {
+        this.whichAnimation += 1;
+        if (this.whichAnimation < this.clearAnimations.length)
+        {
+          ImageComponent[] arrayOfImageComponent = getImageComponents();
 
-      this.whichAnimation += 1;
-      if (this.whichAnimation >= this.clearAnimations.length) return;
+          arrayOfImageComponent[0] = this.clearAnimations[this.whichAnimation];
 
-      ImageComponent[] arrayOfImageComponent = getImageComponents();
+          setImages(arrayOfImageComponent);
+          this.active = true;
+          if (this.whichAnimation == this.clearAnimations.length - 1) {
+            this.clear = true;
 
-      arrayOfImageComponent[0] = this.clearAnimations[this.whichAnimation];
+            return;
+          }
 
-      setImages(arrayOfImageComponent);
-      this.active = true;
-      if (this.whichAnimation != this.clearAnimations.length - 1) return;
-      this.clear = true;
+        }
 
-      return;
+      }
+
     }
-
-    this.clear = true;
+    else
+    {
+      this.clear = true;
+    }
   }
 
   public void tick() {
-    if ((this.active) && 
-      (!(this.clearAnimations[this.whichAnimation].nextImage())))
+    if (this.active)
     {
-      this.active = false;
-      if (this.whichAnimation == this.clearAnimations.length - 1)
-        this.clear = true;
+      if (!this.clearAnimations[this.whichAnimation].nextImage())
+      {
+        this.active = false;
+        if (this.whichAnimation == this.clearAnimations.length - 1)
+          this.clear = true;
+      }
     }
   }
 
@@ -167,15 +177,15 @@ public class FoundRobot extends Actor
           localRobot.setChassis((Chassis)Class.forName("com.templar.games.stormrunner.chassis." + this.chassis).newInstance());
           localRobot.setName(this.newName);
           Debug.println(this.parts);
-          for (int i = 0; i < this.parts.length; ++i)
-            if (this.parts[i] != null)
-            {
-              Class localClass = Class.forName("com.templar.games.stormrunner." + this.parts[i]);
-              if (this.parts[i].startsWith("sensor."))
-                localRobot.addSensor((Sensor)localClass.newInstance());
-              else
-                localRobot.addAssembly((Assembly)localClass.newInstance());
-            }
+          for (int i = 0; i < this.parts.length; i++) {
+            if (this.parts[i] == null)
+              continue;
+            Class localClass = Class.forName("com.templar.games.stormrunner." + this.parts[i]);
+            if (this.parts[i].startsWith("sensor."))
+              localRobot.addSensor((Sensor)localClass.newInstance());
+            else
+              localRobot.addAssembly((Assembly)localClass.newInstance());
+          }
           this.state.activateRobot(localRobot, localPosition.getMapPoint());
           localRobot.setOrientation(this.initialOrientation);
           localRobot.getEnvironment().getRenderer().setOffsetToCenter(localPosition.getMapPoint());

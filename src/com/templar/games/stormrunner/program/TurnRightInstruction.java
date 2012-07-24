@@ -37,7 +37,7 @@ public class TurnRightInstruction extends Instruction
 
   public boolean execute(Robot paramRobot)
   {
-    if (!(this.animating))
+    if (!this.animating)
     {
       int i = paramRobot.getOrientation();
       i += 90;
@@ -47,7 +47,7 @@ public class TurnRightInstruction extends Instruction
     }
     this.animating = TurnInstruction.updateState(paramRobot);
     paramRobot.repaint();
-    return (!(this.animating));
+    return !this.animating;
   }
 
   public static String getDescription() {
@@ -56,11 +56,11 @@ public class TurnRightInstruction extends Instruction
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)
   {
-    return false; }
-
+    return false;
+  }
   public boolean boundaryCheck(Robot paramRobot) {
-    return false; }
-
+    return false;
+  }
   public void terminate(Robot paramRobot) {
     this.animating = false;
     paramRobot.setState(0, -1);

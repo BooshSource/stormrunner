@@ -56,13 +56,13 @@ public class RepeatForever extends Instruction
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)
   {
-    return false; }
-
-  public boolean boundaryCheck(Robot paramRobot) { return false; }
-
-  public void terminate(Robot paramRobot) { }
-
-  public Instruction loopPeek() { return this.destination;
+    return false;
+  }
+  public boolean boundaryCheck(Robot paramRobot) { return false; } 
+  public void terminate(Robot paramRobot) {
+  }
+  public Instruction loopPeek() {
+    return this.destination;
   }
 
   public Instruction loop() {

@@ -28,8 +28,7 @@ public class ShipDoor extends Actor
   boolean down = false;
   boolean falling = false;
 
-  public void readExternal(ObjectInput paramObjectInput)
-    throws ClassNotFoundException, IOException
+  public void readExternal(ObjectInput paramObjectInput) throws ClassNotFoundException, IOException
   {
     super.readExternal(paramObjectInput);
     this.dest = ((AnimationComponent[])paramObjectInput.readObject());
@@ -69,12 +68,12 @@ public class ShipDoor extends Actor
   }
 
   public void activate(Robot paramRobot, int paramInt) {
-    if ((!(this.down)) && (!(this.falling)))
+    if ((!this.down) && (!this.falling))
     {
       GameApplet localGameApplet = GameApplet.thisApplet;
       Image[] arrayOfImage = new Image[8];
       int[] arrayOfInt = new int[8];
-      for (int i = 0; i < 8; ++i)
+      for (int i = 0; i < 8; i++)
       {
         arrayOfImage[i] = localGameApplet.getImage("com/templar/games/stormrunner/media/images/spaceships/decatur/decatur_door_0" + i + ".gif");
         arrayOfInt[i] = i;
@@ -91,13 +90,13 @@ public class ShipDoor extends Actor
     if (this.falling)
     {
       this.falling = this.dest[0].nextImage();
-      if (!(this.falling))
+      if (!this.falling)
         this.down = true;
     }
   }
 
   public boolean isObstructing(Robot paramRobot) {
-    return (!(this.down));
+    return !this.down;
   }
 
   public void setGameState(GameState paramGameState)

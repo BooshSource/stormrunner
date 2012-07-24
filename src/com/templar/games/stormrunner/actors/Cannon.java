@@ -1,6 +1,5 @@
 package com.templar.games.stormrunner.actors;
 
-import [Z;
 import com.templar.games.stormrunner.Actor;
 import com.templar.games.stormrunner.GameApplet;
 import com.templar.games.stormrunner.PhysicalObject;
@@ -51,6 +50,7 @@ public class Cannon extends Actor
     120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 
     120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 
     120, 120, 120, 120, 120, 120, 120, 120, 120, 120 };
+
   protected static Hashtable cannonImages = new Hashtable();
   transient Image[] missImages;
   static final int[] missSequence = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -122,12 +122,12 @@ public class Cannon extends Actor
       while (localEnumeration.hasMoreElements())
       {
         PhysicalObject localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
-        if (localPhysicalObject instanceof CannonTrigger)
-        {
-          Debug.println("Cannon connecting to " + localPhysicalObject);
-          ((CannonTrigger)localPhysicalObject).setCannon(this);
-        }
+        if (!(localPhysicalObject instanceof CannonTrigger))
+          continue;
+        Debug.println("Cannon connecting to " + localPhysicalObject);
+        ((CannonTrigger)localPhysicalObject).setCannon(this);
       }
+
       this.cannon = new AnimationComponent();
       this.orientation = 210;
       this.destOrientation = 210;
@@ -145,7 +145,7 @@ public class Cannon extends Actor
     }
     else {
       arrayOfImage = new Image[4];
-      for (int i = 0; i < 4; ++i)
+      for (int i = 0; i < 4; i++)
       {
         arrayOfImage[i] = GameApplet.thisApplet.getImage(
           "com/templar/games/stormrunner/media/images/objects/cannon/g_cannon_" + 
@@ -168,7 +168,7 @@ public class Cannon extends Actor
 
     paramRobot.playSound("Robot-Angry");
 
-    if (!(this.active))
+    if (!this.active)
     {
       Point localPoint1 = getPosition().getMapPoint();
       localPoint1.translate(1, 1);
@@ -178,9 +178,9 @@ public class Cannon extends Actor
       Debug.println(localPoint2);
       int i = (int)Math.rint(Math.atan2(-localPoint2.y, localPoint2.x) * 57.295779513082323D);
 
-      if (i < 0)
+      if (i < 0) {
         i = 360 + i;
-
+      }
       Debug.println("angle: " + i + ", distance: " + this.distance);
       i %= 180;
 
@@ -192,7 +192,7 @@ public class Cannon extends Actor
       if (this.missImages == null)
       {
         this.missImages = new Image[9];
-        for (int j = 0; j < 9; ++j)
+        for (int j = 0; j < 9; j++)
           this.missImages[j] = GameApplet.thisApplet.getImage(
             "com/templar/games/stormrunner/media/images/objects/cannon_miss/g_miss_0" + (j + 1) + ".gif");
       }
@@ -222,185 +222,188 @@ public class Cannon extends Actor
       int i = this.destOrientation - this.orientation;
       if (i == 0)
       {
-        Object localObject3;
         Debug.println("Lined up and shooting");
 
         stopSoundThroughRobots("CannonScan");
 
-        if (!(this.z))
+        if (!this.z)
           playSoundThroughRobots("CannonFire");
         this.z = true;
-        if (this.cannon.nextImage()) { return;
-        }
+        if (!this.cannon.nextImage())
+        {
+          Debug.println("Done shooting");
 
-        Debug.println("Done shooting");
-
-        boolean bool = true;
-        Class localClass = new Robot().getClass();
-        Object localObject1 = null;
-        Vector localVector = getEnvironment().getObjectOfTypeAt(this.shootPos, localClass);
-        Debug.println(this.shootPos + ":");
-        if (localVector != null)
-        {
-          Debug.println(String.valueOf(localVector.size()));
-          localObject2 = (Robot)localVector.elementAt(0);
-          Debug.println(((Robot)localObject2).getName() + ":" + ((PhysicalObject)localObject2).getPosition());
-          if ((Math.abs(((PhysicalObject)localObject2).getPosition().dx) < 25) || 
-            (Math.abs(((PhysicalObject)localObject2).getPosition().dy) < 25))
-          {
-            bool = false;
-            localObject1 = localObject2;
-          }
-        }
-        Object localObject2 = new Point(this.shootPos.x - 1, this.shootPos.y);
-        Debug.println("---\n" + bool + "," + localObject2 + ":");
-        localVector = getEnvironment().getObjectOfTypeAt((Point)localObject2, localClass);
-        if ((localVector != null) && (bool))
-        {
-          Debug.println(String.valueOf(localVector.size()));
-          localObject3 = (Robot)localVector.elementAt(0);
-          Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
-          if (((PhysicalObject)localObject3).getPosition().dx > 25)
-          {
-            bool = false;
-            localObject1 = localObject3;
-          }
-        }
-        localObject2 = new Point(this.shootPos.x + 1, this.shootPos.y);
-        Debug.println("---\n" + bool + "," + localObject2 + ":");
-        localVector = getEnvironment().getObjectOfTypeAt((Point)localObject2, localClass);
-        if ((localVector != null) && (bool))
-        {
-          Debug.println(String.valueOf(localVector.size()));
-          localObject3 = (Robot)localVector.elementAt(0);
-          Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
-          if (((PhysicalObject)localObject3).getPosition().dx > -25)
-          {
-            bool = false;
-            localObject1 = localObject3;
-          }
-        }
-        localObject2 = new Point(this.shootPos.x + 1, this.shootPos.y);
-        Debug.println("---\n" + bool + "," + localObject2 + ":");
-        localVector = getEnvironment().getObjectOfTypeAt(this.shootPos.x, this.shootPos.y - 1, localClass);
-        if ((localVector != null) && (bool))
-        {
-          Debug.println(String.valueOf(localVector.size()));
-          localObject3 = (Robot)localVector.elementAt(0);
-          Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
-          if (((PhysicalObject)localObject3).getPosition().dy > -25)
-          {
-            bool = false;
-            localObject1 = localObject3;
-          }
-        }
-        localObject2 = new Point(this.shootPos.x + 1, this.shootPos.y);
-        Debug.println("---\n" + bool + "," + localObject2 + ":");
-        localVector = getEnvironment().getObjectOfTypeAt(this.shootPos.x, this.shootPos.y + 1, localClass);
-        if ((localVector != null) && (bool))
-        {
-          Debug.println(String.valueOf(localVector.size()));
-          localObject3 = (Robot)localVector.elementAt(0);
-          Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
-          if (((PhysicalObject)localObject3).getPosition().dy > -25)
-          {
-            bool = false;
-            localObject1 = localObject3;
-          }
-        }
-        if (bool)
-        {
-          Object localObject4;
-          Debug.println("Cannon missed.");
-
-          if (this.misses.containsKey(this.shootPos))
-          {
-            ((Mask)this.misses.get(this.shootPos)).setVisible(true);
-          }
-          else
-            Debug.println("hashtable does not contain " + this.shootPos);
-          playSoundThroughRobots("CannonMiss");
-
-          localObject3 = { 
-            GameApplet.thisApplet.getImage(
-            "com/templar/games/stormrunner/media/images/objects/g_crater.gif") };
-
-          [Z[] arrayOf[Z = { { true } }; int j = 0;
-          localVector = getEnvironment().getObjectOfTypeAt(this.shootPos, new Mask().getClass());
+          boolean bool = true;
+          Class localClass = new Robot().getClass();
+          Robot localObject1 = null;
+          Vector localVector = getEnvironment().getObjectOfTypeAt(this.shootPos, localClass);
+          Debug.println(this.shootPos + ":");
           if (localVector != null)
           {
-            localObject4 = localVector.elements();
-            while (((Enumeration)localObject4).hasMoreElements())
+            Debug.println(String.valueOf(localVector.size()));
+            Robot localObject2 = (Robot)localVector.elementAt(0);
+            Debug.println(((Robot)localObject2).getName() + ":" + ((PhysicalObject)localObject2).getPosition());
+            if ((Math.abs(((PhysicalObject)localObject2).getPosition().dx) < 25) || 
+              (Math.abs(((PhysicalObject)localObject2).getPosition().dy) < 25))
             {
-              Mask localMask = (Mask)((Enumeration)localObject4).nextElement();
-              Debug.println(localMask);
-              if (localMask.getID().compareTo("crater") == 0)
+              bool = false;
+              localObject1 = localObject2;
+            }
+          }
+          Object localObject2 = new Point(this.shootPos.x - 1, this.shootPos.y);
+          Debug.println("---\n" + bool + "," + localObject2 + ":");
+          localVector = getEnvironment().getObjectOfTypeAt((Point)localObject2, localClass);
+          Robot localObject3=null;
+          if ((localVector != null) && (bool))
+          {
+            Debug.println(String.valueOf(localVector.size()));
+            localObject3 = (Robot)localVector.elementAt(0);
+            Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
+            if (((PhysicalObject)localObject3).getPosition().dx > 25)
+            {
+              bool = false;
+              localObject1 = localObject3;
+            }
+          }
+          localObject2 = new Point(this.shootPos.x + 1, this.shootPos.y);
+          Debug.println("---\n" + bool + "," + localObject2 + ":");
+          localVector = getEnvironment().getObjectOfTypeAt((Point)localObject2, localClass);
+          if ((localVector != null) && (bool))
+          {
+            Debug.println(String.valueOf(localVector.size()));
+            localObject3 = (Robot)localVector.elementAt(0);
+            Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
+            if (((PhysicalObject)localObject3).getPosition().dx > -25)
+            {
+              bool = false;
+              localObject1 = localObject3;
+            }
+          }
+          localObject2 = new Point(this.shootPos.x + 1, this.shootPos.y);
+          Debug.println("---\n" + bool + "," + localObject2 + ":");
+          localVector = getEnvironment().getObjectOfTypeAt(this.shootPos.x, this.shootPos.y - 1, localClass);
+          if ((localVector != null) && (bool))
+          {
+            Debug.println(String.valueOf(localVector.size()));
+            localObject3 = (Robot)localVector.elementAt(0);
+            Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
+            if (((PhysicalObject)localObject3).getPosition().dy > -25)
+            {
+              bool = false;
+              localObject1 = localObject3;
+            }
+          }
+          localObject2 = new Point(this.shootPos.x + 1, this.shootPos.y);
+          Debug.println("---\n" + bool + "," + localObject2 + ":");
+          localVector = getEnvironment().getObjectOfTypeAt(this.shootPos.x, this.shootPos.y + 1, localClass);
+          if ((localVector != null) && (bool))
+          {
+            Debug.println(String.valueOf(localVector.size()));
+            localObject3 = (Robot)localVector.elementAt(0);
+            Debug.println(((Robot)localObject3).getName() + ":" + ((PhysicalObject)localObject3).getPosition());
+            if (((PhysicalObject)localObject3).getPosition().dy > -25)
+            {
+              bool = false;
+              localObject1 = localObject3;
+            }
+          }
+          if (bool)
+          {
+            Debug.println("Cannon missed.");
+
+            if (this.misses.containsKey(this.shootPos))
+            {
+              ((Mask)this.misses.get(this.shootPos)).setVisible(true);
+            }
+            else
+              Debug.println("hashtable does not contain " + this.shootPos);
+            playSoundThroughRobots("CannonMiss");
+
+            Image[] localImages = new Image[] { 
+              GameApplet.thisApplet.getImage(
+              "com/templar/games/stormrunner/media/images/objects/g_crater.gif") };
+
+            boolean[][] arrayOfBoolean = { { true } }; int j = 0;
+            localVector = getEnvironment().getObjectOfTypeAt(this.shootPos, new Mask().getClass());
+            Object localObject4;
+            if (localVector != null)
+            {
+              localObject4 = localVector.elements();
+              while (((Enumeration)localObject4).hasMoreElements())
               {
+                Mask localMask = (Mask)((Enumeration)localObject4).nextElement();
+                Debug.println(localMask);
+                if (localMask.getID().compareTo("crater") != 0)
+                  continue;
                 j = 1;
                 break;
               }
             }
-          }
-          if (j == 0)
-          {
-            Debug.println("placing crater");
-            localObject4 = new Mask(getEnvironment(), 
-              new Position(this.shootPos), 
-              localObject3, arrayOf[Z, false);
-            ((PhysicalObject)localObject4).setPosition(new Position(this.shootPos));
-            ((PhysicalObject)localObject4).setID("crater");
-            ((PhysicalObject)localObject4).setLayer("Ground Effects");
-            getEnvironment().addObject((PhysicalObject)localObject4);
-            getEnvironment().getRenderer().repaint();
-          }
-          this.misses.remove(this.shootPos);
-        }
-        else
-        {
-          Debug.println("Cannon hit " + localObject1.getName());
-          playSoundThroughRobots("CannonHit");
-          localObject1.setDeath(new Shot());
-          if (this.misses.containsKey(this.shootPos))
-          {
-            localObject3 = (Mask)this.misses.get(this.shootPos);
+
+            if (j == 0)
+            {
+              Debug.println("placing crater");
+              localObject4 = new Mask(getEnvironment(), 
+                new Position(this.shootPos), 
+                localImages, arrayOfBoolean, false);
+              ((PhysicalObject)localObject4).setPosition(new Position(this.shootPos));
+              ((PhysicalObject)localObject4).setID("crater");
+              ((PhysicalObject)localObject4).setLayer("Ground Effects");
+              getEnvironment().addObject((PhysicalObject)localObject4);
+              getEnvironment().getRenderer().repaint();
+            }
             this.misses.remove(this.shootPos);
-            ((PhysicalObject)localObject3).getEnvironment().removeObject((PhysicalObject)localObject3);
           }
+          else
+          {
+            Debug.println("Cannon hit " + localObject1.getName());
+            playSoundThroughRobots("CannonHit");
+            localObject1.setDeath(new Shot());
+            if (this.misses.containsKey(this.shootPos))
+            {////
+              Object lo3 = this.misses.get(this.shootPos);
+              this.misses.remove(this.shootPos);
+              ((PhysicalObject)localObject3).getEnvironment().removeObject((PhysicalObject)lo3);
+            }
+          }
+          this.active = false;
+          this.z = false;
+          this.cannon.reset();
+
+          this.RobotsWereShootingAt.removeAllElements();
+
+          return;
         }
-        this.active = false;
-        this.z = false;
-        this.cannon.reset();
 
-        this.RobotsWereShootingAt.removeAllElements();
-
-        return;
       }
-
-      loopSoundThroughRobots("CannonScan");
-
-      Debug.println("Cannon turning");
-      if (i > 0)
-        this.orientation += 30;
       else
-        this.orientation -= 30;
-      updateAppearance(new Integer(this.orientation));
+      {
+        loopSoundThroughRobots("CannonScan");
+
+        Debug.println("Cannon turning");
+        if (i > 0)
+          this.orientation += 30;
+        else
+          this.orientation -= 30;
+        updateAppearance(new Integer(this.orientation));
+      }
     }
   }
 
   private void loopSoundThroughRobots(String paramString)
   {
-    for (int i = 0; i < this.RobotsWereShootingAt.size(); ++i)
+    for (int i = 0; i < this.RobotsWereShootingAt.size(); i++)
     {
       Robot localRobot = (Robot)this.RobotsWereShootingAt.elementAt(i);
 
       Vector localVector = localRobot.getLoopList();
       int j = 0;
-      for (int k = 0; (k < localVector.size()) && (j == 0); ++k)
+      for (int k = 0; (k < localVector.size()) && (j == 0); k++)
       {
-        if (localVector.elementAt(k).equals(paramString))
+        if (localVector.elementAt(k).equals(paramString)) {
           j = 1;
+        }
       }
-
       if (j == 0)
         localRobot.loopSound(paramString);
     }
@@ -408,7 +411,7 @@ public class Cannon extends Actor
 
   private void playSoundThroughRobots(String paramString)
   {
-    for (int i = 0; i < this.RobotsWereShootingAt.size(); ++i)
+    for (int i = 0; i < this.RobotsWereShootingAt.size(); i++)
     {
       Robot localRobot = (Robot)this.RobotsWereShootingAt.elementAt(i);
       localRobot.playSound(paramString);
@@ -417,7 +420,7 @@ public class Cannon extends Actor
 
   private void stopSoundThroughRobots(String paramString)
   {
-    for (int i = 0; i < this.RobotsWereShootingAt.size(); ++i)
+    for (int i = 0; i < this.RobotsWereShootingAt.size(); i++)
     {
       Robot localRobot = (Robot)this.RobotsWereShootingAt.elementAt(i);
       localRobot.stopSound(paramString);

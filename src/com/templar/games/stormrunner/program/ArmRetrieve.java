@@ -41,7 +41,6 @@ public class ArmRetrieve extends Instruction
 
   public boolean execute(Robot paramRobot)
   {
-    Object localObject;
     this.ArmAnimator = paramRobot.getAnimationComponent("GrabberArm");
     this.Arm = ((GrabberArm)paramRobot.getAssembly("GrabberArm"));
 
@@ -56,7 +55,7 @@ public class ArmRetrieve extends Instruction
     {
       return true;
     }
-
+    Object localObject;
     switch (this.state)
     {
     case 0:
@@ -95,7 +94,7 @@ public class ArmRetrieve extends Instruction
       return true;
     case 1:
       this.RearAnimator.nextImage();
-      if (!(this.ArmAnimator.nextImage()))
+      if (!this.ArmAnimator.nextImage())
       {
         this.ArmAnimator.setSequence(this.Arm.getAnimationSequence(4), null, false);
         try
@@ -115,7 +114,7 @@ public class ArmRetrieve extends Instruction
       return false;
     case 2:
       this.RearAnimator.nextImage();
-      if (!(this.ArmAnimator.nextImage()))
+      if (!this.ArmAnimator.nextImage())
         this.state += 1;
       return false;
     case 3:
@@ -141,7 +140,7 @@ public class ArmRetrieve extends Instruction
 
   public boolean verifyRobot(Robot paramRobot)
   {
-    return ((paramRobot.getAssembly("GrabberArm") != null) && (paramRobot.getAssembly(1) != null));
+    return (paramRobot.getAssembly("GrabberArm") != null) && (paramRobot.getAssembly(1) != null);
   }
 
   public boolean boundaryCheck(Robot paramRobot)

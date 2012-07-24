@@ -16,6 +16,8 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Enumeration;
 
 public class LoadMenu extends Container
@@ -55,7 +57,7 @@ public class LoadMenu extends Container
 
     this.editor.setInternalFocus(this);
 
-    this.kh = new KeyHandler(this);
+    this.kh = new KeyHandler();
     addKeyListener(this.kh);
 
     this.TextDark = Editor.TEXTDARKCOLOR;
@@ -99,7 +101,7 @@ public class LoadMenu extends Container
     this.Delete.setActionCommand("Delete");
     this.Delete.addActionListener(this);
 
-    super.add(localTextContainer);
+    add(localTextContainer);
     try
     {
       UtilityThread localUtilityThread = new UtilityThread(200, this, getClass().getMethod("displayStep", null), false);
@@ -138,9 +140,9 @@ public class LoadMenu extends Container
 
     this.FileList.repaint();
 
-    if ((this.Response != null) && (this.Response.getParent() != null))
-      super.remove(this.Response);
-
+    if ((this.Response != null) && (this.Response.getParent() != null)) {
+      remove(this.Response);
+    }
     if (this.Load.getParent() == null)
     {
       this.DisplayStep = 1;
@@ -161,28 +163,26 @@ public class LoadMenu extends Container
 
   public synchronized void actionPerformed(ActionEvent paramActionEvent)
   {
-    Object localObject;
-    OrderedTable localOrderedTable;
     if (paramActionEvent.getActionCommand().compareTo("Cancel") == 0)
     {
       remove();
 
       return;
     }
-
+    Object localObject;
+    OrderedTable localOrderedTable;
     if (paramActionEvent.getActionCommand().compareTo("Load") == 0)
     {
       localObject = this.FileList.getSelection();
-      if (localObject == null) { return;
-      }
-
+      if (localObject == null)
+        return;
       localOrderedTable = this.editor.getGameState().getProgramLibrary();
 
       boolean bool = this.editor.load(((Program)localOrderedTable.get(localObject)).copy());
 
-      super.remove(this.Load);
-      super.remove(this.Cancel);
-      super.remove(this.Delete);
+      remove(this.Load);
+      remove(this.Cancel);
+      remove(this.Delete);
 
       repaint();
 
@@ -197,7 +197,7 @@ public class LoadMenu extends Container
 
       this.Response.setStreak(true, 10, 7, 50);
       this.Response.setLocation(10, getSize().height - this.Response.getSize().height - 3);
-      super.add(this.Response);
+      add(this.Response);
       try
       {
         UtilityThread localUtilityThread2 = new UtilityThread(2000, this, getClass().getMethod("remove", null), false);
@@ -224,16 +224,16 @@ public class LoadMenu extends Container
 
         localOrderedTable.remove(localObject);
 
-        super.remove(this.Load);
-        super.remove(this.Cancel);
-        super.remove(this.Delete);
+        remove(this.Load);
+        remove(this.Cancel);
+        remove(this.Delete);
 
         repaint();
 
         this.Response = new TextContainer("FILE DELETED.", DELETE_COLOR, this.TextFont);
         this.Response.setStreak(true, 10, 7, 50);
         this.Response.setLocation(10, getSize().height - this.Response.getSize().height - 3);
-        super.add(this.Response);
+        add(this.Response);
         try
         {
           UtilityThread localUtilityThread1 = new UtilityThread(2000, this, getClass().getMethod("refresh", null), false);
@@ -257,25 +257,26 @@ public class LoadMenu extends Container
     switch (this.DisplayStep)
     {
     case 0:
-      super.add(this.FileList);
+      add(this.FileList);
 
       OrderedTable localOrderedTable = generateLoadList();
       this.FileList.setContents(localOrderedTable);
 
       break;
     case 1:
-      super.add(this.Load);
+      add(this.Load);
       break;
     case 2:
-      super.add(this.Cancel);
+      add(this.Cancel);
       break;
     case 3:
-      super.add(this.Delete);
+      add(this.Delete);
+      break;
     }
 
     this.DisplayStep += 1;
 
-    return (this.DisplayStep < 4);
+    return this.DisplayStep < 4;
   }
 
   public boolean remove()
@@ -314,5 +315,24 @@ public class LoadMenu extends Container
     super.addNotify();
 
     requestFocus();
+  }
+
+  protected class KeyHandler extends KeyAdapter
+  {
+    public void keyPressed(KeyEvent paramKeyEvent)
+    {
+      if (paramKeyEvent.getKeyCode() == 38) {
+        LoadMenu.this.FileList.stepUp(20);
+
+        return;
+      }
+
+      if (paramKeyEvent.getKeyCode() == 40)
+        LoadMenu.this.FileList.stepDown(20);
+    }
+
+    protected KeyHandler()
+    {
+    }
   }
 }

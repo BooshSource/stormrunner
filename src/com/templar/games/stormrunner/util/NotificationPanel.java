@@ -17,6 +17,7 @@ public class NotificationPanel extends SimpleContainer
   implements ActionListener
 {
   private final int BLINK_TIME = 250;
+
   private Vector CurrentMessages = new Vector();
   private long TopMessageFinishedAt;
   private String LastMessage;
@@ -167,14 +168,14 @@ public class NotificationPanel extends SimpleContainer
 
   public void addNotify()
   {
-    addNotify();
+    super.addNotify();
 
     this.added = true;
   }
 
   public void removeNotify()
   {
-    removeNotify();
+    super.removeNotify();
 
     this.added = false;
   }

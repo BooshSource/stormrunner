@@ -21,11 +21,13 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.util.Date;
@@ -47,8 +49,7 @@ public class LoadSaveFrame extends Dialog
   Button cancel;
   int mode;
   int index;
-  Vector descs = new Vector();
-  Vector filenames = new Vector();
+  Vector descs = new Vector(); Vector filenames = new Vector();
   File response;
   int newSaveNumber;
   String desc;
@@ -57,7 +58,7 @@ public class LoadSaveFrame extends Dialog
 
   public LoadSaveFrame(Frame paramFrame, int paramInt)
   {
-    super(paramFrame, (paramInt == 0) ? "Load..." : "Save...", true);
+    super(paramFrame, paramInt == 0 ? "Load..." : "Save...", true);
 
     this.parentFrame = paramFrame;
     this.mode = paramInt;
@@ -65,8 +66,16 @@ public class LoadSaveFrame extends Dialog
     setLayout(new BorderLayout());
 
     addWindowListener(
-      new 1(this));
-
+      new WindowAdapter()
+    {
+      public void windowClosing(WindowEvent paramWindowEvent)
+      {
+        LoadSaveFrame.this.setVisible(false); LoadSaveFrame.this
+          .dispose(); LoadSaveFrame.this.response = 
+          null; LoadSaveFrame.this.desc = 
+          null;
+      }
+    });
     Panel localPanel1 = new Panel(new BorderLayout()); Panel localPanel2 = new Panel();
     add(localPanel1, "Center");
     add(localPanel2, "South");
@@ -80,7 +89,7 @@ public class LoadSaveFrame extends Dialog
     this.field.addActionListener(this);
     localPanel1.add(this.field, "South");
 
-    this.action = new Button("Save");
+    this.action = new Button(paramInt == 0 ? "Load" : "Save");
     localPanel2.add(this.action);
     this.action.addActionListener(this);
     this.action.setEnabled(false);
@@ -94,10 +103,10 @@ public class LoadSaveFrame extends Dialog
     this.cancel.addActionListener(this);
 
     File localFile = new File(".");
-    String[] arrayOfString = localFile.list(new SavegameFilter(this));
+    String[] arrayOfString = localFile.list(new SavegameFilter());
     this.newSaveNumber = arrayOfString.length;
 
-    for (int i = 0; i < arrayOfString.length; )
+    for (int i = 0; i < arrayOfString.length; i++)
     {
       try
       {
@@ -109,25 +118,25 @@ public class LoadSaveFrame extends Dialog
         localObjectInputStream.readDouble();
         localObjectInputStream.readDouble();
 
-        localObject = (String)localObjectInputStream.readObject();
+        String localObject = (String)localObjectInputStream.readObject();
         long l = localObjectInputStream.readLong() / 5L;
-        Debug.println(arrayOfString[i] + ":\n" + ((String)localObject) + "\n" + l + "-----");
+        Debug.println(arrayOfString[i] + ":\n" + (String)localObject + "\n" + l + "-----");
 
         localObjectInputStream.close();
 
         StringBuffer localStringBuffer = new StringBuffer("[");
 
         int[] arrayOfInt = { 3600, 60, 1 };
-        if (l / 86400L > 2497820093065461760L)
+        if (l / 86400L > 0L)
         {
-          j = (int)(l / 86400L);
+          int j = (int)(l / 86400L);
           l %= 86400L;
           localStringBuffer.append(j);
           localStringBuffer.append("D ");
         }
-        for (int j = 0; j < arrayOfInt.length; ++j)
+        for (int j = 0; j < arrayOfInt.length; j++)
         {
-          if (l / arrayOfInt[j] > 2497823975715897344L)
+          if (l / arrayOfInt[j] > 0L)
           {
             int k = (int)(l / arrayOfInt[j]);
             l %= arrayOfInt[j];
@@ -137,8 +146,8 @@ public class LoadSaveFrame extends Dialog
             localStringBuffer.append(str);
           }
           else {
-            localStringBuffer.append("00"); }
-          if (j != arrayOfInt.length - 1)
+            localStringBuffer.append("00");
+          }if (j != arrayOfInt.length - 1)
             localStringBuffer.append(":");
         }
         localStringBuffer.append("] ");
@@ -155,7 +164,7 @@ public class LoadSaveFrame extends Dialog
         Debug.println("Invalid savegame " + arrayOfString[i]);
         localException.printStackTrace();
       }
-      ++i;
+
     }
 
     pack();
@@ -175,10 +184,10 @@ public class LoadSaveFrame extends Dialog
       {
         Debug.println("loading");
 
-        if (this.field.getText().compareTo("") == 0)
+        if (this.field.getText().compareTo("") == 0) {
           return;
-
-        i = this.savegamelist.getSelectedIndex();
+        }
+       int i = this.savegamelist.getSelectedIndex();
 
         if (i != -1)
         {
@@ -192,9 +201,9 @@ public class LoadSaveFrame extends Dialog
 
       Debug.println("saving");
 
-      if (this.field.getText().compareTo("") == 0)
+      if (this.field.getText().compareTo("") == 0) {
         this.field.setText("Savegame at " + new Date());
-
+      }
       int i = this.descs.indexOf(this.field.getText());
       if (i != -1)
       {
@@ -214,52 +223,51 @@ public class LoadSaveFrame extends Dialog
       dispose();
     }
 
-    if ((paramActionEvent.getSource() == this.del) && 
-      (this.savegamelist.getSelectedIndex() != -1))
+    if (paramActionEvent.getSource() == this.del)
     {
-      YesNoDialog localYesNoDialog = new YesNoDialog(this.parentFrame, "Confirm Delete", 
-        "Really delete this savegame?");
-      if (localYesNoDialog.getResponse().compareTo("Yes") == 0)
+      if (this.savegamelist.getSelectedIndex() != -1)
       {
-        try
+        YesNoDialog localYesNoDialog = new YesNoDialog(this.parentFrame, "Confirm Delete", 
+          "Really delete this savegame?");
+        if (localYesNoDialog.getResponse().compareTo("Yes") == 0)
         {
-          localObject = new File((String)this.filenames.elementAt(this.savegamelist.getSelectedIndex()));
-          Debug.println("Deleting " + localObject);
-
-          this.savegamelist.remove(this.savegamelist.getSelectedIndex());
-
-          if (((File)localObject).exists()) {
-            ((File)localObject).delete();
-          }
-
-          String[] arrayOfString = new File(".").list(new SavegameFilter(this));
-          for (int j = 0; j < arrayOfString.length; ++j)
+          try
           {
-            File localFile = new File("SRSavegame." + j);
-            if (localFile.toString().compareTo(arrayOfString[j]) != 0)
+            localObject = new File((String)this.filenames.elementAt(this.savegamelist.getSelectedIndex()));
+            Debug.println("Deleting " + localObject);
+
+            this.savegamelist.remove(this.savegamelist.getSelectedIndex());
+
+            if (((File)localObject).exists()) {
+              ((File)localObject).delete();
+            }
+
+            String[] arrayOfString = new File(".").list(new SavegameFilter());
+            for (int j = 0; j < arrayOfString.length; j++)
             {
+              File localFile = new File("SRSavegame." + j);
+              if (localFile.toString().compareTo(arrayOfString[j]) == 0)
+                continue;
               Debug.println("renaming " + arrayOfString[j] + " to " + localFile);
               new File(arrayOfString[j]).renameTo(localFile);
               int k = this.filenames.indexOf(arrayOfString[j]);
 
-              if (k == -1)
+              if (k == -1) {
                 System.err.println("LoadSaveFrame: deletion rename: " + arrayOfString[j] + " is not in the filenames vector.");
-
+              }
               this.filenames.setElementAt(localFile.toString(), k);
             }
 
+            this.newSaveNumber -= 1;
           }
-
-          this.newSaveNumber -= 1;
+          catch (Exception localException)
+          {
+            localException.printStackTrace();
+          }
         }
-        catch (Exception localException)
-        {
-          localException.printStackTrace();
-        }
+        localYesNoDialog.dispose();
       }
-      localYesNoDialog.dispose();
     }
-
     if (paramActionEvent.getSource() == this.cancel)
     {
       setVisible(false);
@@ -273,7 +281,7 @@ public class LoadSaveFrame extends Dialog
     ((Integer)paramItemEvent.getItem()).intValue();
     String str = this.savegamelist.getSelectedItem();
     this.skipTextEvent = true;
-    this.field.setText(str.substring(str.indexOf(93) + 2));
+    this.field.setText(str.substring(str.indexOf(']') + 2));
     this.action.setEnabled((this.field.getText().compareTo("") != 0) || 
       (this.savegamelist.getSelectedIndex() != -1));
   }
@@ -281,21 +289,23 @@ public class LoadSaveFrame extends Dialog
   public synchronized void textValueChanged(TextEvent paramTextEvent)
   {
     String str1 = this.field.getText();
-    if (this.LastFieldContents == null)
+    if (this.LastFieldContents == null) {
       this.LastFieldContents = str1;
-
+    }
     if (this.skipTextEvent)
     {
       this.skipTextEvent = false;
     }
     else
     {
-      int i = (str1.compareTo("") != 0) ? 0 : 1;
+      int i = str1.compareTo("") != 0 ? 0 : 1;
       if (i != 0)
       {
         this.savegamelist.select(-1);
         this.action.setEnabled(false);
-      } else {
+      }
+      else
+      {
         int j;
         String str2;
         if (str1.length() < this.LastFieldContents.length())
@@ -322,24 +332,22 @@ public class LoadSaveFrame extends Dialog
 
           String[] arrayOfString = this.savegamelist.getItems();
           int k = 0;
-          for (int l = 0; (l < arrayOfString.length) && (k == 0); ++l)
+          for (int m = 0; (m < arrayOfString.length) && (k == 0); m++)
           {
-            String str3 = arrayOfString[l].substring(arrayOfString[l].indexOf(93) + 2);
-            if (str3.startsWith(str2))
-            {
-              this.skipTextEvent = true;
-              this.field.setText(str3);
-              this.field.setCaretPosition(j);
-              this.savegamelist.select(l);
-              k = 1;
-            }
-
+            String str3 = arrayOfString[m].substring(arrayOfString[m].indexOf(']') + 2);
+            if (!str3.startsWith(str2))
+              continue;
+            this.skipTextEvent = true;
+            this.field.setText(str3);
+            this.field.setCaretPosition(j);
+            this.savegamelist.select(m);
+            k = 1;
           }
 
           if (k == 0)
           {
-            int i1 = this.savegamelist.getSelectedIndex();
-            if (i1 != -1)
+            int n = this.savegamelist.getSelectedIndex();
+            if (n != -1)
             {
               this.savegamelist.select(-1);
 
@@ -360,8 +368,8 @@ public class LoadSaveFrame extends Dialog
   {
     setVisible(false);
     dispose();
-    this.response = null; }
-
+    this.response = null;
+  }
   public void windowActivated(WindowEvent paramWindowEvent) {  }
 
   public void windowClosed(WindowEvent paramWindowEvent) {  }
@@ -376,5 +384,18 @@ public class LoadSaveFrame extends Dialog
 
   public File getResponse() { return this.response; } 
   public String getDescription() { return this.desc;
+  }
+
+  class SavegameFilter
+    implements FilenameFilter
+  {
+    public boolean accept(File paramFile, String paramString)
+    {
+      return paramString.toLowerCase().startsWith("SRSavegame.".toLowerCase());
+    }
+
+    SavegameFilter()
+    {
+    }
   }
 }

@@ -28,14 +28,13 @@ public class MoveInstruction extends Instruction
   private int square_counter;
   private boolean onstorm = false;
 
-  public void readExternal(ObjectInput paramObjectInput)
-    throws IOException, ClassNotFoundException
+  public void readExternal(ObjectInput paramObjectInput) throws IOException, ClassNotFoundException
   {
     super.readExternal(paramObjectInput);
     this.squares = paramObjectInput.readInt();
     this.square_counter = paramObjectInput.readInt();
 
-    if (GameApplet.thisApplet.getLoadingVersion() > 0.40000000000000002D)
+    if (GameApplet.thisApplet.getLoadingVersion() > 0.4D)
       this.onstorm = paramObjectInput.readBoolean();
   }
 
@@ -73,9 +72,9 @@ public class MoveInstruction extends Instruction
 
   public boolean setParameterString(String paramString)
   {
-    int i;
-    try {
-      i = Integer.parseInt(paramString);
+    try
+    {
+      int i = Integer.parseInt(paramString);
       if (i < 1) {
         return false;
       }
@@ -144,28 +143,28 @@ public class MoveInstruction extends Instruction
       case 270:
         localPosition2.x -= 1;
         localPosition2.dx = 50;
+        break;
       }
-
       paramRobot.setPosition(localPosition2);
       Shroud localShroud = paramRobot.getEnvironment().getShroud();
-      localObject = paramRobot.getPosition().getMapPoint();
+      Point localObject = paramRobot.getPosition().getMapPoint();
 
       boolean bool2 = paramRobot.getEnvironment().getMap().getCell((Point)localObject).getStorm();
 
-      if ((!(this.onstorm)) && (bool2))
+      if ((!this.onstorm) && (bool2))
       {
         GameApplet.thisApplet.sendStatusMessage(
           "RCX: " + paramRobot.getName() + ": extreme weather conditions - VidSensor failure.\n");
         this.onstorm = bool2;
       }
-      else if ((this.onstorm) && (!(bool2)))
+      else if ((this.onstorm) && (!bool2))
       {
         GameApplet.thisApplet.sendStatusMessage(
           "RCX: " + paramRobot.getName() + ": condition normal - VidSensor operating normally.\n");
         this.onstorm = bool2;
       }
       boolean bool3 = paramRobot.getSensor("VidSensor") != null;
-      localShroud.setVisible((Point)localObject, 2, true, (bool2) ? false : bool3);
+      localShroud.setVisible((Point)localObject, 2, true, bool2 ? false : bool3);
 
       localShroud.setVisible(localPosition1.getMapPoint(), 2, false, false);
     }
@@ -184,8 +183,8 @@ public class MoveInstruction extends Instruction
       break;
     case 270:
       localPosition2.dx -= i;
+      break;
     }
-
     paramRobot.setPosition(localPosition2);
     paramRobot.setState(1, -1);
     Object localObject = paramRobot.getChassis().getID();
@@ -193,7 +192,7 @@ public class MoveInstruction extends Instruction
 
     if ((int)(Math.random() * 40.0D) == 1)
     {
-      int j = (int)(Math.random() * 5.0D + 1D);
+      int j = (int)(Math.random() * 5.0D + 1.0D);
       paramRobot.playSound("Robot-Nonsense-" + String.valueOf(j));
     }
 
@@ -211,7 +210,7 @@ public class MoveInstruction extends Instruction
     int i = paramRobot.getChassis().getSpeed();
     Position localPosition = paramRobot.getPosition();
     int j = Math.abs(localPosition.dx); int k = Math.abs(localPosition.dy);
-    return ((j <= i) && (k <= i));
+    return (j <= i) && (k <= i);
   }
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)
@@ -222,10 +221,10 @@ public class MoveInstruction extends Instruction
     {
     case 90:
     case 270:
-      return (Math.abs(localPosition.dx) - i <= paramInt);
+      return Math.abs(localPosition.dx) - i <= paramInt;
     case 0:
     case 180:
-      return (Math.abs(localPosition.dy) - i <= paramInt);
+      return Math.abs(localPosition.dy) - i <= paramInt;
     }
     return false;
   }

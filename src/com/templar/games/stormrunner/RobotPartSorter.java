@@ -12,7 +12,7 @@ public abstract class RobotPartSorter
       paramOrderedTable.size());
     new BubbleSort().sort(arrayOfRobotPartWrapper, false);
     OrderedTable localOrderedTable = new OrderedTable();
-    for (int i = 0; i < arrayOfRobotPartWrapper.length; ++i)
+    for (int i = 0; i < arrayOfRobotPartWrapper.length; i++)
     {
       int j = paramOrderedTable.indexOf(arrayOfRobotPartWrapper[i]);
       if (j == -1)

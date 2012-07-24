@@ -1,6 +1,5 @@
 package com.templar.games.stormrunner;
 
-import [Z;
 import com.templar.games.stormrunner.assembly.Assembly;
 import com.templar.games.stormrunner.chassis.Chassis;
 import com.templar.games.stormrunner.deaths.Death;
@@ -70,11 +69,11 @@ public class Robot extends Actor
 
   public String convertConstant(int paramInt1, int paramInt2)
   {
-    [Ljava.lang.String[] arrayOfString; = { 
+    String[][] arrayOfString = { 
       { "BIAS_CENTRE", "BIAS_LEFT", "BIAS_RIGHT" }, 
       { "STATIONARY", "WALKING", "TURNING", "DYING" } };
 
-    return arrayOfString;[paramInt2][paramInt1];
+    return arrayOfString[paramInt2][paramInt1];
   }
 
   public void readExternal(ObjectInput paramObjectInput)
@@ -98,7 +97,7 @@ public class Robot extends Actor
     ImageComponent[] arrayOfImageComponent = new ImageComponent[this.animationComponents.size()];
     this.deathMethod = ((Death)paramObjectInput.readObject());
     Enumeration localEnumeration = this.animationComponents.elements();
-    for (int i = 0; localEnumeration.hasMoreElements(); ++i)
+    for (int i = 0; localEnumeration.hasMoreElements(); i++)
       arrayOfImageComponent[i] = ((ImageComponent)localEnumeration.nextElement());
     setImages(arrayOfImageComponent);
   }
@@ -159,8 +158,8 @@ public class Robot extends Actor
     this.dest_orientation = 90;
     this.state = 0;
     this.details = new TextContainer();
-    [Z[] arrayOf[Z = { { true } };
-    setShape(arrayOf[Z);
+    boolean[][] arrayOfBoolean = { { true } };
+    setShape(arrayOfBoolean);
     this.layer = "Robot";
     this.stopping = false;
     this.elevated = false;
@@ -169,7 +168,7 @@ public class Robot extends Actor
 
   public void addNotify()
   {
-    addNotify();
+    super.addNotify();
   }
 
   public void setName(String paramString)
@@ -179,8 +178,8 @@ public class Robot extends Actor
 
   public String getName()
   {
-    return this.name; }
-
+    return this.name;
+  }
   public boolean getElevated() {
     return this.elevated;
   }
@@ -199,8 +198,8 @@ public class Robot extends Actor
     if (paramInt1 != -1)
     {
       if (((paramInt1 == 0) && (this.state == 1)) || (
-        (paramInt1 == 2) && ((
-        (this.state == 1) || (this.state == 0)))))
+        (paramInt1 == 2) && (
+        (this.state == 1) || (this.state == 0))))
       {
         if (this.soundPlaying)
         {
@@ -212,7 +211,7 @@ public class Robot extends Actor
       }
       else if (paramInt1 == 1)
       {
-        if (!(this.soundPlaying))
+        if (!this.soundPlaying)
         {
           loopSound(getChassis().getID());
           this.soundPlaying = true;
@@ -228,14 +227,14 @@ public class Robot extends Actor
     }
 
     if (paramInt2 != -1)
-      this.dest_orientation = paramInt2;  }
-
+      this.dest_orientation = paramInt2; 
+  }
   public int get_state() {
     return this.state; } 
-  public int getDestOrientation() { return this.dest_orientation;
-  }
+  public int getDestOrientation() { return this.dest_orientation; }
 
-  public Assembly getAssembly(String paramString) {
+  public Assembly getAssembly(String paramString)
+  {
     Enumeration localEnumeration = this.assemblies.elements();
     while (localEnumeration.hasMoreElements())
     {
@@ -323,9 +322,9 @@ public class Robot extends Actor
     {
       this.dest_orientation = paramInt;
     }
-    if ((this.animationComponents == null) || (this.animationComponents.size() == 0))
+    if ((this.animationComponents == null) || (this.animationComponents.size() == 0)) {
       updateAppearance();
-
+    }
     Enumeration localEnumeration = this.animationComponents.keys();
     while (localEnumeration.hasMoreElements())
     {
@@ -337,11 +336,10 @@ public class Robot extends Actor
 
       Image[] arrayOfImage = localRobotPart.getCells(this.ir, this.orientation, getBias());
       localAnimationComponent.setCells(arrayOfImage);
-      if (str.compareTo(this.chassis.getID()) == 0)
-      {
-        int[] arrayOfInt = this.chassis.getAnimationSequence(0);
-        localAnimationComponent.setSequence(arrayOfInt, null, true);
-      }
+      if (str.compareTo(this.chassis.getID()) != 0)
+        continue;
+      int[] arrayOfInt = this.chassis.getAnimationSequence(0);
+      localAnimationComponent.setSequence(arrayOfInt, null, true);
     }
   }
 
@@ -366,8 +364,8 @@ public class Robot extends Actor
       break;
     case 90:
       localPosition.x += 1;
+      break;
     }
-
     return localPosition;
   }
 
@@ -375,9 +373,9 @@ public class Robot extends Actor
   {
     Position localPosition = inFrontOf();
 
-    return ((localPosition.x < 0) || (localPosition.y < 0) || 
+    return (localPosition.x < 0) || (localPosition.y < 0) || 
       (localPosition.x >= getEnvironment().getMap().getSize().width) || 
-      (localPosition.y >= getEnvironment().getMap().getSize().height));
+      (localPosition.y >= getEnvironment().getMap().getSize().height);
   }
 
   public boolean checkTerrain()
@@ -385,7 +383,7 @@ public class Robot extends Actor
     Position localPosition = inFrontOf();
     MapCell localMapCell = getEnvironment().getMap().getCell(localPosition.getMapPoint());
 
-    return ((localMapCell == null) || (localMapCell.getImpassibility() > getChassis().getImpassibility()));
+    return (localMapCell == null) || (localMapCell.getImpassibility() > getChassis().getImpassibility());
   }
 
   public Program getProgram()
@@ -422,32 +420,32 @@ public class Robot extends Actor
       this.stopping = true;
     }
 
-    getDetailContainer(); }
-
+    getDetailContainer();
+  }
   public boolean isStopping() {
     return this.stopping; } 
-  public void unsetStopping() { this.stopping = false;
-  }
+  public void unsetStopping() { this.stopping = false; }
 
-  public void removeSensor(String paramString) {
-    for (int i = 0; i < this.sensors.size(); ++i)
-      if (((Sensor)this.sensors.elementAt(i)).getID().equals(paramString))
-      {
-        this.sensors.removeElementAt(i);
-        return;
-      }
+  public void removeSensor(String paramString)
+  {
+    for (int i = 0; i < this.sensors.size(); i++) {
+      if (!((Sensor)this.sensors.elementAt(i)).getID().equals(paramString))
+        continue;
+      this.sensors.removeElementAt(i);
+      return;
+    }
   }
 
   public void removeAssembly(String paramString)
   {
-    for (int i = 0; i < this.assemblies.size(); ++i)
-      if (((Assembly)this.assemblies.elementAt(i)).getID().equals(paramString))
-      {
-        this.assemblies.removeElementAt(i);
-        this.animationComponents.remove(paramString);
-        updateAppearance();
-        return;
-      }
+    for (int i = 0; i < this.assemblies.size(); i++) {
+      if (!((Assembly)this.assemblies.elementAt(i)).getID().equals(paramString))
+        continue;
+      this.assemblies.removeElementAt(i);
+      this.animationComponents.remove(paramString);
+      updateAppearance();
+      return;
+    }
   }
 
   public RobotPart getRobotPart(String paramString)
@@ -456,36 +454,36 @@ public class Robot extends Actor
       return this.chassis;
     }
 
-    Object localObject = getAssembly(paramString);
+   Assembly localObject = getAssembly(paramString);
     if (localObject != null)
       return localObject;
-    localObject = getSensor(paramString);
-    if (localObject != null)
-      return localObject;
-    return ((RobotPart)null);
+    Sensor localObject2 = getSensor(paramString);
+    if (localObject2 != null)
+      return localObject2;
+    return (RobotPart)null;
   }
 
   public RobotPart[] getRobotParts()
   {
     int i = this.sensors.size() + this.assemblies.size();
-    if (this.chassis != null)
-      ++i;
-
+    if (this.chassis != null) {
+      i++;
+    }
     RobotPart[] arrayOfRobotPart = new RobotPart[i];
     int j = 0;
 
     if (this.chassis != null)
     {
       arrayOfRobotPart[0] = this.chassis;
-      ++j;
+      j++;
     }
 
-    for (int k = 0; k < this.sensors.size(); ++k)
+    for (int k = 0; k < this.sensors.size(); k++) {
       arrayOfRobotPart[(j++)] = ((RobotPart)this.sensors.elementAt(k));
-
-    for (int l = 0; l < this.assemblies.size(); ++l)
-      arrayOfRobotPart[(j++)] = ((RobotPart)this.assemblies.elementAt(l));
-
+    }
+    for (int m = 0; m < this.assemblies.size(); m++) {
+      arrayOfRobotPart[(j++)] = ((RobotPart)this.assemblies.elementAt(m));
+    }
     return arrayOfRobotPart;
   }
 
@@ -497,7 +495,6 @@ public class Robot extends Actor
 
   public String toString()
   {
-    Enumeration localEnumeration;
     if (this.dead)
       return "";
     StringBuffer localStringBuffer = new StringBuffer("RCX:");
@@ -508,6 +505,7 @@ public class Robot extends Actor
       localStringBuffer.append(this.chassis.toString());
       localStringBuffer.append(" class.\n");
     }
+    Enumeration localEnumeration;
     if (this.assemblies.size() > 0)
     {
       localEnumeration = this.assemblies.elements();
@@ -542,8 +540,7 @@ public class Robot extends Actor
   }
 
   public static final String convertBias(int paramInt) {
-    switch (paramInt)
-    {
+    switch (paramInt) {
     case 0:
       return "C";
     case 2:
@@ -558,7 +555,7 @@ public class Robot extends Actor
   {
     OrderedTable localOrderedTable = new OrderedTable();
     RobotPart[] arrayOfRobotPart = getRobotParts();
-    for (int i = 0; i < arrayOfRobotPart.length; ++i)
+    for (int i = 0; i < arrayOfRobotPart.length; i++)
       localOrderedTable.put(arrayOfRobotPart[i].getID(), arrayOfRobotPart[i]);
     localOrderedTable = RobotPartSorter.sortTable(localOrderedTable);
     Vector localVector = new Vector();
@@ -567,7 +564,7 @@ public class Robot extends Actor
     {
       String str = (String)localEnumeration.nextElement();
 
-      if (localOrderedTable.get(str) instanceof Sensor) {
+      if ((localOrderedTable.get(str) instanceof Sensor)) {
         localVector.addElement(str);
       }
       else {
@@ -575,10 +572,10 @@ public class Robot extends Actor
         localOrderedTable.put(str, arrayOfImage);
       }
     }
-    if (localVector.size() != 0)
-      for (int j = 0; j < localVector.size(); ++j)
+    if (localVector.size() != 0) {
+      for (int j = 0; j < localVector.size(); j++)
         localOrderedTable.remove((String)localVector.elementAt(j));
-
+    }
     this.animationComponents = setImages(localOrderedTable);
 
     getDetailContainer();
@@ -588,7 +585,7 @@ public class Robot extends Actor
   {
     if (this.animationComponents != null)
     {
-      return ((AnimationComponent)this.animationComponents.get(paramString));
+      return (AnimationComponent)this.animationComponents.get(paramString);
     }
     return null;
   }

@@ -18,21 +18,16 @@ public class Eaten extends Death
   implements Externalizable
 {
   static final long serialVersionUID = 4886718345L;
-  int dyingFrame;
-  int framesToWait;
+  int dyingFrame = 0;
+  int framesToWait = 0;
 
-  public Eaten()
-  {
-    this.dyingFrame = 0;
-    this.framesToWait = 0;
+  public Eaten() {
   }
+  public Eaten(int paramInt) { this();
+    this.framesToWait = paramInt; }
 
-  public Eaten(int paramInt)
+  public void deathStep(Robot paramRobot)
   {
-    this.framesToWait = paramInt;
-  }
-
-  public void deathStep(Robot paramRobot) {
     this.dyingFrame += 1;
     if (this.dyingFrame >= this.framesToWait)
     {

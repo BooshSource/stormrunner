@@ -82,7 +82,7 @@ public class SecurityDoor extends Actor
   public boolean isObstructing(Robot paramRobot) {
     if (GameApplet.thisApplet.getGameState().getSecurityLevel() >= 2)
     {
-      if ((!(this.open)) && (!(this.active)))
+      if ((!this.open) && (!this.active))
       {
         GameApplet.thisApplet.sendStatusMessage(
           "RCX: " + paramRobot.getName() + " attempting to open a security door...\n\td1000]Succeeded, access granted.\n");
@@ -90,7 +90,7 @@ public class SecurityDoor extends Actor
         this.door = new AnimationComponent();
         Image[] arrayOfImage = new Image[5];
         int[] arrayOfInt = new int[5];
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 5; i++)
         {
           arrayOfImage[i] = GameApplet.thisApplet.getImage(
             "com/templar/games/stormrunner/media/images/spaceships/tormod/tormud_door_0" + i + ".gif");
@@ -104,16 +104,16 @@ public class SecurityDoor extends Actor
         this.active = true;
       }
     }
-    else
+    else {
       GameApplet.thisApplet.sendStatusMessage(
         "RCX: " + paramRobot.getName() + " attempting to open a security door...\n\td1000]Failed, insufficient access.\n");
-
-    return (!(this.open));
+    }
+    return !this.open;
   }
 
   public void tick() {
     if ((this.active) && 
-      (!(this.door.nextImage())))
+      (!this.door.nextImage()))
     {
       this.open = true;
       this.active = false;

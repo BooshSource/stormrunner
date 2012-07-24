@@ -83,8 +83,8 @@ public class Datalog extends PhysicalObject
 
   public void setGameState(GameState paramGameState)
   {
-    this.state = paramGameState; }
-
-  public String toString() { return super.getID();
+    this.state = paramGameState;
+  }
+  public String toString() { return getID();
   }
 }

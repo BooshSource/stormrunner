@@ -69,7 +69,7 @@ public class ArmPutDown extends Instruction
         "Grabber Arm on RCX: " + paramRobot.getName() + ": Not holding anything.\n");
       return true;
     case 1:
-      if (!(this.ArmAnimator.nextImage()))
+      if (!this.ArmAnimator.nextImage())
       {
         this.ArmAnimator.setSequence(this.Arm.getAnimationSequence(2), null, false);
         this.ArmAnimator.reset();
@@ -79,7 +79,7 @@ public class ArmPutDown extends Instruction
       }
       return false;
     case 2:
-      if (!(this.ArmAnimator.nextImage()))
+      if (!this.ArmAnimator.nextImage())
         this.state += 1;
       return false;
     case 3:
@@ -95,7 +95,7 @@ public class ArmPutDown extends Instruction
 
   public boolean verifyRobot(Robot paramRobot)
   {
-    return (paramRobot.getAssembly("GrabberArm") != null);
+    return paramRobot.getAssembly("GrabberArm") != null;
   }
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)

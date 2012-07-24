@@ -93,14 +93,14 @@ public class Program
 
     Instruction localInstruction = (Instruction)paramInstruction.copy();
 
-    if (paramInstructionList instanceof Instruction)
+    if ((paramInstructionList instanceof Instruction))
       localInstruction.setPreviousInstruction((Instruction)paramInstructionList);
-    else
+    else {
       localInstruction.setPreviousInstruction(null);
-
-    if ((paramInstruction instanceof Loop) && (((Loop)paramInstruction).getDestination() != null))
+    }
+    if (((paramInstruction instanceof Loop)) && (((Loop)paramInstruction).getDestination() != null)) {
       ((Loop)localInstruction).setDestination((Instruction)((Loop)paramInstruction).getDestination().copy());
-
+    }
     localInstruction.setNextInstruction(copyInstruction(localInstruction.getNextInstruction(), localInstruction));
     return localInstruction;
   }
@@ -124,8 +124,7 @@ public class Program
   }
 
   public void executeNext(Robot paramRobot) {
-    Object localObject3;
-    if (!(this.executing)) {
+    if (!this.executing) {
       return;
     }
 
@@ -138,29 +137,27 @@ public class Program
         return;
       }
 
-      localObject1 = (Context)this.execution.pop();
+      Context localObject1 = (Context)this.execution.pop();
       this.pc = ((Context)localObject1).instruction;
     }
     while (this.pc == null);
 
-    Object localObject1 = paramRobot.getEnvironment().getObjectOfTypeAt(
+    Vector localObject1 = paramRobot.getEnvironment().getObjectOfTypeAt(
       paramRobot.getPosition(), 
       triggerClass);
-
+    Object localObject3;
     if (localObject1 != null)
     {
       Enumeration localEnumeration = ((Vector)localObject1).elements();
       while (localEnumeration.hasMoreElements())
       {
-        localObject2 = (Trigger)localEnumeration.nextElement();
-        if (localObject2 instanceof HairTrigger)
-        {
-          localObject3 = (HairTrigger)localObject2;
-          if (this.pc.boundaryCheck(paramRobot, ((HairTrigger)localObject3).getThreshold()))
-          {
-            ((Trigger)localObject3).activate(paramRobot, 0);
-          }
-        }
+        Trigger localObject2 = (Trigger)localEnumeration.nextElement();
+        if (!(localObject2 instanceof HairTrigger))
+          continue;
+        localObject3 = (HairTrigger)localObject2;
+        if (!this.pc.boundaryCheck(paramRobot, ((HairTrigger)localObject3).getThreshold()))
+          continue;
+        ((Trigger)localObject3).activate(paramRobot, 0);
       }
 
     }
@@ -184,7 +181,7 @@ public class Program
 
       if ((paramRobot.getLastCell() != null) && (paramRobot.getEnvironment() != null))
       {
-        localObject2 = paramRobot.getEnvironment().getObjectOfTypeAt(
+       Vector localObject2 = paramRobot.getEnvironment().getObjectOfTypeAt(
           paramRobot.getLastCell(), triggerClass);
         if (localObject2 != null)
         {
@@ -192,14 +189,14 @@ public class Program
           while (((Enumeration)localObject3).hasMoreElements())
           {
             Trigger localTrigger = (Trigger)((Enumeration)localObject3).nextElement();
-            if ((localTrigger.activateOnEvent() & 0x8) > 0)
-            {
-              Debug.println("EXIT: activating " + localTrigger);
-              localTrigger.activate(paramRobot, 8);
-            }
+            if ((localTrigger.activateOnEvent() & 0x8) <= 0)
+              continue;
+            Debug.println("EXIT: activating " + localTrigger);
+            localTrigger.activate(paramRobot, 8);
           }
         }
-        else {
+        else
+        {
           Debug.println("Nothing here (" + paramRobot.getLastCell() + ")");
         }
       } else {
@@ -208,17 +205,18 @@ public class Program
 
       if (localObject1 != null)
       {
-        localObject2 = ((Vector)localObject1).elements();
+        Enumeration localObject2 = ((Vector)localObject1).elements();
         while (((Enumeration)localObject2).hasMoreElements())
         {
           localObject3 = (Trigger)((Enumeration)localObject2).nextElement();
-          if ((((Trigger)localObject3).activateOnEvent() & 0x4) > 0)
-          {
-            ((Trigger)localObject3).activate(paramRobot, 4);
+          if ((((Trigger)localObject3).activateOnEvent() & 0x4) <= 0) {
+            continue;
           }
+          ((Trigger)localObject3).activate(paramRobot, 4);
         }
       }
-      else {
+      else
+      {
         Debug.println("Nothing here (" + paramRobot.getPosition() + ")");
       }
 
@@ -228,42 +226,41 @@ public class Program
         paramRobot.unsetStopping();
         return;
       }
-
+Conditional localObject2;
       for (localObject2 = this.FirstConditional; localObject2 != null; localObject2 = ((Conditional)localObject2).getNextConditional())
       {
-        if (((Conditional)localObject2).getNextInstruction() != null)
+        if (((Conditional)localObject2).getNextInstruction() == null)
+          continue;
+        if ((((Conditional)localObject2).getSensor() instanceof DirectionalSensor))
         {
-          if (((Conditional)localObject2).getSensor() instanceof DirectionalSensor)
+          int i = 0;
+          for (int j = this.execution.size() - 1; j >= 0; j--)
           {
-            int i = 0;
-            for (int j = this.execution.size() - 1; j >= 0; --j)
-            {
-              Context localContext = (Context)this.execution.elementAt(j);
-              if ((localContext.conditional != null) && 
-                (localContext.conditional.getSensor() == ((Conditional)localObject2).getSensor()))
-              {
-                i = 1;
-                break;
-              }
-
-            }
-
-            if (i != 0);
+            Context localContext = (Context)this.execution.elementAt(j);
+            if ((localContext.conditional == null) || 
+              (localContext.conditional.getSensor() != ((Conditional)localObject2).getSensor()))
+              continue;
+            i = 1;
+            break;
           }
-          else if (((Conditional)localObject2).check(paramRobot))
-          {
-            this.pc.terminate(paramRobot);
-            this.execution.push(new Context((Conditional)localObject2, this.pc));
-            this.pc = ((Conditional)localObject2).getStart();
 
-            return;
+          if (i != 0) {
+            continue;
           }
         }
+        if (!((Conditional)localObject2).check(paramRobot))
+          continue;
+        this.pc.terminate(paramRobot);
+        this.execution.push(new Context((Conditional)localObject2, this.pc));
+        this.pc = ((Conditional)localObject2).getStart();
+
+        return;
       }
+
     }
 
     Object localObject2 = this.pc.getNextInstruction();
-    if (this.pc instanceof Loop)
+    if ((this.pc instanceof Loop))
     {
       Instruction localInstruction = ((Loop)this.pc).loop();
       if (localInstruction != null)
@@ -336,12 +333,12 @@ public class Program
 
   public String toString()
   {
-    if (this.pc == null)
+    if (this.pc == null) {
       return "No Program\n";
-
-    if (!(this.executing))
+    }
+    if (!this.executing) {
       return "Stopped\n";
-
+    }
     return "Executing " + this.pc.toString() + "\n";
   }
 }

@@ -16,7 +16,9 @@ public class ImageComposite extends SimpleContainer
   private Image[] Images;
   private Vector ImageComponents;
   private Dimension FinalSize = new Dimension(0, 0);
+
   private boolean Stopped = false;
+
   private Vector ImageListeners = new Vector();
   private Vector ReportingComponentListeners;
 
@@ -62,31 +64,31 @@ public class ImageComposite extends SimpleContainer
     if (paramArrayOfImageComponent != null)
     {
       this.FinalSize = null;
-
+      int i;
+      int m=0;
+      int n=0;
       this.ErroredImages = new Vector();
       i = this.ImageComponents.size();
 
-      for (int j = paramArrayOfImageComponent.length; j < i; ++j)
+      for (int j = paramArrayOfImageComponent.length; j < i; j++)
       {
         ImageComponent localImageComponent2 = (ImageComponent)this.ImageComponents.elementAt(j);
         remove(localImageComponent2);
         localImageComponent2.removeImageListener(this);
       }
 
-      for (int k = 0; k < paramArrayOfImageComponent.length; ++k)
+      for (int k = 0; k < paramArrayOfImageComponent.length; k++)
       {
         if (k < this.ImageComponents.size())
         {
           this.ImageComponents.setElementAt(paramArrayOfImageComponent[k], k);
-          l = getComponentCount();
+          m = getComponentCount();
           add(paramArrayOfImageComponent[k], k);
           paramArrayOfImageComponent[k].addImageListener(this);
 
-          if ((l < getComponentCount()) && (l != 0))
-          {
-            super.remove(k + 1);
-          }
-
+          if ((m >= getComponentCount()) || (m == 0))
+            continue;
+          remove(k + 1);
         }
         else
         {
@@ -96,26 +98,26 @@ public class ImageComposite extends SimpleContainer
         }
       }
 
-      int l = 0;
-      int i1 = 0;
+      //int m = 0;
+      
 
       Enumeration localEnumeration = this.ImageComponents.elements();
 
       while (localEnumeration.hasMoreElements())
       {
         Dimension localDimension = ((ImageComponent)localEnumeration.nextElement()).getSize();
-        l = Math.max(localDimension.width, l);
-        i1 = Math.max(localDimension.height, i1);
+        m = Math.max(localDimension.width, m);
+        n = Math.max(localDimension.height, n);
       }
 
-      this.FinalSize = new Dimension(l, i1);
+      this.FinalSize = new Dimension(m, n);
 
       return;
     }
 
     this.FinalSize = new Dimension(0, 0);
     this.ErroredImages = new Vector();
-    for (int i = 0; i < this.ImageComponents.size(); ++i)
+    for (int i = 0; i < this.ImageComponents.size(); i++)
     {
       ImageComponent localImageComponent1 = (ImageComponent)this.ImageComponents.elementAt(i);
       remove(localImageComponent1);
@@ -125,29 +127,28 @@ public class ImageComposite extends SimpleContainer
 
   public void setImages(Image[] paramArrayOfImage)
   {
-    ImageComponent localImageComponent1;
     deliverImageEvent(3);
 
     this.Images = paramArrayOfImage;
-
+    ImageComponent localImageComponent1;
     if (paramArrayOfImage != null)
     {
       this.FinalSize = null;
 
       this.ErroredImages = new Vector();
-      i = this.ImageComponents.size();
+      int i = this.ImageComponents.size();
       localImageComponent1 = null;
-      for (int j = 0; j < paramArrayOfImage.length; ++j)
+      for (int j = 0; j < paramArrayOfImage.length; j++)
       {
         if (j < i)
         {
           ImageComponent localImageComponent2 = (ImageComponent)this.ImageComponents.elementAt(j);
-          if (localImageComponent2 instanceof AnimationComponent)
+          if ((localImageComponent2 instanceof AnimationComponent))
           {
             localImageComponent1 = new ImageComponent(paramArrayOfImage[j], true, false);
             this.ImageComponents.setElementAt(localImageComponent1, j);
             add(localImageComponent1);
-            super.remove(j);
+            remove(j);
 
             localImageComponent1.addImageListener(this);
           }
@@ -168,7 +169,7 @@ public class ImageComposite extends SimpleContainer
       i = this.ImageComponents.size();
       if (paramArrayOfImage.length < i)
       {
-        for (k = paramArrayOfImage.length; k < i; ++k)
+        for (int k = paramArrayOfImage.length; k < i; k++)
         {
           ImageComponent localImageComponent3 = (ImageComponent)this.ImageComponents.elementAt(k);
           remove(localImageComponent3);
@@ -178,7 +179,7 @@ public class ImageComposite extends SimpleContainer
       }
 
       int k = 0;
-      int l = 0;
+      int m = 0;
 
       Enumeration localEnumeration = this.ImageComponents.elements();
 
@@ -186,17 +187,17 @@ public class ImageComposite extends SimpleContainer
       {
         Dimension localDimension = ((ImageComponent)localEnumeration.nextElement()).getSize();
         k = Math.max(localDimension.width, k);
-        l = Math.max(localDimension.height, l);
+        m = Math.max(localDimension.height, m);
       }
 
-      this.FinalSize = new Dimension(k, l);
+      this.FinalSize = new Dimension(k, m);
 
       return;
     }
 
     this.FinalSize = new Dimension(0, 0);
     this.ErroredImages = new Vector();
-    for (int i = 0; i < this.ImageComponents.size(); ++i)
+    for (int i = 0; i < this.ImageComponents.size(); i++)
     {
       localImageComponent1 = (ImageComponent)this.ImageComponents.elementAt(i);
       remove(localImageComponent1);
@@ -206,12 +207,11 @@ public class ImageComposite extends SimpleContainer
 
   public OrderedTable setImages(OrderedTable paramOrderedTable)
   {
-    int i;
-    Object localObject;
     deliverImageEvent(3);
 
     OrderedTable localOrderedTable = null;
-
+    int i;
+    Object localObject;
     if (paramOrderedTable != null)
     {
       localOrderedTable = new OrderedTable();
@@ -224,7 +224,7 @@ public class ImageComposite extends SimpleContainer
       localObject = null;
 
       Enumeration localEnumeration1 = paramOrderedTable.keys();
-      for (int j = 0; j < paramOrderedTable.size(); ++j)
+      for (int j = 0; j < paramOrderedTable.size(); j++)
       {
         String str = (String)localEnumeration1.nextElement();
         Image[] arrayOfImage = (Image[])paramOrderedTable.get(str);
@@ -260,7 +260,7 @@ public class ImageComposite extends SimpleContainer
       i = this.ImageComponents.size();
       if (paramOrderedTable.size() < i)
       {
-        for (k = paramOrderedTable.size(); k < i; ++k)
+        for (int k = paramOrderedTable.size(); k < i; k++)
         {
           ImageComponent localImageComponent = (ImageComponent)this.ImageComponents.elementAt(k);
           this.ImageComponents.removeElement(localImageComponent);
@@ -271,7 +271,7 @@ public class ImageComposite extends SimpleContainer
       }
 
       int k = 0;
-      int l = 0;
+      int m = 0;
 
       Enumeration localEnumeration2 = this.ImageComponents.elements();
 
@@ -279,16 +279,16 @@ public class ImageComposite extends SimpleContainer
       {
         Dimension localDimension = ((ImageComponent)localEnumeration2.nextElement()).getSize();
         k = Math.max(localDimension.width, k);
-        l = Math.max(localDimension.height, l);
+        m = Math.max(localDimension.height, m);
       }
 
-      this.FinalSize = new Dimension(k, l);
+      this.FinalSize = new Dimension(k, m);
     }
     else
     {
       this.FinalSize = new Dimension(0, 0);
       this.ErroredImages = new Vector();
-      for (i = 0; i < this.ImageComponents.size(); ++i)
+      for (i = 0; i < this.ImageComponents.size(); i++)
       {
         localObject = (ImageComponent)this.ImageComponents.elementAt(i);
         remove((Component)localObject);
@@ -296,7 +296,7 @@ public class ImageComposite extends SimpleContainer
         ((ImageComponent)localObject).removeImageListener(this);
       }
     }
-    return ((OrderedTable)localOrderedTable);
+    return (OrderedTable)localOrderedTable;
   }
 
   public Image[] getImages()
@@ -317,7 +317,7 @@ public class ImageComposite extends SimpleContainer
     {
       deliverImageEvent(7);
 
-      setVisible(paramBoolean);
+      super.setVisible(paramBoolean);
     }
   }
 
@@ -333,7 +333,7 @@ public class ImageComposite extends SimpleContainer
 
   public boolean isDrawing()
   {
-    return (!(this.Stopped));
+    return !this.Stopped;
   }
 
   public Dimension getSize()
@@ -379,18 +379,18 @@ public class ImageComposite extends SimpleContainer
   public synchronized void deliverImageEvent(ImageEvent paramImageEvent)
   {
     if (this.ImageListeners.size() > 0)
-      for (int i = 0; i < this.ImageListeners.size(); ++i)
+      for (int i = 0; i < this.ImageListeners.size(); i++)
       {
-        ImageListener localImageListener = (ReportingComponent)this.ImageListeners.elementAt(i);
+        ImageListener localImageListener = (ImageListener) this.ImageListeners.elementAt(i);//(ReportingComponent)this.ImageListeners.elementAt(i);
         localImageListener.imageChanged(paramImageEvent);
       }
   }
 
   public synchronized void addReportingComponentListener(ReportingComponentListener paramReportingComponentListener)
   {
-    if (this.ReportingComponentListeners == null)
+    if (this.ReportingComponentListeners == null) {
       this.ReportingComponentListeners = new Vector();
-
+    }
     this.ReportingComponentListeners.addElement(paramReportingComponentListener);
   }
 
@@ -402,7 +402,7 @@ public class ImageComposite extends SimpleContainer
 
   protected synchronized void reportReshape(Rectangle paramRectangle1, Rectangle paramRectangle2)
   {
-    for (int i = 0; i < this.ReportingComponentListeners.size(); ++i)
+    for (int i = 0; i < this.ReportingComponentListeners.size(); i++)
     {
       ReportingComponentListener localReportingComponentListener = (ReportingComponentListener)this.ReportingComponentListeners.elementAt(i);
       localReportingComponentListener.componentReshaped(this, new Rectangle(paramRectangle1), new Rectangle(paramRectangle2));

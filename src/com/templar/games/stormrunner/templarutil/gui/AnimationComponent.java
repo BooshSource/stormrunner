@@ -21,7 +21,7 @@ public class AnimationComponent extends ImageComponent
   protected int[] Delays;
   protected int CurrentIndex;
   protected boolean Loop;
-  protected boolean Running;
+  protected boolean Running = false;
   protected Thread Runner;
 
   public void readExternal(ObjectInput paramObjectInput)
@@ -31,7 +31,7 @@ public class AnimationComponent extends ImageComponent
     if (arrayOfString != null)
     {
       this.Cells = new Image[arrayOfString.length];
-      for (int i = 0; i < arrayOfString.length; ++i)
+      for (int i = 0; i < arrayOfString.length; i++)
         if (arrayOfString[i] != null)
           this.Cells[i] = GameApplet.thisApplet.getImage(arrayOfString[i]);
         else
@@ -46,7 +46,7 @@ public class AnimationComponent extends ImageComponent
       if (this.Indexes != null)
         jumpTo(this.CurrentIndex);
       else
-        super.setImage(this.Cells[0]);
+        setImage(this.Cells[0]);
     if (paramObjectInput.readBoolean())
     {
       this.Runner = new Thread(this);
@@ -60,7 +60,7 @@ public class AnimationComponent extends ImageComponent
     }
     else {
       String[] arrayOfString = new String[this.Cells.length];
-      for (int i = 0; i < this.Cells.length; ++i)
+      for (int i = 0; i < this.Cells.length; i++)
         if (this.Cells[i] != null)
           arrayOfString[i] = GameApplet.thisApplet.getImageFilename(this.Cells[i]);
       paramObjectOutput.writeObject(arrayOfString);
@@ -76,12 +76,11 @@ public class AnimationComponent extends ImageComponent
   public AnimationComponent()
   {
     super(null, true, false);
-
-    this.Running = false;
   }
 
   public AnimationComponent(Image[] paramArrayOfImage)
   {
+    this();
     if (paramArrayOfImage.length < 1) {
       System.out.println("AnimationSequence: Cells must have at least one item.");
 
@@ -95,15 +94,16 @@ public class AnimationComponent extends ImageComponent
   {
     this.Cells = paramArrayOfImage;
 
-    super.setImage(this.Cells[0]);
+    setImage(this.Cells[0]);
   }
 
   public void setSequence(int[] paramArrayOfInt1, int[] paramArrayOfInt2, boolean paramBoolean)
   {
-    if ((paramArrayOfInt2 != null) && 
-      (paramArrayOfInt1.length != paramArrayOfInt2.length))
-      throw new IllegalArgumentException("AnimationSequence: Unacceptable sequence: Delays and Indexes not the same length.");
-
+    if (paramArrayOfInt2 != null)
+    {
+      if (paramArrayOfInt1.length != paramArrayOfInt2.length)
+        throw new IllegalArgumentException("AnimationSequence: Unacceptable sequence: Delays and Indexes not the same length.");
+    }
     this.Indexes = paramArrayOfInt1;
     this.Delays = paramArrayOfInt2;
     this.Loop = paramBoolean;
@@ -114,7 +114,7 @@ public class AnimationComponent extends ImageComponent
   {
     this.CurrentIndex = 0;
     if ((this.Cells != null) && (this.Indexes != null))
-      super.setImage(this.Cells[this.Indexes[0]]);
+      setImage(this.Cells[this.Indexes[0]]);
   }
 
   public void start()
@@ -140,39 +140,42 @@ public class AnimationComponent extends ImageComponent
         this.CurrentIndex = (paramInt - this.Indexes.length);
       else
         this.CurrentIndex = (this.Indexes.length - 1);
-    super.setImage(this.Cells[this.Indexes[this.CurrentIndex]]);
+    setImage(this.Cells[this.Indexes[this.CurrentIndex]]);
   }
 
   public boolean nextImage()
   {
-    int i = 0;
+    boolean b = false;
     this.CurrentIndex += 1;
 
     if ((this.Loop) && (this.CurrentIndex == this.Indexes.length)) {
       this.CurrentIndex = 0;
     }
     else if (this.CurrentIndex < this.Indexes.length)
-      i = 1;
-    if ((this.CurrentIndex < this.Indexes.length) && 
-      (this.Indexes[this.CurrentIndex] < this.Cells.length))
+      b = true;
+    if (this.CurrentIndex < this.Indexes.length)
     {
-      super.setImage(this.Cells[this.Indexes[this.CurrentIndex]]);
+      if (this.Indexes[this.CurrentIndex] < this.Cells.length)
+      {
+        setImage(this.Cells[this.Indexes[this.CurrentIndex]]);
+      }
+
     }
 
-    return i;
+    return b;
   }
 
   public void run()
   {
     while ((this.Running) && (this.CurrentIndex < this.Indexes.length))
     {
-      if (nextImage())
+      if (nextImage()) {
         this.Running = false;
-
-      if (!(this.Running)) { return;
       }
-
-      if (this.Delays != null)
+      if (!this.Running) {
+        break;
+      }
+      if (this.Delays != null) {
         try
         {
           Thread.currentThread(); Thread.sleep(this.Delays[this.CurrentIndex]);
@@ -181,9 +184,10 @@ public class AnimationComponent extends ImageComponent
         {
           localInterruptedException.printStackTrace();
         }
-
-      if (!(this.Running))
-        return;  }
+      }
+      if (!this.Running)
+        return; 
+    }
   }
 
   public int queryCurrentIndex() {
@@ -192,7 +196,7 @@ public class AnimationComponent extends ImageComponent
 
   public String toString() {
     StringBuffer localStringBuffer = new StringBuffer("AnimationComponent[");
-    localStringBuffer.append(super.getSize());
+    localStringBuffer.append(getSize());
     localStringBuffer.append(",CurrentIndex:");
     localStringBuffer.append(this.CurrentIndex);
     localStringBuffer.append(",Indexes:");

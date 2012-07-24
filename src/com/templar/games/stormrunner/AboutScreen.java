@@ -50,7 +50,7 @@ public class AboutScreen extends SimpleContainer
 
   public void invalidate()
   {
-    invalidate();
+    super.invalidate();
 
     Rectangle localRectangle = new Rectangle(TEXT_MARGINS, 0, getSize().width - TEXT_MARGINS * 2, getSize().height - this.BackButton.getSize().height);
     this.TextDisplay.setBounds(localRectangle.x, localRectangle.y, localRectangle.width, localRectangle.height);

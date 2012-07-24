@@ -51,8 +51,8 @@ public class ElevationTrigger extends PhysicalObject
       return;
     }
 
-    paramRobot.setElevated(false); }
-
+    paramRobot.setElevated(false);
+  }
   public int activateOnEvent() {
     return 12;
   }

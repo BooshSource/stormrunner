@@ -22,9 +22,9 @@ class RobotPartWrapper
   }
 
   public boolean isGreater(SortData paramSortData) {
-    if (paramSortData.getData() instanceof RobotPart)
+    if ((paramSortData.getData() instanceof RobotPart))
     {
-      return (this.data.getPlacement() < ((RobotPart)paramSortData.getData()).getPlacement());
+      return this.data.getPlacement() < ((RobotPart)paramSortData.getData()).getPlacement();
     }
 
     throw new IllegalArgumentException("Wrong SortData type passed to isGreater");

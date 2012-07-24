@@ -8,10 +8,12 @@ import com.templar.games.stormrunner.program.Instruction;
 import com.templar.games.stormrunner.program.Linkable;
 import com.templar.games.stormrunner.program.Loop;
 import com.templar.games.stormrunner.program.Parameterized;
+import com.templar.games.stormrunner.program.Program;
+import com.templar.games.stormrunner.templarutil.audio.AudioManager;
 import com.templar.games.stormrunner.templarutil.gui.HighlightBox;
+import com.templar.games.stormrunner.templarutil.gui.ImageButton;
 import com.templar.games.stormrunner.templarutil.gui.ImageComponent;
 import com.templar.games.stormrunner.templarutil.util.UtilityThread;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -31,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.io.PrintStream;
 import java.util.Enumeration;
+import java.util.EventObject;
 import java.util.Vector;
 
 public class ProgramComponent extends ImageComponent
@@ -81,7 +84,7 @@ public class ProgramComponent extends ImageComponent
 
     this.ParameterYOffset = paramInt;
 
-    super.setImage(paramImage1);
+    setImage(paramImage1);
 
     this.CurrentFont = new Font("SansSerif", 0, 9);
     this.CurrentFontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(this.CurrentFont);
@@ -89,12 +92,12 @@ public class ProgramComponent extends ImageComponent
     this.DropTargets = new Vector();
     this.next = new Vector(1, 1);
 
-    this.mh = new MotionHandler(this);
-    this.ch = new ClickHandler(this);
+    this.mh = new MotionHandler();
+    this.ch = new ClickHandler();
     addMouseMotionListener(this.mh);
     addMouseListener(this.ch);
 
-    setSize(super.getSize());
+    setSize(getSize());
   }
 
   public void setAncillaryImage(Image paramImage, int paramInt)
@@ -126,7 +129,7 @@ public class ProgramComponent extends ImageComponent
   {
     super.paint(paramGraphics);
 
-    if ((this.ParameterYOffset >= 0) && (this.ProgramPart instanceof Parameterized))
+    if ((this.ParameterYOffset >= 0) && ((this.ProgramPart instanceof Parameterized)))
     {
       paramGraphics.setColor(Color.white);
       paramGraphics.setFont(this.CurrentFont);
@@ -134,7 +137,7 @@ public class ProgramComponent extends ImageComponent
       String str = ((Parameterized)this.ProgramPart).getParameterString();
       char[] arrayOfChar = str.toCharArray();
       int i = this.CurrentFontMetrics.charsWidth(arrayOfChar, 0, arrayOfChar.length);
-      int j = super.getSize().width / 2 - i / 2;
+      int j = getSize().width / 2 - i / 2;
       paramGraphics.drawString(str, j, this.ParameterYOffset);
     }
   }
@@ -147,11 +150,11 @@ public class ProgramComponent extends ImageComponent
   public ProgramComponent copy()
   {
     ProgramComponent localProgramComponent;
-    if (this instanceof Linkable)
+    if ((this instanceof Linkable))
       localProgramComponent = new ProgramComponent((Linkable)this, getNormalImage(), getIconImage(), this.ParameterYOffset, this.OurPalette);
-    else
+    else {
       localProgramComponent = new ProgramComponent((Linkable)((Copyable)this.ProgramPart).copy(), getNormalImage(), getIconImage(), this.ParameterYOffset, this.OurPalette);
-
+    }
     localProgramComponent.DropTargets = this.DropTargets;
     localProgramComponent.setAncillaryImage(this.AncillaryImage, this.AncillaryDrop);
     if (this.BoundingComponent != null)
@@ -162,9 +165,9 @@ public class ProgramComponent extends ImageComponent
   public void delete()
   {
     Vector localVector = (Vector)this.next.clone();
-    for (int i = 0; i < localVector.size(); ++i)
+    for (int i = 0; i < localVector.size(); i++)
     {
-      localObject = (ProgramComponent)localVector.elementAt(i);
+      ProgramComponent localObject = (ProgramComponent)localVector.elementAt(i);
       ((ProgramComponent)localObject).delete();
     }
 
@@ -208,27 +211,27 @@ public class ProgramComponent extends ImageComponent
 
     this.next.addElement(paramProgramComponent);
 
-    paramProgramComponent.setLocation(getLocation().x, getLocation().y + super.getSize().height + 15);
+    paramProgramComponent.setLocation(getLocation().x, getLocation().y + getSize().height + 15);
   }
 
   public boolean dropAgainst(ProgramComponent paramProgramComponent)
   {
-    int i = 0;
+    boolean b = false;
     Enumeration localEnumeration = this.DropTargets.elements();
-    while ((localEnumeration.hasMoreElements()) && (i == 0))
+    while ((localEnumeration.hasMoreElements()) && (b == false))
     {
       DropTargetInfo localDropTargetInfo = (DropTargetInfo)localEnumeration.nextElement();
       try
       {
         Class localClass = Class.forName(localDropTargetInfo.TargetPart);
-        if (!(localClass.isAssignableFrom(paramProgramComponent.ProgramPart.getClass()))) {
-          break label108;
+        if (!localClass.isAssignableFrom(paramProgramComponent.ProgramPart.getClass()))
+        {
+          continue;
         }
-
         int j = paramProgramComponent.getLocation().x + localDropTargetInfo.DropTarget.x;
         int k = paramProgramComponent.getLocation().y + localDropTargetInfo.DropTarget.y;
         setLocation(j, k);
-        label108: i = 1;
+        b = true;
       }
       catch (ClassNotFoundException localClassNotFoundException)
       {
@@ -236,40 +239,43 @@ public class ProgramComponent extends ImageComponent
       }
     }
 
-    return i;
+    return b;
   }
 
   public boolean attachPrevious(ProgramComponent paramProgramComponent)
   {
-    Object localObject;
     boolean bool1 = false;
 
     Enumeration localEnumeration = paramProgramComponent.next.elements();
+    Object localObject;
     while (localEnumeration.hasMoreElements())
     {
       localObject = (ProgramComponent)localEnumeration.nextElement();
-      if (localObject instanceof BoundingComponent)
+      if (!(localObject instanceof BoundingComponent))
       {
-        ProgramComponent localProgramComponent = this;
-        while (localProgramComponent.next.size() > 0) {
-          localProgramComponent = (ProgramComponent)localProgramComponent.next.elementAt(0);
-        }
-
-        boolean bool2 = ((ProgramComponent)localObject).dropAgainst(localProgramComponent);
-
-        if (bool2)
-        {
-          paramProgramComponent.next.removeElement(localObject);
-          localProgramComponent.next.addElement(localObject);
-          ((ProgramComponent)localObject).prev = localProgramComponent;
-        }
-        else {
-          return false;
-        }
+        continue;
       }
+
+      ProgramComponent localProgramComponent = this;
+      while (localProgramComponent.next.size() > 0) {
+        localProgramComponent = (ProgramComponent)localProgramComponent.next.elementAt(0);
+      }
+
+      boolean bool2 = ((ProgramComponent)localObject).dropAgainst(localProgramComponent);
+
+      if (bool2)
+      {
+        paramProgramComponent.next.removeElement(localObject);
+        localProgramComponent.next.addElement(localObject);
+        ((ProgramComponent)localObject).prev = localProgramComponent;
+      }
+      else {
+        return false;
+      }
+
     }
 
-    if (paramProgramComponent.ProgramPart instanceof Loop)
+    if ((paramProgramComponent.ProgramPart instanceof Loop))
     {
       localObject = (Loop)paramProgramComponent.ProgramPart;
       if (((Loop)localObject).getDestination() == null)
@@ -278,10 +284,10 @@ public class ProgramComponent extends ImageComponent
 
         if (((Instruction)this.ProgramPart).getPreviousInstruction() != null)
           System.out.println("ProgramComponent: Inconsistency detected: ProgramPart " + this.ProgramPart + " had a non-null prev while attempting a loop attachment.");
-        else
+        else {
           bool1 = true;
+        }
       }
-
     }
     else
     {
@@ -322,8 +328,10 @@ public class ProgramComponent extends ImageComponent
         {
           localVector.addElement(localProgramComponent);
         }
-        else if ((localProgramComponent instanceof BoundingComponent) && (!(localVector.contains(((BoundingComponent)localProgramComponent).getBoundSource()))))
-        {
+        else {
+          if ((!(localProgramComponent instanceof BoundingComponent)) || (localVector.contains(((BoundingComponent)localProgramComponent).getBoundSource()))) {
+            continue;
+          }
           i = 1;
 
           localProgramComponent.prev.next.removeElement(localProgramComponent);
@@ -335,15 +343,14 @@ public class ProgramComponent extends ImageComponent
 
           boolean bool2 = localProgramComponent.dropAgainst(this.prev);
 
-          if (!(bool2))
-          {
-            System.out.println("ProgramComponent: BoundingComponent detatched but failed to find a match while attempting to reposition.");
-          }
+          if (bool2)
+            continue;
+          System.out.println("ProgramComponent: BoundingComponent detatched but failed to find a match while attempting to reposition.");
         }
 
       }
 
-      if (this.prev.ProgramPart instanceof Loop)
+      if ((this.prev.ProgramPart instanceof Loop))
       {
         if ((((Loop)this.prev.ProgramPart).getDestination() == this.ProgramPart) && (((Instruction)this.ProgramPart).getPreviousInstruction() == null))
         {
@@ -354,9 +361,9 @@ public class ProgramComponent extends ImageComponent
         else {
           System.out.println("ProgramComponent: Inconsistent list state while trying to detach from a Loop.");
         }
-
       }
-      else {
+      else
+      {
         bool1 = this.ProgramPart.detachPrevious(this.prev.ProgramPart);
       }
 
@@ -380,7 +387,7 @@ public class ProgramComponent extends ImageComponent
     int i = paramInt1 - getLocation().x;
     int j = paramInt2 - getLocation().y;
 
-    setLocation(paramInt1, paramInt2);
+    super.setLocation(paramInt1, paramInt2);
 
     if (this.AncillaryActive)
     {
@@ -389,7 +396,7 @@ public class ProgramComponent extends ImageComponent
       this.Ancillary.setLocation(localPoint);
     }
 
-    for (int k = 0; k < this.next.size(); ++k)
+    for (int k = 0; k < this.next.size(); k++)
     {
       ProgramComponent localProgramComponent = (ProgramComponent)this.next.elementAt(k);
       localProgramComponent.setLocation(localProgramComponent.getLocation().x + i, localProgramComponent.getLocation().y + j);
@@ -408,10 +415,10 @@ public class ProgramComponent extends ImageComponent
       this.programlayer.add(this.Ancillary);
     }
     getParent().remove(this);
-    setLocation(getLocation().x + i, getLocation().y + j);
+    super.setLocation(getLocation().x + i, getLocation().y + j);
     this.programlayer.add(this, 0);
 
-    for (int k = 0; k < this.next.size(); ++k)
+    for (int k = 0; k < this.next.size(); k++)
     {
       ProgramComponent localProgramComponent = (ProgramComponent)this.next.elementAt(k);
       localProgramComponent.moveToProgramLayer();
@@ -430,10 +437,10 @@ public class ProgramComponent extends ImageComponent
       this.display.add(this.Ancillary, 0);
     }
     getParent().remove(this);
-    setLocation(getLocation().x + i, getLocation().y + j);
+    super.setLocation(getLocation().x + i, getLocation().y + j);
     this.display.add(this, 0);
 
-    for (int k = 0; k < this.next.size(); ++k)
+    for (int k = 0; k < this.next.size(); k++)
     {
       ProgramComponent localProgramComponent = (ProgramComponent)this.next.elementAt(k);
       localProgramComponent.moveToDisplayLayer();
@@ -455,15 +462,15 @@ public class ProgramComponent extends ImageComponent
 
   public void setLocationWhileDragging(int paramInt1, int paramInt2)
   {
-    if (this.PaletteMouse)
+    if (this.PaletteMouse) {
       this.StartPoint.translate(getLocation().x - paramInt1, getLocation().y - paramInt2);
-
+    }
     setLocation(paramInt1, paramInt2);
   }
 
   protected void editParameter()
   {
-    if (this.ProgramPart instanceof Parameterized)
+    if ((this.ProgramPart instanceof Parameterized))
     {
       Parameterized localParameterized = (Parameterized)this.ProgramPart;
 
@@ -482,74 +489,80 @@ public class ProgramComponent extends ImageComponent
 
   protected void filterAndRepositionByContext()
   {
-    if ((!(this.ProgramPart instanceof Conditional)) && 
-      (this.prev != null))
+    if (!(this.ProgramPart instanceof Conditional))
     {
-      Vector localVector = new Vector();
-      ProgramComponent localProgramComponent1 = this;
-
-      while (localProgramComponent1.next.size() > 0)
+      if (this.prev != null)
       {
-        localProgramComponent1 = (ProgramComponent)localProgramComponent1.next.elementAt(0);
+        Vector localVector = new Vector();
+        ProgramComponent localProgramComponent1 = this;
 
-        if ((localProgramComponent1.ProgramPart != null) && (localProgramComponent1.ProgramPart instanceof Contextualized))
-          localVector.addElement(localProgramComponent1);
-      }
-
-      if (localVector.size() > 0)
-      {
-        for (int i = 0; i < localVector.size(); ++i)
+        while (localProgramComponent1.next.size() > 0)
         {
-          localProgramComponent1 = (ProgramComponent)localVector.elementAt(i);
+          localProgramComponent1 = (ProgramComponent)localProgramComponent1.next.elementAt(0);
 
-          localProgramComponent2 = localProgramComponent1.prev;
-          if (localProgramComponent1.next.size() > 0)
-            localProgramComponent3 = (ProgramComponent)localProgramComponent1.next.elementAt(0);
-          else {
-            localProgramComponent3 = null;
+          if ((localProgramComponent1.ProgramPart != null) && ((localProgramComponent1.ProgramPart instanceof Contextualized))) {
+            localVector.addElement(localProgramComponent1);
           }
-
-          localProgramComponent1.detachPrevious();
-
-          if ((localProgramComponent3 != null) && ((
-            (localProgramComponent2.next.size() <= 0) || (localProgramComponent2.next.elementAt(0) != localProgramComponent3))))
+        }
+        if (localVector.size() > 0)
+        {
+          for (int i = 0; i < localVector.size(); i++)
           {
+            localProgramComponent1 = (ProgramComponent)localVector.elementAt(i);
+            
+            ProgramComponent localProgramComponent2 = localProgramComponent1.prev;
+            
+            ProgramComponent localProgramComponent3;
+            if (localProgramComponent1.next.size() > 0)
+            	localProgramComponent3 = (ProgramComponent)localProgramComponent1.next.elementAt(0);
+            else {
+            	localProgramComponent3 = null;
+            }
+
+            localProgramComponent1.detachPrevious();
+
+            if (localProgramComponent3 == null)
+              continue;
+            if ((localProgramComponent2.next.size() > 0) && (localProgramComponent2.next.elementAt(0) == localProgramComponent3))
+            {
+              continue;
+            }
+
             localProgramComponent3.detachPrevious();
             localProgramComponent3.attachPrevious(localProgramComponent2);
 
             localProgramComponent3.dropAgainst(localProgramComponent2);
           }
 
-        }
+          ProgramComponent localProgramComponent2 = null;
+          for (int j = localVector.size() - 1; j > 0; j--)
+          {
+            localProgramComponent2 = (ProgramComponent)localVector.elementAt(j - 1);
+            localProgramComponent1 = (ProgramComponent)localVector.elementAt(j);
 
-        ProgramComponent localProgramComponent2 = null;
-        for (int j = localVector.size() - 1; j > 0; --j)
-        {
-          localProgramComponent2 = (ProgramComponent)localVector.elementAt(j - 1);
-          localProgramComponent1 = (ProgramComponent)localVector.elementAt(j);
+            localProgramComponent1.attachPrevious(localProgramComponent2);
 
+            localProgramComponent1.dropAgainst(localProgramComponent2);
+          }
+
+          localProgramComponent1 = (ProgramComponent)localVector.elementAt(0);
+          ProgramComponent localProgramComponent3 = (ProgramComponent)localVector.elementAt(localVector.size() - 1);
+
+          localProgramComponent2 = this.prev;
+          detachPrevious();
           localProgramComponent1.attachPrevious(localProgramComponent2);
+          attachPrevious(localProgramComponent3);
 
           localProgramComponent1.dropAgainst(localProgramComponent2);
+          dropAgainst(localProgramComponent3);
         }
-
-        localProgramComponent1 = (ProgramComponent)localVector.elementAt(0);
-        ProgramComponent localProgramComponent3 = (ProgramComponent)localVector.elementAt(localVector.size() - 1);
-
-        localProgramComponent2 = this.prev;
-        detachPrevious();
-        localProgramComponent1.attachPrevious(localProgramComponent2);
-        attachPrevious(localProgramComponent3);
-
-        localProgramComponent1.dropAgainst(localProgramComponent2);
-        dropAgainst(localProgramComponent3);
       }
     }
   }
 
   protected boolean verifyContext(ProgramComponent paramProgramComponent)
   {
-    if (this.ProgramPart instanceof Contextualized)
+    if ((this.ProgramPart instanceof Contextualized))
     {
       Contextualized localContextualized = (Contextualized)this.ProgramPart;
       ProgramComponent localProgramComponent = paramProgramComponent;
@@ -563,25 +576,25 @@ public class ProgramComponent extends ImageComponent
         }
         else if (j != 0)
           k = 1;
-        else if (localProgramComponent.getProgramPart() instanceof Conditional)
+        else if ((localProgramComponent.getProgramPart() instanceof Conditional))
         {
           j = 1;
         }
 
-        if (k == 0)
+        if (k != 0)
+          continue;
+        Linkable localLinkable = localProgramComponent.getProgramPart();
+        if (localContextualized.checkContext(localLinkable))
         {
-          Linkable localLinkable = localProgramComponent.getProgramPart();
-          if (localContextualized.checkContext(localLinkable))
-          {
-            i = 0;
-            k = 1;
-            this.LastContext = localLinkable;
-          }
-          else {
-            localProgramComponent = localProgramComponent.prev; }
+          i = 0;
+          k = 1;
+          this.LastContext = localLinkable;
+        }
+        else {
+          localProgramComponent = localProgramComponent.prev;
         }
       }
-      return i;
+      if(i==1) return true; else return false;
     }
 
     return false;
@@ -593,7 +606,7 @@ public class ProgramComponent extends ImageComponent
 
     filterAndRepositionByContext();
 
-    if (!(this.PaletteMouse))
+    if (!this.PaletteMouse)
     {
       moveToDisplayLayer();
     }
@@ -602,7 +615,7 @@ public class ProgramComponent extends ImageComponent
     {
       detachPrevious();
 
-      if (this.ProgramPart instanceof Contextualized) {
+      if ((this.ProgramPart instanceof Contextualized)) {
         ((Contextualized)this.ProgramPart).setContext(null);
       }
 
@@ -618,59 +631,41 @@ public class ProgramComponent extends ImageComponent
     }
   }
 
-  static Point access$0(ProgramComponent paramProgramComponent)
+  protected class ClickHandler extends MouseAdapter
   {
-    return paramProgramComponent.StartPoint;
-  }
-
-  static ProgramComponent access$1(ProgramComponent paramProgramComponent)
-  {
-    return paramProgramComponent.realthis;
-  }
-
-  static void access$2(ProgramComponent paramProgramComponent, Point paramPoint)
-  {
-    paramProgramComponent.StartPoint = paramPoint;
-  }
-  
-  
-  class ClickHandler extends MouseAdapter
-  {
-    private final ProgramComponent this$0;
     private long LastClickTime;
     private Point PickupLocation;
 
-    public void mousePressed(MouseEvent paramMouseEvent)
-    {
+    public void mousePressed(MouseEvent paramMouseEvent) {
       long l = System.currentTimeMillis();
 
-      if (this.this$0.editor.getProgram().isExecuting())
-        this.this$0.editor.stopProgram();
-
+      if (ProgramComponent.this.editor.getProgram().isExecuting()) {
+        ProgramComponent.this.editor.stopProgram();
+      }
       if (l - this.LastClickTime <= 500L)
       {
-        this.this$0.editParameter();
+        ProgramComponent.this.editParameter();
 
-        this.this$0.DoubleClickPressed = true;
+        ProgramComponent.this.DoubleClickPressed = true;
       }
       else
       {
-        this.this$0.editor.cancelEditParameter();
+        ProgramComponent.this.editor.cancelEditParameter();
 
-        if (paramMouseEvent.getSource() instanceof PaletteComponent) {
-          this.this$0.PaletteMouse = true;
+        if ((paramMouseEvent.getSource() instanceof PaletteComponent)) {
+          ProgramComponent.this.PaletteMouse = true;
         }
         else
         {
-          this.this$0.PaletteMouse = false;
-          this.PickupLocation = this.this$0.getLocation();
+          ProgramComponent.this.PaletteMouse = false;
+          this.PickupLocation = ProgramComponent.this.getLocation();
         }
 
-        this.this$0.OurPalette.setCurrentActiveProgramComponent(ProgramComponent.access$1(this.this$0));
+        ProgramComponent.this.OurPalette.setCurrentActiveProgramComponent(ProgramComponent.this.realthis);
 
-        ProgramComponent.access$2(this.this$0, paramMouseEvent.getPoint());
+        ProgramComponent.this.StartPoint = paramMouseEvent.getPoint();
 
-        this.this$0.MouseJustPressed = true;
+        ProgramComponent.this.MouseJustPressed = true;
       }
 
       this.LastClickTime = l;
@@ -678,63 +673,60 @@ public class ProgramComponent extends ImageComponent
 
     public void mouseReleased(MouseEvent paramMouseEvent)
     {
-      if (this.this$0.MouseJustPressed)
-        this.this$0.MouseJustPressed = false;
-
-      if (this.this$0.DoubleClickPressed) {
-        this.this$0.DoubleClickPressed = false;
+      if (ProgramComponent.this.MouseJustPressed) {
+        ProgramComponent.this.MouseJustPressed = false;
+      }
+      if (ProgramComponent.this.DoubleClickPressed) {
+        ProgramComponent.this.DoubleClickPressed = false;
 
         return;
       }
-      if (this.this$0.Detached)
+      if (ProgramComponent.this.Detached)
       {
-        this.this$0.Detached = false;
+        ProgramComponent.this.Detached = false;
 
-        this.this$0.DragScrollDone = true;
+        ProgramComponent.this.DragScrollDone = true;
 
-        if (this.this$0.OurPalette.getDelete().getOn())
+        if (ProgramComponent.this.OurPalette.getDelete().getOn())
         {
-          this.this$0.delete();
-          this.this$0.OurPalette.getDelete().setOn(false);
+          ProgramComponent.this.delete();
+          ProgramComponent.this.OurPalette.getDelete().setOn(false);
 
           return;
         }
 
-        Rectangle localRectangle = new Rectangle(Math.abs(this.this$0.display.getLocation().x) + Editor.EditorInsets.left, 
-          Math.abs(this.this$0.display.getLocation().y) + Editor.EditorInsets.top, 
-          this.this$0.editor.getSize().width - Editor.EditorInsets.left - Editor.EditorInsets.right, 
-          this.this$0.editor.getSize().height - Editor.EditorInsets.top - Editor.EditorInsets.bottom);
-        if (!(localRectangle.intersects(ProgramComponent.access$1(this.this$0).getBounds())))
+        Rectangle localRectangle = new Rectangle(Math.abs(ProgramComponent.this.display.getLocation().x) + Editor.EditorInsets.left, 
+          Math.abs(ProgramComponent.this.display.getLocation().y) + Editor.EditorInsets.top, 
+          ProgramComponent.this.editor.getSize().width - Editor.EditorInsets.left - Editor.EditorInsets.right, 
+          ProgramComponent.this.editor.getSize().height - Editor.EditorInsets.top - Editor.EditorInsets.bottom);
+        if (!localRectangle.intersects(ProgramComponent.this.realthis.getBounds()))
         {
-          if (this.this$0.PaletteMouse)
+          if (ProgramComponent.this.PaletteMouse)
           {
-            this.this$0.delete();
+            ProgramComponent.this.delete();
 
             return;
           }
 
-          this.this$0.setLocation(this.PickupLocation);
+          ProgramComponent.this.setLocation(this.PickupLocation);
         }
 
-        this.this$0.moveToProgramLayer();
+        ProgramComponent.this.moveToProgramLayer();
 
-        this.this$0.OurPalette.setCurrentActiveProgramComponent(null);
+        ProgramComponent.this.OurPalette.setCurrentActiveProgramComponent(null);
 
-        int i = this.this$0.getLocation().x;
-        int j = this.this$0.getLocation().y;
+        int i = ProgramComponent.this.getLocation().x;
+        int j = ProgramComponent.this.getLocation().y;
 
-        int i1 = 0;
+        int n = 0;
         Vector localVector = new Vector();
-        for (int i2 = 0; (i2 < this.this$0.DropTargets.size()) && (i1 == 0); ++i2)
-        {
-          Class localClass;
-          DropTargetInfo localDropTargetInfo = (DropTargetInfo)this.this$0.DropTargets.elementAt(i2);
+        for (int i1 = 0; (i1 < ProgramComponent.this.DropTargets.size()) && (n == 0); i1++) {
+          DropTargetInfo localDropTargetInfo = (DropTargetInfo)ProgramComponent.this.DropTargets.elementAt(i1);
 
           int k = i + localDropTargetInfo.TargetResolveX + localDropTargetInfo.HalfTargetAreaX;
-          int l = j + localDropTargetInfo.TargetResolveY + localDropTargetInfo.HalfTargetAreaY;
-          try
-          {
-            localClass = Class.forName(localDropTargetInfo.TargetPart);
+          int m = j + localDropTargetInfo.TargetResolveY + localDropTargetInfo.HalfTargetAreaY;
+          Class localClass;
+          try { localClass = Class.forName(localDropTargetInfo.TargetPart);
           }
           catch (ClassNotFoundException localClassNotFoundException)
           {
@@ -742,16 +734,16 @@ public class ProgramComponent extends ImageComponent
             System.err.println("ProgramComponent: Badly initialized: Can't find TargetPart Class " + localDropTargetInfo.TargetPart);
           }
 
-          Component localComponent = ProgramComponent.access$1(this.this$0).getParent().getComponentAt(k, l);
+          Component localComponent = ProgramComponent.this.realthis.getParent().getComponentAt(k, m);
 
-          if ((localComponent != null) && (localComponent instanceof ProgramComponent))
+          if ((localComponent != null) && ((localComponent instanceof ProgramComponent)))
           {
-            int i3 = localComponent.getLocation().x;
-            int i4 = localComponent.getLocation().y;
-            int i5 = k - i3;
-            int i6 = l - i4;
+            int i2 = localComponent.getLocation().x;
+            int i3 = localComponent.getLocation().y;
+            int i4 = k - i2;
+            int i5 = m - i3;
 
-            if ((i5 <= localDropTargetInfo.DropAreaSize.width) && (i6 <= localDropTargetInfo.DropAreaSize.height))
+            if ((i4 <= localDropTargetInfo.DropAreaSize.width) && (i5 <= localDropTargetInfo.DropAreaSize.height))
             {
               ProgramComponent localProgramComponent = (ProgramComponent)localComponent;
               Linkable localLinkable = localProgramComponent.getProgramPart();
@@ -759,38 +751,38 @@ public class ProgramComponent extends ImageComponent
               if (localClass.isAssignableFrom(localLinkable.getClass()))
               {
                 boolean bool1 = false;
-                for (int i7 = 0; (i7 < localVector.size()) && (!(bool1)); ++i7)
+                for (int i6 = 0; (i6 < localVector.size()) && (!bool1); i6++)
                 {
-                  if (((Class)localVector.elementAt(i7)).isAssignableFrom(localLinkable.getClass())) {
+                  if (((Class)localVector.elementAt(i6)).isAssignableFrom(localLinkable.getClass())) {
                     bool1 = true;
                   }
 
                 }
 
-                if (!(bool1))
-                  bool1 = this.this$0.verifyContext(localProgramComponent);
-
-                if (!(bool1))
+                if (!bool1) {
+                  bool1 = ProgramComponent.this.verifyContext(localProgramComponent);
+                }
+                if (!bool1)
                 {
-                  boolean bool2 = this.this$0.attachPrevious(localProgramComponent);
+                  boolean bool2 = ProgramComponent.this.attachPrevious(localProgramComponent);
 
                   if (bool2)
                   {
-                    int i8 = localProgramComponent.getLocation().x + localDropTargetInfo.DropTarget.x;
-                    int i9 = localProgramComponent.getLocation().y + localDropTargetInfo.DropTarget.y;
-                    this.this$0.setLocation(i8, i9);
+                    int i7 = localProgramComponent.getLocation().x + localDropTargetInfo.DropTarget.x;
+                    int i8 = localProgramComponent.getLocation().y + localDropTargetInfo.DropTarget.y;
+                    ProgramComponent.this.setLocation(i7, i8);
 
-                    if (this.this$0.ProgramPart instanceof Contextualized) {
-                      ((Contextualized)this.this$0.ProgramPart).setContext(this.this$0.LastContext);
+                    if ((ProgramComponent.this.ProgramPart instanceof Contextualized)) {
+                      ((Contextualized)ProgramComponent.this.ProgramPart).setContext(ProgramComponent.this.LastContext);
                     }
 
-                    this.this$0.addAncillaryImage();
+                    ProgramComponent.this.addAncillaryImage();
 
-                    ProgramComponent.access$1(this.this$0).getParent().repaint();
+                    ProgramComponent.this.realthis.getParent().repaint();
 
                     GameApplet.audio.play("ProgramClick");
 
-                    i1 = 1;
+                    n = 1;
                   }
                 }
 
@@ -800,26 +792,18 @@ public class ProgramComponent extends ImageComponent
 
           }
 
-          if (i1 == 0)
+          if (n != 0)
           {
-            localVector.addElement(localClass);
+            continue;
           }
+          localVector.addElement(localClass);
         }
       }
     }
-
-    protected ClickHandler(ProgramComponent paramProgramComponent)
-    {
-      this.this$0 = paramProgramComponent;
+    protected ClickHandler() {
     }
   }
-  
-  
-  
-  public class MotionHandler extends MouseMotionAdapter
-  {
-    private final ProgramComponent this$0;
-    private UtilityThread Fred;
+  public class MotionHandler extends MouseMotionAdapter { private UtilityThread Fred;
     private int xfactor;
     private int yfactor;
     private int tx;
@@ -827,15 +811,13 @@ public class ProgramComponent extends ImageComponent
     private HighlightBox hb;
     private int ScrollThreadCounter;
 
-    public boolean dragScroll(MouseEvent paramMouseEvent)
-    {
-      if (this.this$0.DragScrollDone == false)
+    public boolean dragScroll() { if (ProgramComponent.this.DragScrollDone == false)
       {
-        int i = this.this$0.getLocation().x;
-        int j = this.this$0.getLocation().y;
+        int i = ProgramComponent.this.getLocation().x;
+        int j = ProgramComponent.this.getLocation().y;
 
         int k = Math.max(Math.min(this.xfactor, 20), -20);
-        int l = Math.max(Math.min(this.yfactor, 20), -20);
+        int m = Math.max(Math.min(this.yfactor, 20), -20);
 
         if (this.xfactor != 0)
           this.tx = 0;
@@ -843,45 +825,45 @@ public class ProgramComponent extends ImageComponent
           this.ty = 0;
         }
 
-        if ((i < Editor.EditorInsets.left) && (i > 10) && (l > 0)) {
-          l = 0;
+        if ((i < Editor.EditorInsets.left) && (i > 10) && (m > 0)) {
+          m = 0;
         }
 
-        int i1 = i + this.tx;
-        int i2 = j + this.ty;
+        int n = i + this.tx;
+        int i1 = j + this.ty;
 
         this.tx = (this.ty = 0);
 
-        i1 = Math.max(Math.min(i1, this.this$0.programlayer.getSize().width - this.this$0.getSize().width), 0);
-        i2 = Math.max(Math.min(i2, this.this$0.programlayer.getSize().height - this.this$0.getSize().height - Editor.EditorInsets.bottom), Editor.EditorInsets.top);
+        n = Math.max(Math.min(n, ProgramComponent.this.programlayer.getSize().width - ProgramComponent.this.getSize().width), 0);
+        i1 = Math.max(Math.min(i1, ProgramComponent.this.programlayer.getSize().height - ProgramComponent.this.getSize().height - Editor.EditorInsets.bottom), Editor.EditorInsets.top);
 
-        this.this$0.setLocation(i1, i2);
+        ProgramComponent.this.setLocation(n, i1);
 
-        int i3 = this.this$0.programlayer.getLocation().x;
-        int i4 = this.this$0.programlayer.getLocation().y;
+        int i2 = ProgramComponent.this.programlayer.getLocation().x;
+        int i3 = ProgramComponent.this.programlayer.getLocation().y;
 
-        int i5 = i3 - k;
-        int i6 = i4 - l;
+        int i4 = i2 - k;
+        int i5 = i3 - m;
 
-        Dimension localDimension1 = this.this$0.programlayer.getSize();
-        Dimension localDimension2 = this.this$0.display.getSize();
-        i5 = Math.max(Math.min(i5, 0), localDimension2.width - localDimension1.width - Editor.EditorInsets.right);
-        i6 = Math.max(Math.min(i6, 0), localDimension2.height - localDimension1.height);
+        Dimension localDimension1 = ProgramComponent.this.programlayer.getSize();
+        Dimension localDimension2 = ProgramComponent.this.display.getSize();
+        i4 = Math.max(Math.min(i4, 0), localDimension2.width - localDimension1.width - Editor.EditorInsets.right);
+        i5 = Math.max(Math.min(i5, 0), localDimension2.height - localDimension1.height);
 
-        if ((i5 == this.this$0.programlayer.getLocation().x) && (i6 == this.this$0.programlayer.getLocation().y)) {
-          this.this$0.DragScrollDone = true;
+        if ((i4 == ProgramComponent.this.programlayer.getLocation().x) && (i5 == ProgramComponent.this.programlayer.getLocation().y)) {
+          ProgramComponent.this.DragScrollDone = true;
         }
         else
         {
-          this.this$0.programlayer.setLocation(i5, i6);
+          ProgramComponent.this.programlayer.setLocation(i4, i5);
         }
       }
 
-      if (this.this$0.DragScrollDone) {
+      if (ProgramComponent.this.DragScrollDone) {
         this.ScrollThreadCounter -= 1;
       }
 
-      return (!(this.this$0.DragScrollDone));
+      return !ProgramComponent.this.DragScrollDone;
     }
 
     private void scrollStart()
@@ -908,63 +890,63 @@ public class ProgramComponent extends ImageComponent
 
     public void mouseDragged(MouseEvent paramMouseEvent)
     {
-      if (!(this.this$0.DoubleClickPressed))
+      if (!ProgramComponent.this.DoubleClickPressed)
       {
-        if (this.this$0.MouseJustPressed)
+        if (ProgramComponent.this.MouseJustPressed)
         {
-          this.this$0.MouseJustPressed = false;
-          this.this$0.detacher(paramMouseEvent);
+          ProgramComponent.this.MouseJustPressed = false;
+          ProgramComponent.this.detacher(paramMouseEvent);
         }
 
-        int i = this.this$0.getLocation().x;
-        int j = this.this$0.getLocation().y;
+        int i = ProgramComponent.this.getLocation().x;
+        int j = ProgramComponent.this.getLocation().y;
 
         int k = paramMouseEvent.getPoint().x;
-        int l = paramMouseEvent.getPoint().y;
+        int m = paramMouseEvent.getPoint().y;
 
-        int i1 = k + i - ProgramComponent.access$0(this.this$0).x;
-        int i2 = l + j - ProgramComponent.access$0(this.this$0).y;
+        int n = k + i - ProgramComponent.this.StartPoint.x;
+        int i1 = m + j - ProgramComponent.this.StartPoint.y;
 
-        this.this$0.TrashBounds = this.this$0.OurPalette.getDeleteBounds();
-        if (this.this$0.TrashBounds.intersects(this.this$0.getBounds()))
+        ProgramComponent.this.TrashBounds = ProgramComponent.this.OurPalette.getDeleteBounds();
+        if (ProgramComponent.this.TrashBounds.intersects(ProgramComponent.this.getBounds()))
         {
-          if (!(this.this$0.OurPalette.getDelete().getOn()))
+          if (!ProgramComponent.this.OurPalette.getDelete().getOn())
           {
-            this.this$0.OurPalette.getDelete().setOn(true);
+            ProgramComponent.this.OurPalette.getDelete().setOn(true);
             this.hb = new HighlightBox();
-            this.hb.setTarget(ProgramComponent.access$1(this.this$0));
-            this.this$0.getParent().add(this.hb, 0);
+            this.hb.setTarget(ProgramComponent.this.realthis);
+            ProgramComponent.this.getParent().add(this.hb, 0);
           }
         }
-        else if (this.this$0.OurPalette.getDelete().getOn())
+        else if (ProgramComponent.this.OurPalette.getDelete().getOn())
         {
-          this.this$0.OurPalette.getDelete().setOn(false);
-          this.this$0.getParent().remove(this.hb);
-          this.this$0.getParent().repaint();
+          ProgramComponent.this.OurPalette.getDelete().setOn(false);
+          ProgramComponent.this.getParent().remove(this.hb);
+          ProgramComponent.this.getParent().repaint();
         }
 
-        Dimension localDimension = this.this$0.getParent().getSize();
-        int i3 = i1 + this.this$0.getSize().width - localDimension.width + Editor.EditorInsets.right;
-        int i4 = i1;
-        if (i3 > 0)
+        Dimension localDimension = ProgramComponent.this.getParent().getSize();
+        int i2 = n + ProgramComponent.this.getSize().width - localDimension.width + Editor.EditorInsets.right;
+        int i3 = n;
+        if (i2 > 0)
         {
-          this.this$0.setLocation(localDimension.width - this.this$0.getSize().width - Editor.EditorInsets.right, this.this$0.getLocation().y);
+          ProgramComponent.this.setLocation(localDimension.width - ProgramComponent.this.getSize().width - Editor.EditorInsets.right, ProgramComponent.this.getLocation().y);
 
-          this.this$0.DragScrollDone = false;
+          ProgramComponent.this.DragScrollDone = false;
 
-          this.xfactor = i3;
-          this.ty = (l - ProgramComponent.access$0(this.this$0).y);
+          this.xfactor = i2;
+          this.ty = (m - ProgramComponent.this.StartPoint.y);
 
           scrollStart();
         }
-        else if (i4 < 0)
+        else if (i3 < 0)
         {
-          this.this$0.setLocation(0, this.this$0.getLocation().y);
+          ProgramComponent.this.setLocation(0, ProgramComponent.this.getLocation().y);
 
-          this.this$0.DragScrollDone = false;
+          ProgramComponent.this.DragScrollDone = false;
 
-          this.xfactor = i4;
-          this.ty = (l - ProgramComponent.access$0(this.this$0).y);
+          this.xfactor = i3;
+          this.ty = (m - ProgramComponent.this.StartPoint.y);
 
           scrollStart();
         }
@@ -973,27 +955,27 @@ public class ProgramComponent extends ImageComponent
           this.xfactor = 0;
         }
 
-        int i5 = i2 - Editor.EditorInsets.top;
-        int i6 = i2 + this.this$0.getSize().height - localDimension.height + Editor.EditorInsets.bottom;
-        if (i6 > 0)
+        int i4 = i1 - Editor.EditorInsets.top;
+        int i5 = i1 + ProgramComponent.this.getSize().height - localDimension.height + Editor.EditorInsets.bottom;
+        if (i5 > 0)
         {
-          this.this$0.setLocation(this.this$0.getLocation().x, localDimension.height - this.this$0.getSize().height - Editor.EditorInsets.bottom);
+          ProgramComponent.this.setLocation(ProgramComponent.this.getLocation().x, localDimension.height - ProgramComponent.this.getSize().height - Editor.EditorInsets.bottom);
 
-          this.this$0.DragScrollDone = false;
+          ProgramComponent.this.DragScrollDone = false;
 
-          this.yfactor = i6;
-          this.tx = (k - ProgramComponent.access$0(this.this$0).x);
+          this.yfactor = i5;
+          this.tx = (k - ProgramComponent.this.StartPoint.x);
 
           scrollStart();
         }
-        else if (i5 < 0)
+        else if (i4 < 0)
         {
-          this.this$0.setLocation(this.this$0.getLocation().x, Editor.EditorInsets.top);
+          ProgramComponent.this.setLocation(ProgramComponent.this.getLocation().x, Editor.EditorInsets.top);
 
-          this.this$0.DragScrollDone = false;
+          ProgramComponent.this.DragScrollDone = false;
 
-          this.yfactor = i5;
-          this.tx = (k - ProgramComponent.access$0(this.this$0).x);
+          this.yfactor = i4;
+          this.tx = (k - ProgramComponent.this.StartPoint.x);
 
           scrollStart();
         }
@@ -1004,16 +986,14 @@ public class ProgramComponent extends ImageComponent
 
         if ((this.xfactor == 0) && (this.yfactor == 0))
         {
-          this.this$0.DragScrollDone = true;
-          this.this$0.setLocation(i1, i2);
+          ProgramComponent.this.DragScrollDone = true;
+          ProgramComponent.this.setLocation(n, i1);
         }
       }
     }
 
-    public MotionHandler(ProgramComponent paramProgramComponent)
+    public MotionHandler()
     {
-      this.this$0 = paramProgramComponent;
-
     }
   }
 }

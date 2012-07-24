@@ -50,7 +50,7 @@ public class SaveMenu extends Container
     localTextContainer.setLocation(3, 35);
     localTextContainer.setStreak(true, 10, 7, 50);
     localTextContainer.setBurnLine(true, getSize().width - 6, 1, 1, 25, 5, this.TextDark, 50);
-    super.add(localTextContainer);
+    add(localTextContainer);
 
     this.NameInput = new TextInputContainer("SAVE FILENAME:", this.TextDark, this.TextLight, this.TextFont);
     this.NameInput.setLocation(3, 60);
@@ -87,7 +87,7 @@ public class SaveMenu extends Container
       str = "TRANSFER COMPLETED.";
       localColor = this.TextDark;
 
-      localObject = this.editor.getGameState().getProgramLibrary();
+      OrderedTable localObject = this.editor.getGameState().getProgramLibrary();
       ((OrderedTable)localObject).put(paramActionEvent.getActionCommand(), this.editor.getProgram().copy());
     }
 
@@ -96,7 +96,7 @@ public class SaveMenu extends Container
     Object localObject = new TextContainer(str, localColor, this.TextFont);
     ((TextContainer)localObject).setStreak(true, 10, 7, 50);
     ((Component)localObject).setLocation(4, getSize().height - ((TextContainer)localObject).getSize().height - 3);
-    super.add((Component)localObject);
+    add((Component)localObject);
     try
     {
       UtilityThread localUtilityThread = new UtilityThread(2000, this, getClass().getMethod("remove", null), false);
@@ -113,7 +113,7 @@ public class SaveMenu extends Container
 
   public boolean displayStep()
   {
-    super.add(this.NameInput);
+    add(this.NameInput);
 
     return false;
   }

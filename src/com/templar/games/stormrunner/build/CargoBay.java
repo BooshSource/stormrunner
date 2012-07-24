@@ -37,9 +37,9 @@ public class CargoBay extends SimpleContainer
 
   public void addNotify()
   {
-    addNotify();
+    super.addNotify();
 
-    if (!(this.FirstAdded))
+    if (!this.FirstAdded)
     {
       Image localImage = this.ir.getImage("com/templar/games/stormrunner/media/images/build/scene/B_background.jpg");
       this.ir.hitCache(localImage);

@@ -9,12 +9,12 @@ public class AppletSound
 
   public AppletSound(AudioClip paramAudioClip)
   {
-    this.clip = paramAudioClip; }
-
-  AudioClip getAudioClip() { return this.clip;
+    this.clip = paramAudioClip;
   }
+  AudioClip getAudioClip() { return this.clip; }
 
-  public boolean load() {
+  public boolean load()
+  {
     this.clip.play();
     this.clip.stop();
     return true;

@@ -29,23 +29,21 @@ public abstract class Instruction
   public Object copy()
   {
     try {
-      return super.clone();
+      return clone();
     }
     catch (CloneNotSupportedException localCloneNotSupportedException) {
     }
     return null;
   }
-
   public abstract boolean execute(Robot paramRobot);
 
   public abstract boolean verifyRobot(Robot paramRobot);
 
-  public Instruction getNextInstruction() {
-    return this.next; } 
-  public Instruction getPreviousInstruction() { return this.prev;
-  }
+  public Instruction getNextInstruction() { return this.next; } 
+  public Instruction getPreviousInstruction() { return this.prev; }
 
-  public void setNextInstruction(Instruction paramInstruction) {
+  public void setNextInstruction(Instruction paramInstruction)
+  {
     this.next = paramInstruction;
   }
 
@@ -56,9 +54,9 @@ public abstract class Instruction
 
   public boolean detachNext(Linkable paramLinkable)
   {
-    int i = 0;
+    boolean b = false;
 
-    if (paramLinkable instanceof InstructionList)
+    if ((paramLinkable instanceof InstructionList))
     {
       InstructionList localInstructionList = (InstructionList)paramLinkable;
       if ((localInstructionList.getPreviousInstruction() == this) && (this.next == localInstructionList))
@@ -66,18 +64,18 @@ public abstract class Instruction
         this.next.setPreviousInstruction(null);
         this.next = null;
 
-        i = 1;
+        b = true;
       }
     }
 
-    return i;
+    return b;
   }
 
   public boolean attachNext(Linkable paramLinkable)
   {
-    int i = 0;
+   boolean  b = false;
 
-    if (paramLinkable instanceof InstructionList)
+    if ((paramLinkable instanceof InstructionList))
     {
       InstructionList localInstructionList = (InstructionList)paramLinkable;
       if (localInstructionList.getPreviousInstruction() == null)
@@ -85,18 +83,18 @@ public abstract class Instruction
         localInstructionList.setPreviousInstruction(this);
         this.next = ((Instruction)localInstructionList);
 
-        i = 1;
+        b = true;
       }
     }
 
-    return i;
+    return b;
   }
 
   public boolean detachPrevious(Linkable paramLinkable)
   {
-    int i = 0;
+    boolean b = false;
 
-    if (paramLinkable instanceof InstructionList)
+    if ((paramLinkable instanceof InstructionList))
     {
       InstructionList localInstructionList = (InstructionList)paramLinkable;
 
@@ -106,41 +104,42 @@ public abstract class Instruction
         {
           if (this.prev != null)
             this.prev.setNextInstruction(null);
-          else
+          else {
             localInstructionList.setNextInstruction(null);
-
+          }
           this.prev = null;
 
-          i = 1;
+          b = true;
         }
         else {
           System.out.println("Instruction: Attempt to detach from an instruction we are not attached to.");
         }
       }
-      else System.out.println("Instruction: Attempt to detach from an Instruction which not attached to us.");
+      else System.out.println("Instruction: Attempt to detach from an Instruction which not attached to us."); 
     }
-    else {
+    else
+    {
       System.out.println("Instruction: Attempt to detach from an incompatible Linkable.");
     }
-    return i;
+    return b;
   }
 
   public boolean attachPrevious(Linkable paramLinkable)
   {
-    int i = 0;
+    boolean b=false;
 
-    if (paramLinkable instanceof InstructionList)
+    if ((paramLinkable instanceof InstructionList))
     {
       InstructionList localInstructionList = (InstructionList)paramLinkable;
       if (localInstructionList.getNextInstruction() == null)
       {
         localInstructionList.setNextInstruction(this);
-        if (paramLinkable instanceof Instruction)
+        if ((paramLinkable instanceof Instruction))
           this.prev = ((Instruction)localInstructionList);
-        else
+        else {
           this.prev = null;
-
-        i = 1;
+        }
+        b = true;
       }
 
     }
@@ -148,7 +147,7 @@ public abstract class Instruction
     {
       System.out.println("Instruction: Attempt to attach to an incompatible Linkable.");
     }
-    return i;
+    return b;
   }
 
   public static String getDescription()

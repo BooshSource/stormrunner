@@ -18,9 +18,9 @@ public class FocusCatcher extends Component
     this.FocusTarget = paramComponent1;
     this.EventRecipient = paramComponent2;
 
-    super.setBounds(paramComponent2.getBounds());
+    setBounds(paramComponent2.getBounds());
 
-    super.enableEvents(48L);
+    enableEvents(48L);
   }
 
   public void setFocusTarget(Component paramComponent)
@@ -48,7 +48,7 @@ public class FocusCatcher extends Component
         this.FocusTarget.requestFocus();
       }
 
-      if (!(this.exitedlast))
+      if (!this.exitedlast)
       {
         this.skipdelivery = true;
       }
@@ -61,11 +61,11 @@ public class FocusCatcher extends Component
     else {
       this.skipdelivery = false;
     }
-    super.disableEvents(48L);
+    disableEvents(48L);
 
-    if (!(this.skipdelivery))
+    if (!this.skipdelivery) {
       this.EventRecipient.dispatchEvent(paramAWTEvent);
-
+    }
     if ((localMouseEvent1 != null) && (i > 0))
     {
       MouseEvent localMouseEvent2 = new MouseEvent(localMouseEvent1.getComponent(), 
@@ -89,6 +89,6 @@ public class FocusCatcher extends Component
       this.EventRecipient.dispatchEvent(localMouseEvent3);
     }
 
-    super.enableEvents(48L);
+    enableEvents(48L);
   }
 }

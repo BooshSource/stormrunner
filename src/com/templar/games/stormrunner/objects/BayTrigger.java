@@ -1,6 +1,7 @@
 package com.templar.games.stormrunner.objects;
 
 import com.templar.games.stormrunner.GameState;
+import com.templar.games.stormrunner.PhysicalObject;
 import com.templar.games.stormrunner.Position;
 import com.templar.games.stormrunner.Robot;
 import com.templar.games.stormrunner.Scene;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public class BayTrigger extends com.templar.games.stormrunner.PhysicalObject
+public class BayTrigger extends PhysicalObject
   implements Ceiling, Trigger, Externalizable
 {
   protected GameState state;
@@ -56,13 +57,17 @@ public class BayTrigger extends com.templar.games.stormrunner.PhysicalObject
   public void activate(Robot paramRobot, int paramInt) {
     if (this.state != null)
     {
-      if (!(this.state.isRobotActive(paramRobot))) return;
+      if (this.state.isRobotActive(paramRobot))
+      {
+        this.state.deactivateRobot(paramRobot);
 
-      this.state.deactivateRobot(paramRobot);
+        return;
+      }
 
-      return;
     }
-
-    Debug.println("BayTrigger: no GameState!");
+    else
+    {
+      Debug.println("BayTrigger: no GameState!");
+    }
   }
 }

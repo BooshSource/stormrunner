@@ -68,7 +68,7 @@ public class Plant extends Actor
     if (localVector != null)
     {
       this.oldImages = new Image[localVector.size()];
-      for (int i = 0; i < localVector.size(); ++i)
+      for (int i = 0; i < localVector.size(); i++)
         this.oldImages[i] = GameApplet.thisApplet.getImage((String)localVector.elementAt(i));
     }
     this.comp = ((AnimationComponent)paramObjectInput.readObject());
@@ -96,7 +96,7 @@ public class Plant extends Actor
     }
     else {
       Vector localVector = new Vector();
-      for (int i = 0; i < this.oldImages.length; ++i)
+      for (int i = 0; i < this.oldImages.length; i++)
         localVector.addElement(GameApplet.thisApplet.getImageFilename(this.oldImages[i]));
       paramObjectOutput.writeObject(localVector);
     }
@@ -143,11 +143,11 @@ public class Plant extends Actor
     Position localPosition1 = this.victim.getPosition();
     Position localPosition2 = this.victimPos;
 
-    return (((localPosition1.x == localPosition2.x) && (localPosition1.y == localPosition2.y) && (Math.abs(localPosition1.dx) < 25) && (Math.abs(localPosition1.dy) < 25)) || 
+    return ((localPosition1.x == localPosition2.x) && (localPosition1.y == localPosition2.y) && (Math.abs(localPosition1.dx) < 25) && (Math.abs(localPosition1.dy) < 25)) || 
       ((localPosition1.x == localPosition2.x) && (localPosition1.y == localPosition2.y - 1) && (Math.abs(localPosition1.dy) < 25)) || 
       ((localPosition1.x == localPosition2.x - 1) && (localPosition1.y == localPosition2.y) && (Math.abs(localPosition1.dx) < 25)) || 
       ((localPosition1.x == localPosition2.x + 1) && (localPosition1.y == localPosition2.y) && (Math.abs(localPosition1.dx) < 25)) || (
-      (localPosition1.x == localPosition2.x) && (localPosition1.y == localPosition2.y + 1) && (Math.abs(localPosition1.dy) < 25)));
+      (localPosition1.x == localPosition2.x) && (localPosition1.y == localPosition2.y + 1) && (Math.abs(localPosition1.dy) < 25));
   }
 
   public void tick()
@@ -162,10 +162,8 @@ public class Plant extends Actor
         this.comp.setSequence(animationFrames[5], null, false);
       }
       if ((this.emptyCountDown >= 0) || 
-        (this.comp.nextImage())) {
-        return;
-      }
-
+        (this.comp.nextImage()))
+        break;
       arrayOfImage = this.oldImages;
       initialize();
       this.oldImages = arrayOfImage;
@@ -178,22 +176,22 @@ public class Plant extends Actor
       switch (this.frame)
       {
       case 0:
-        if (this.comp.nextImage()) { return;
+        if (this.comp.nextImage()) {
+          break;
         }
-
         if (checkVictimPosition())
         {
           playSound("Robot-Scream");
           this.frame = 2;
         }
         else {
-          this.frame = 1; }
-        this.comp.setSequence(animationFrames[this.frame], null, false);
+          this.frame = 1;
+        }this.comp.setSequence(animationFrames[this.frame], null, false);
 
         return;
       case 1:
-        if (this.comp.nextImage()) return;
-
+        if (this.comp.nextImage())
+          break;
         arrayOfImage = this.oldImages;
         initialize();
         this.oldImages = arrayOfImage;
@@ -202,12 +200,12 @@ public class Plant extends Actor
 
         return;
       case 2:
-        if (this.comp.nextImage()) return;
+        if (this.comp.nextImage()) break;
         this.comp.setSequence(animationFrames[(++this.frame)], null, false);
         return;
       case 3:
-        if (this.comp.nextImage()) return;
-
+        if (this.comp.nextImage())
+          break;
         this.comp.setSequence(animationFrames[(++this.frame)], null, false);
         if (checkVictimPosition())
         {
@@ -225,8 +223,8 @@ public class Plant extends Actor
 
         return;
       case 4:
-        if (this.comp.nextImage()) return;
-
+        if (this.comp.nextImage())
+          break;
         this.frame = 0;
         this.state = 1;
 
@@ -238,8 +236,8 @@ public class Plant extends Actor
 
   public int activateOnEvent()
   {
-    return 4; }
-
+    return 4;
+  }
   public void activate(Robot paramRobot, int paramInt) {
     if (this.state == 0)
     {
@@ -286,12 +284,12 @@ public class Plant extends Actor
     Integer localInteger = new Integer(paramInt);
     Object localObject = this.cellCache.get(localInteger);
     if (localObject != null) {
-      return ((Image[])localObject);
+      return (Image[])localObject;
     }
 
     Image[] arrayOfImage = new Image[getAnimationFrames()];
     String str = "com/templar/games/stormrunner/media/images/scenery/plants/eater/eater_";
-    for (int i = 1; i < getAnimationFrames(); ++i)
+    for (int i = 1; i < getAnimationFrames(); i++)
     {
       StringBuffer localStringBuffer = new StringBuffer(str);
       localStringBuffer.append(paramInt);
@@ -302,8 +300,8 @@ public class Plant extends Actor
       arrayOfImage[(i - 1)] = GameApplet.thisApplet.getImage(localStringBuffer.toString());
     }
     this.cellCache.put(localInteger, arrayOfImage);
-    return arrayOfImage; }
-
+    return arrayOfImage;
+  }
   public int getAnimationFrames() {
     return 18;
   }

@@ -17,6 +17,7 @@ public class Sequence
   protected transient Thread Director;
   protected int StepIndex;
   protected boolean Looping = false;
+
   protected Vector ActionRecipients = new Vector();
 
   public void setManager(AnimationManager paramAnimationManager)
@@ -48,11 +49,11 @@ public class Sequence
 
     addStep(new Step(130, 0, paramString, paramPoint1));
 
-    for (int i2 = 0; i2 < i; ++i2)
+    for (int i1 = 0; i1 < i; i1++)
     {
-      int l = paramPoint1.x + Math.round(j / f * i2);
-      int i1 = paramPoint1.y + Math.round(k / f * i2);
-      addStep(new Step(130, paramInt2, paramString, new Point(l, i1)));
+      int m = paramPoint1.x + Math.round(j / f * i1);
+      int n = paramPoint1.y + Math.round(k / f * i1);
+      addStep(new Step(130, paramInt2, paramString, new Point(m, n)));
     }
 
     addStep(new Step(130, 0, paramString, paramPoint2));
@@ -61,7 +62,7 @@ public class Sequence
   public void moveLayers(Vector paramVector, Point paramPoint1, Point paramPoint2, int paramInt1, int paramInt2)
   {
     addStep(new Step(400, 0));
-    for (int i = 0; i < paramVector.size(); ++i)
+    for (int i = 0; i < paramVector.size(); i++)
       addStep(new Step(330, 0, (String)paramVector.elementAt(i), paramPoint1));
     addStep(new Step(410, 0));
 
@@ -69,25 +70,25 @@ public class Sequence
     {
       float f = paramInt1 / paramInt2;
       int j = (int)Math.floor(f);
-      (paramInt1 % paramInt2);
+      ////(paramInt1 % paramInt2);
       int k = paramPoint2.x - paramPoint1.x;
-      int l = paramPoint2.y - paramPoint1.y;
+      int m = paramPoint2.y - paramPoint1.y;
 
-      for (int i3 = 0; i3 < j; ++i3)
+      for (int i2 = 0; i2 < j; i2++)
       {
         addStep(new Step(400, 0));
-        int i1 = paramPoint1.x + Math.round(k / f * i3);
-        int i2 = paramPoint1.y + Math.round(l / f * i3);
-        for (i4 = 0; i4 < paramVector.size(); ++i4)
-          addStep(new Step(330, 0, (String)paramVector.elementAt(i4), new Point(i1, i2)));
+        int n = paramPoint1.x + Math.round(k / f * i2);
+        int i1 = paramPoint1.y + Math.round(m / f * i2);
+        for (int i3 = 0; i3 < paramVector.size(); i3++)
+          addStep(new Step(330, 0, (String)paramVector.elementAt(i3), new Point(n, i1)));
         addStep(new Step(410, 0));
 
         addStep(new Step(500, paramInt2, null));
       }
 
       addStep(new Step(400, 0));
-      for (int i4 = 0; i4 < paramVector.size(); ++i4)
-        addStep(new Step(330, 0, (String)paramVector.elementAt(i4), paramPoint2));
+      for (int i3 = 0; i3 < paramVector.size(); i3++)
+        addStep(new Step(330, 0, (String)paramVector.elementAt(i3), paramPoint2));
       addStep(new Step(410, 0));
     }
   }
@@ -166,10 +167,8 @@ public class Sequence
       case 340:
         if (localStep.Argument2 == null)
           this.Manager.reorderLayer(localStep.Argument1, localStep.Number1);
-        else {
+        else
           this.Manager.reorderLayer(localStep.Argument1, localStep.Argument2);
-        }
-
         break;
       case 400:
         this.Manager.setFrozen(true);
@@ -184,14 +183,16 @@ public class Sequence
 
       try
       {
-        if (localStep.Delay <= 0) break label516;
-        Thread.currentThread(); Thread.sleep(localStep.Delay);
+        if (localStep.Delay > 0) {
+          Thread.currentThread(); Thread.sleep(localStep.Delay);
+        }
+
       }
       catch (InterruptedException localInterruptedException)
       {
       }
 
-      label516: this.StepIndex += 1;
+      this.StepIndex += 1;
     }
 
     processActionEvent(new ActionEvent(this, 1001, "Sequence Complete."));
@@ -226,9 +227,9 @@ public class Sequence
   public String toString()
   {
     String str = "Sequence on Step " + this.StepIndex + " (looping=" + this.Looping + ")\n";
-    for (int i = 0; i < this.Steps.size(); ++i)
+    for (int i = 0; i < this.Steps.size(); i++)
     {
-      str = str + "Step " + i + ": " + ((Step)this.Steps.elementAt(i)) + "\n";
+      str = str + "Step " + i + ": " + (Step)this.Steps.elementAt(i) + "\n";
     }
 
     return str;

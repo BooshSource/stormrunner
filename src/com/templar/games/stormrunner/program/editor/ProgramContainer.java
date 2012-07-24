@@ -48,7 +48,7 @@ public class ProgramContainer extends SimpleContainer
 
   public synchronized void setLocation(int paramInt1, int paramInt2)
   {
-    setLocation(paramInt1, paramInt2);
+    super.setLocation(paramInt1, paramInt2);
 
     this.BoundX = (Math.abs(paramInt1) + Editor.EditorInsets.left);
     this.BoundY = (Math.abs(paramInt2) + Editor.EditorInsets.top);

@@ -28,9 +28,8 @@ public class TApplet extends Applet
     BufferedInputStream localBufferedInputStream = new BufferedInputStream(localInputStream);
     try
     {
-      int i;
       byte[] arrayOfByte = new byte[4096];
-
+      int i;
       while ((i = localBufferedInputStream.read(arrayOfByte)) > 0)
       {
         localByteArrayOutputStream.write(arrayOfByte, 0, i);

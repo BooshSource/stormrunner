@@ -100,10 +100,10 @@ public class Position
   public static Position screenToMap(Point paramPoint, Position paramPosition)
   {
     Position localPosition = new Position();
-    localPosition.x = (paramPosition.x + paramPoint.x / 50);
-    localPosition.y = (paramPosition.y + paramPoint.y / 50);
-    localPosition.dx = (paramPosition.dx + paramPoint.x % 50);
-    localPosition.dy = (paramPosition.dy + paramPoint.y % 50);
+    paramPosition.x += paramPoint.x / 50;
+    paramPosition.y += paramPoint.y / 50;
+    paramPosition.dx += paramPoint.x % 50;
+    paramPosition.dy += paramPoint.y % 50;
     return localPosition;
   }
 

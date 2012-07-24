@@ -109,7 +109,7 @@ public class PaletteSection extends SimpleContainer
     this.PaletteSpace.removeAll();
     this.PaletteSpace.setLocation(0, 0);
 
-    for (int i = 0; i < this.Contents.size(); ++i)
+    for (int i = 0; i < this.Contents.size(); i++)
     {
       ProgramComponent localProgramComponent = (ProgramComponent)this.Contents.elementAt(i);
       PaletteComponent localPaletteComponent = new PaletteComponent(localProgramComponent.getIconImage(), localProgramComponent, this.AddTarget, this.OurPalette);
@@ -123,7 +123,7 @@ public class PaletteSection extends SimpleContainer
 
   public void setMinimized(boolean paramBoolean)
   {
-    if (!(paramBoolean))
+    if (!paramBoolean)
     {
       this.minimized = false;
 
@@ -173,28 +173,26 @@ public class PaletteSection extends SimpleContainer
 
       if (paramActionEvent.getActionCommand().compareTo("R:down") == 0)
       {
-        if (this.ScrollThread == null) break label174;
-        this.ScrollThread.politeStop();
+        if (this.ScrollThread != null) {
+          this.ScrollThread.politeStop();
 
-        return;
+          return;
+        }
       }
-
-      if (paramActionEvent.getActionCommand().compareTo("P:up") == 0)
+      else
       {
-        this.ScrollThread = new UtilityThread(50, this, getClass().getMethod("stepUp", null), false);
-        this.ScrollThread.start();
+        if (paramActionEvent.getActionCommand().compareTo("P:up") == 0)
+        {
+          this.ScrollThread = new UtilityThread(50, this, getClass().getMethod("stepUp", null), false);
+          this.ScrollThread.start();
 
-        return;
+          return;
+        }
+
+        if (paramActionEvent.getActionCommand().compareTo("R:up") != 0) return;
+        if (this.ScrollThread == null) return; this.ScrollThread.politeStop();
       }
-
-      if ((paramActionEvent.getActionCommand().compareTo("R:up") != 0) || 
-        (this.ScrollThread == null)) {
-        return;
-      }
-
-      this.ScrollThread.politeStop();
-
-      label174: return;
+      return;
     }
     catch (NoSuchMethodException localNoSuchMethodException)
     {
@@ -252,9 +250,9 @@ public class PaletteSection extends SimpleContainer
     if (this.minimized) {
       localDimension = this.TitleBackground.getSize();
     }
-    else
+    else {
       localDimension = new Dimension(this.TitleBackground.getSize().width, this.TitleBackground.getSize().height + 112);
-
+    }
     return localDimension;
   }
 }

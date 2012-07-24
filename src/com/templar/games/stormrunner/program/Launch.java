@@ -45,10 +45,10 @@ public class Launch extends Instruction
     }
 
     Enumeration localEnumeration = GameApplet.thisApplet.getGameState().getSpecialProgramParts().elements();
-    while (localEnumeration.hasMoreElements())
-      if (localEnumeration.nextElement() instanceof Launch)
+    while (localEnumeration.hasMoreElements()) {
+      if ((localEnumeration.nextElement() instanceof Launch))
         return true;
-
+    }
     return false;
   }
 
@@ -57,8 +57,8 @@ public class Launch extends Instruction
   }
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt) {
-    return false; }
-
+    return false;
+  }
   public boolean boundaryCheck(Robot paramRobot) { return false; }
 
   public void terminate(Robot paramRobot) {
@@ -70,33 +70,35 @@ public class Launch extends Instruction
 
   public boolean execute(Robot paramRobot)
   {
-    if (paramRobot.getAssembly(1) instanceof Launcher)
+    if ((paramRobot.getAssembly(1) instanceof Launcher))
     {
       Launcher localLauncher = (Launcher)paramRobot.getAssembly(1);
-      if (!(localLauncher.isEmpty()))
+      if (!localLauncher.isEmpty())
       {
         Vector localVector = paramRobot.getEnvironment().getObjectAt(paramRobot.getPosition().getMapPoint());
         if (localVector != null)
         {
           Enumeration localEnumeration = localVector.elements();
-          while (localEnumeration.hasMoreElements())
-            if (localEnumeration.nextElement() instanceof LaunchSite)
+          while (localEnumeration.hasMoreElements()) {
+            if (!(localEnumeration.nextElement() instanceof LaunchSite))
             {
-              GameApplet.thisApplet.setBackground(Color.black);
-              GameApplet.thisApplet.removeAll();
-              GameApplet.thisApplet.getGameState().setFinished();
-              if (GameApplet.appletContext != null)
-                try
-                {
-                  GameApplet.appletContext.showDocument(
-                    new URL(GameApplet.thisApplet.getDocumentBase(), "victory.html"), 
-                    "_self");
-                }
-                catch (MalformedURLException localMalformedURLException)
-                {
-                }
-              return true;
+              continue;
             }
+            GameApplet.thisApplet.setBackground(Color.black);
+            GameApplet.thisApplet.removeAll();
+            GameApplet.thisApplet.getGameState().setFinished();
+            if (GameApplet.appletContext != null)
+              try
+              {
+                GameApplet.appletContext.showDocument(
+                  new URL(GameApplet.thisApplet.getDocumentBase(), "victory.html"), 
+                  "_self");
+              }
+              catch (MalformedURLException localMalformedURLException)
+              {
+              }
+            return true;
+          }
         }
         paramRobot.playSound("Robot-Deny");
         GameApplet.thisApplet.sendStatusMessage(

@@ -25,16 +25,16 @@ public class VidSensor extends Sensor
 
   public boolean check(Robot paramRobot)
   {
-    return false; }
-
+    return false;
+  }
   public String getID() { return "VidSensor"; }
 
   public String getDescription() {
-    return "Video Sensor\n\nPolymetals: 2\nEnergy Units: 2\nSecurity Level: 1\nWeight: 0.04\n\td4000]\nManufactured by Xerox Corp. Palo Alto, California, 94304. Specially designed for mapping and extended surveying of uncharted terrain, the PAO-G1 disperses solar-powered MNT mapping particles capable of relaying continuous information about the covered area to the RCX control system for review in the map interface, making it possible to safely deploy RCX units in unexplored areas."; }
-
+    return "Video Sensor\n\nPolymetals: 2\nEnergy Units: 2\nSecurity Level: 1\nWeight: 0.04\n\td4000]\nManufactured by Xerox Corp. Palo Alto, California, 94304. Specially designed for mapping and extended surveying of uncharted terrain, the PAO-G1 disperses solar-powered MNT mapping particles capable of relaying continuous information about the covered area to the RCX control system for review in the map interface, making it possible to safely deploy RCX units in unexplored areas.";
+  }
   public String toString() {
     return "Video Sensor"; } 
-  public double getWeight() { return 0.040000000000000001D; } 
+  public double getWeight() { return 0.04D; } 
   public int getSalvageCost() { return 2; } 
   public int getEnergyCost() { return 2; } 
   public int getSecurityLevel() { return 1; } 

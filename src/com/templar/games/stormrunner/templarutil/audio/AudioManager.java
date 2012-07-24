@@ -31,7 +31,7 @@ public class AudioManager
   public Sound getSound(String paramString, URL paramURL)
   {
     Sound localSound = this.device.getSound(paramURL);
-    if (!(localSound.load()))
+    if (!localSound.load())
       Debug.println("Sound.load() failed on " + localSound);
     else
       this.audioCache.put(paramString, localSound);
@@ -40,7 +40,7 @@ public class AudioManager
 
   public Sound getSound(String paramString1, String paramString2) {
     Sound localSound = this.device.getSound(paramString2);
-    if (!(localSound.load()))
+    if (!localSound.load())
       Debug.println("Sound.load() failed on " + localSound);
     else
       this.audioCache.put(paramString1, localSound);
@@ -56,9 +56,9 @@ public class AudioManager
   {
     if (this.muted)
     {
-      if (paramSoundListener != null)
+      if (paramSoundListener != null) {
         paramSoundListener.soundStopped(paramString, 2);
-
+      }
       return;
     }
     Sound localSound = (Sound)this.audioCache.get(paramString);
@@ -81,26 +81,30 @@ public class AudioManager
 
   public void loop(String paramString, SoundListener paramSoundListener)
   {
-    if ((this.muted) && 
-      (paramSoundListener != null))
-      paramSoundListener.soundStopped(paramString, 2);
-
+    if (this.muted)
+    {
+      if (paramSoundListener != null)
+        paramSoundListener.soundStopped(paramString, 2);
+    }
     Sound localSound = (Sound)this.audioCache.get(paramString);
     if (localSound != null)
     {
       SoundRecord localSoundRecord = new SoundRecord(paramString, localSound, this, paramSoundListener, true);
       this.soundRecords.addElement(localSoundRecord);
-      if (this.muted) return;
-      this.device.loopMethod(localSoundRecord);
+      if (!this.muted) {
+        this.device.loopMethod(localSoundRecord);
 
-      return;
+        return;
+      }
+
     }
-
-    System.err.println("AudioManager: loop(): No such sound: " + paramString);
+    else
+    {
+      System.err.println("AudioManager: loop(): No such sound: " + paramString);
+    }
   }
 
-  public void stop(String paramString)
-  {
+  public void stop(String paramString) {
     stop(paramString, null);
   }
 
@@ -129,8 +133,8 @@ public class AudioManager
     if (paramSoundRecord.getSoundListener() != null)
     {
       paramSoundRecord.getSoundListener().soundStopped(paramSoundRecord.getName(), 
-        (paramBoolean) ? 
-        0 : (this.muted) ? 2 : 
+        paramBoolean ? 
+        0 : this.muted ? 2 : 
         1);
     }
     this.soundRecords.removeElement(paramSoundRecord);
@@ -138,7 +142,7 @@ public class AudioManager
 
   public void mute()
   {
-    if (!(this.muted))
+    if (!this.muted)
     {
       this.muted = true;
       Enumeration localEnumeration = this.soundRecords.elements();
@@ -147,7 +151,7 @@ public class AudioManager
       {
         SoundRecord localSoundRecord = (SoundRecord)localEnumeration.nextElement();
         this.device.stopMethod(localSoundRecord);
-        if (!(localSoundRecord.isLooping()))
+        if (!localSoundRecord.isLooping())
           localVector.addElement(localSoundRecord);
       }
       localEnumeration = localVector.elements();
@@ -167,7 +171,8 @@ public class AudioManager
       {
         SoundRecord localSoundRecord = (SoundRecord)localEnumeration.nextElement();
 
-        this.device.loopMethod(localSoundRecord); }
+        this.device.loopMethod(localSoundRecord);
+      }
     }
   }
 

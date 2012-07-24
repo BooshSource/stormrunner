@@ -28,18 +28,18 @@ public class EnergySensor extends DirectionalSensor
   public boolean check(Robot paramRobot)
   {
     this.lastDirection = -1;
-    boolean bool = super.checkRadius(paramRobot, 5, new EnergyCell().getClass());
-    return bool; }
-
+    boolean bool = checkRadius(paramRobot, 5, new EnergyCell().getClass());
+    return bool;
+  }
   public String getID() {
-    return "EnergySensor"; }
-
+    return "EnergySensor";
+  }
   public String getDescription() {
-    return "Energy Sensor:\n\nPolymetals: 3\nEnergy Units: 2\nSecurity Level: 2\nWeight. 0.05\n\td4000]\nManufactured by Sinclair/Clement AG, B Section, #21, Luna, C1-00024. The ARC2 ranged charged-particle detection system gives the RCX the ability to locate and seek out concentrated sources of B- and C-type Giraud particles, the signature of high-yield fusionable materials. The ARC series was originally designed for automated mining in the Van Allen Belt, but is highly versatile, with a distinguished service record in both the CES military, and the civilian waste management division, which has used the ARC2 very successfully in recovering lost or wasted fuel cells."; }
-
+    return "Energy Sensor:\n\nPolymetals: 3\nEnergy Units: 2\nSecurity Level: 2\nWeight. 0.05\n\td4000]\nManufactured by Sinclair/Clement AG, B Section, #21, Luna, C1-00024. The ARC2 ranged charged-particle detection system gives the RCX the ability to locate and seek out concentrated sources of B- and C-type Giraud particles, the signature of high-yield fusionable materials. The ARC series was originally designed for automated mining in the Van Allen Belt, but is highly versatile, with a distinguished service record in both the CES military, and the civilian waste management division, which has used the ARC2 very successfully in recovering lost or wasted fuel cells.";
+  }
   public String toString() {
     return "Energy Sensor"; } 
-  public double getWeight() { return 0.050000000000000003D; } 
+  public double getWeight() { return 0.05D; } 
   public int getSalvageCost() { return 3; } 
   public int getEnergyCost() { return 2; } 
   public int getSecurityLevel() { return 2; } 

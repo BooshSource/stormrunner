@@ -10,7 +10,9 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -22,14 +24,16 @@ public class ImageButton extends ImageComponent
   protected Image MouseOverImage;
   protected Image PressedImage;
   protected Image OnImage;
-  protected boolean On;
-  protected boolean Clickable;
-  protected boolean Enabled;
+  protected boolean On = false;
+
+  protected boolean Clickable = true;
+  protected boolean Enabled = true;
   protected Hashtable ImageMap;
-  protected boolean VerboseEvents;
+  protected boolean VerboseEvents = false;
   protected Vector ActionRecipients;
-  protected String ActionCommand;
-  protected boolean EventTransparent;
+  protected String ActionCommand = "ImageButton";
+
+  protected boolean EventTransparent = false;
   protected Vector EventChildren;
   protected AudioManager player;
   protected String sound;
@@ -46,43 +50,21 @@ public class ImageButton extends ImageComponent
   {
     super(paramImage);
 
-    this.On = false;
-
-    this.Clickable = true;
-    this.Enabled = true;
-
-    this.VerboseEvents = false;
-
-    this.ActionCommand = "ImageButton";
-
-    this.EventTransparent = false;
-
     this.realthis = this;
 
     this.ActionRecipients = new Vector();
 
     this.ImageMap = paramHashtable;
 
-    this.mh = new MouseHandler(this);
+    this.mh = new MouseHandler();
     addMouseListener(this.mh);
 
-    setSize(super.getSize());
+    setSize(getSize());
   }
 
   public ImageButton(Image paramImage1, Image paramImage2, Image paramImage3)
   {
     super(paramImage1);
-
-    this.On = false;
-
-    this.Clickable = true;
-    this.Enabled = true;
-
-    this.VerboseEvents = false;
-
-    this.ActionCommand = "ImageButton";
-
-    this.EventTransparent = false;
 
     this.realthis = this;
 
@@ -94,10 +76,10 @@ public class ImageButton extends ImageComponent
 
     this.ImageMap = null;
 
-    this.mh = new MouseHandler(this);
+    this.mh = new MouseHandler();
     addMouseListener(this.mh);
 
-    setSize(super.getSize());
+    setSize(getSize());
   }
 
   protected void rawSetImage(Image paramImage)
@@ -115,7 +97,7 @@ public class ImageButton extends ImageComponent
 
     super.setImage(paramImage);
 
-    setSize(super.getSize());
+    setSize(getSize());
 
     repaint();
   }
@@ -146,7 +128,7 @@ public class ImageButton extends ImageComponent
 
     if (paramHashtable != null)
     {
-      this.mmh = new MouseMotionHandler(this);
+      this.mmh = new MouseMotionHandler();
       addMouseMotionListener(this.mmh);
     }
   }
@@ -170,7 +152,7 @@ public class ImageButton extends ImageComponent
 
     super.setImage(paramImage1);
 
-    setSize(super.getSize());
+    setSize(getSize());
   }
 
   public void setOnImage(Image paramImage)
@@ -190,7 +172,7 @@ public class ImageButton extends ImageComponent
   {
     if (this.OnImage != null)
     {
-      if ((paramBoolean) && (!(this.On)))
+      if ((paramBoolean) && (!this.On))
       {
         this.On = true;
         super.setImage(this.OnImage);
@@ -198,19 +180,22 @@ public class ImageButton extends ImageComponent
         return;
       }
 
-      if ((paramBoolean) || (!(this.On))) return;
+      if ((!paramBoolean) && (this.On))
+      {
+        this.On = false;
+        super.setImage(this.NormalImage);
 
-      this.On = false;
-      super.setImage(this.NormalImage);
+        return;
+      }
 
-      return;
     }
-
-    System.out.println("ImageButton: Attempt to setOn without an onImage.");
+    else
+    {
+      System.out.println("ImageButton: Attempt to setOn without an onImage.");
+    }
   }
 
-  public boolean getEventTransparent()
-  {
+  public boolean getEventTransparent() {
     return this.EventTransparent;
   }
 
@@ -251,9 +236,9 @@ public class ImageButton extends ImageComponent
 
   public void processEvent(AWTEvent paramAWTEvent)
   {
-    processEvent(paramAWTEvent);
+    super.processEvent(paramAWTEvent);
 
-    if ((paramAWTEvent instanceof MouseEvent) && (this.EventTransparent))
+    if (((paramAWTEvent instanceof MouseEvent)) && (this.EventTransparent))
     {
       MouseEvent localMouseEvent1 = (MouseEvent)paramAWTEvent;
 
@@ -262,7 +247,7 @@ public class ImageButton extends ImageComponent
 
       int i = -1;
 
-      for (int j = 0; j < arrayOfComponent.length; ++j)
+      for (int j = 0; j < arrayOfComponent.length; j++)
       {
         Component localComponent = localContainer.getComponent(j);
         if (localComponent == this)
@@ -272,29 +257,32 @@ public class ImageButton extends ImageComponent
         else
         {
           int k = localMouseEvent1.getX() + getLocation().x - localComponent.getLocation().x;
-          int l = localMouseEvent1.getY() + getLocation().y - localComponent.getLocation().y;
+          int m = localMouseEvent1.getY() + getLocation().y - localComponent.getLocation().y;
 
           if (i > -1)
-            if (localComponent.contains(k, l))
+            if (localComponent.contains(k, m))
             {
               localMouseEvent1.translatePoint(getLocation().x - localComponent.getLocation().x, getLocation().y - localComponent.getLocation().y);
 
               localComponent.dispatchEvent(localMouseEvent1);
 
-              if (!(this.EventChildren.contains(localComponent))) {
+              if (!this.EventChildren.contains(localComponent)) {
                 this.EventChildren.addElement(localComponent);
               }
 
               j = arrayOfComponent.length;
             }
-            else if (this.EventChildren.contains(localComponent))
+            else
             {
+              if (!this.EventChildren.contains(localComponent)) {
+                continue;
+              }
               MouseEvent localMouseEvent2 = new MouseEvent(localComponent, 
                 505, 
                 System.currentTimeMillis(), 
                 0, 
                 k, 
-                l, 
+                m, 
                 0, 
                 false);
 
@@ -317,25 +305,25 @@ public class ImageButton extends ImageComponent
       while ((localEnumeration.hasMoreElements()) && (i == 0))
       {
         localObject = localEnumeration.nextElement();
-        if (localObject instanceof Rectangle)
+        if ((localObject instanceof Rectangle))
         {
           if (((Rectangle)localObject).contains(paramInt1, paramInt2))
             i = 1;
         }
-        else if (localObject instanceof Polygon)
+        else if ((localObject instanceof Polygon))
         {
-          if (((Polygon)localObject).contains(paramInt1, paramInt2))
-          {
-            i = 1;
-          }
+          if (!((Polygon)localObject).contains(paramInt1, paramInt2))
+            continue;
+          i = 1;
         }
         else
+        {
           System.out.println("ImageButton: Somebody put some weird object in my ImageMap.");
+        }
       }
-
-      if (i != 0)
-        return ((String)this.ImageMap.get(localObject));
-
+      if (i != 0) {
+        return (String)this.ImageMap.get(localObject);
+      }
       return null;
     }
 
@@ -346,7 +334,7 @@ public class ImageButton extends ImageComponent
   {
     String str1 = "";
 
-    if (this.VerboseEvents)
+    if (this.VerboseEvents) {
       if (paramMouseEvent.getID() == 501)
         str1 = "P:";
       else if (paramMouseEvent.getID() == 502)
@@ -355,7 +343,7 @@ public class ImageButton extends ImageComponent
         str1 = "I:";
       else if (paramMouseEvent.getID() == 505)
         str1 = "O:";
-
+    }
     if (this.ImageMap == null)
     {
       processActionEvent(new ActionEvent(this.realthis, 1001, str1 + this.ActionCommand));
@@ -367,5 +355,173 @@ public class ImageButton extends ImageComponent
 
     if (str2 != null)
       processActionEvent(new ActionEvent(this.realthis, 1001, str1 + str2));
+  }
+
+  protected class MouseHandler extends MouseAdapter
+  {
+    public void mousePressed(MouseEvent paramMouseEvent)
+    {
+      if ((ImageButton.this.Clickable) && (ImageButton.this.Enabled))
+      {
+        String str = ImageButton.this.checkMap(paramMouseEvent.getX(), paramMouseEvent.getY());
+
+        if ((ImageButton.this.player != null) && (ImageButton.this.sound != null))
+        {
+          if (ImageButton.this.ImageMap != null)
+          {
+            if (str != null)
+            {
+              ImageButton.this.player.play(ImageButton.this.sound);
+            }
+          }
+          else
+          {
+            ImageButton.this.player.play(ImageButton.this.sound);
+          }
+        }
+
+        if (ImageButton.this.PressedImage != null)
+        {
+          if (ImageButton.this.ImageMap != null)
+          {
+            if (str != null)
+              ImageButton.this.rawSetImage(ImageButton.this.PressedImage);
+          }
+          else {
+            ImageButton.this.rawSetImage(ImageButton.this.PressedImage);
+          }
+        }
+        if (ImageButton.this.VerboseEvents)
+          if (ImageButton.this.ImageMap != null)
+          {
+            if (str != null) {
+              ImageButton.this.event(paramMouseEvent);
+
+              return;
+            }
+
+          }
+          else
+          {
+            ImageButton.this.event(paramMouseEvent);
+          }
+      }
+    }
+
+    public void mouseEntered(MouseEvent paramMouseEvent) {
+      String str = null;
+
+      if (ImageButton.this.Enabled)
+      {
+        if (ImageButton.this.MouseOverImage != null)
+        {
+          if (ImageButton.this.ImageMap != null)
+          {
+            str = ImageButton.this.checkMap(paramMouseEvent.getX(), paramMouseEvent.getY());
+            if (str != null)
+              ImageButton.this.rawSetImage(ImageButton.this.MouseOverImage);
+          }
+          else {
+            ImageButton.this.rawSetImage(ImageButton.this.MouseOverImage);
+          }
+        }
+        if (ImageButton.this.VerboseEvents)
+          if (ImageButton.this.ImageMap != null)
+          {
+            if (str != null) {
+              ImageButton.this.event(paramMouseEvent);
+
+              return;
+            }
+
+          }
+          else
+          {
+            ImageButton.this.event(paramMouseEvent);
+          }
+      }
+    }
+
+    public void mouseExited(MouseEvent paramMouseEvent) {
+      if (ImageButton.this.Enabled)
+      {
+        if (ImageButton.this.MouseOverImage != null)
+        {
+          if ((ImageButton.this.On) && (ImageButton.this.OnImage != null))
+            ImageButton.this.rawSetImage(ImageButton.this.OnImage);
+          else {
+            ImageButton.this.rawSetImage(ImageButton.this.NormalImage);
+          }
+        }
+        if (ImageButton.this.VerboseEvents)
+          ImageButton.this.event(paramMouseEvent);
+      }
+    }
+
+    public void mouseReleased(MouseEvent paramMouseEvent)
+    {
+      if ((ImageButton.this.Clickable) && (ImageButton.this.Enabled))
+      {
+        if ((ImageButton.this.NormalImage != null) && (ImageButton.this.PressedImage != null) && (ImageButton.this.CurrentImage != ImageButton.this.NormalImage)) {
+          if (ImageButton.this.MouseOverImage != null)
+            ImageButton.this.rawSetImage(ImageButton.this.MouseOverImage);
+          else {
+            ImageButton.this.rawSetImage(ImageButton.this.NormalImage);
+          }
+        }
+
+        if (ImageButton.this.OnImage != null)
+        {
+          if ((ImageButton.this.ImageMap == null) || ((ImageButton.this.ImageMap != null) && (ImageButton.this.checkMap(paramMouseEvent.getX(), paramMouseEvent.getY()) != null)))
+          {
+            if (ImageButton.this.On)
+              ImageButton.this.setOn(false);
+            else {
+              ImageButton.this.setOn(true);
+            }
+          }
+        }
+        ImageButton.this.event(paramMouseEvent);
+      }
+    }
+
+    protected MouseHandler() {
+    }
+  }
+
+  protected class MouseMotionHandler extends MouseMotionAdapter {
+    public void mouseMoved(MouseEvent paramMouseEvent) {
+      if (ImageButton.this.Enabled)
+      {
+        if ((ImageButton.this.MouseOverImage != null) && 
+          (ImageButton.this.ImageMap != null))
+        {
+          if (ImageButton.this.checkMap(paramMouseEvent.getX(), paramMouseEvent.getY()) != null)
+          {
+            if (ImageButton.this.CurrentImage != ImageButton.this.MouseOverImage) {
+              ImageButton.this.rawSetImage(ImageButton.this.MouseOverImage);
+
+              return;
+            }
+
+          }
+          else if ((ImageButton.this.On) && (ImageButton.this.OnImage != null))
+          {
+            if (ImageButton.this.CurrentImage != ImageButton.this.OnImage) {
+              ImageButton.this.rawSetImage(ImageButton.this.OnImage);
+
+              return;
+            }
+
+          }
+          else if (ImageButton.this.CurrentImage != ImageButton.this.NormalImage)
+            ImageButton.this.rawSetImage(ImageButton.this.NormalImage);
+        }
+      }
+    }
+
+    protected MouseMotionHandler()
+    {
+    }
   }
 }

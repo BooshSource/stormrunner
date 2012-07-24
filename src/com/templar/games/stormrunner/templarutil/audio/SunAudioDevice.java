@@ -32,8 +32,8 @@ public class SunAudioDevice extends AudioDevice
     catch (IOException localIOException)
     {
       System.err.println("SunAudioDevice: IOException generated while reading data - " + localIOException);
-      localIOException.printStackTrace(); }
-    return null;
+      localIOException.printStackTrace();
+    }return null;
   }
 
   public Sound getSound(String paramString)
@@ -63,7 +63,7 @@ public class SunAudioDevice extends AudioDevice
   public void loopMethod(SoundRecord paramSoundRecord)
     throws IllegalArgumentException
   {
-    if (paramSoundRecord.getSound() instanceof SunSound)
+    if ((paramSoundRecord.getSound() instanceof SunSound))
     {
       ((SunSound)paramSoundRecord.getSound()).loop(paramSoundRecord);
 
@@ -75,7 +75,7 @@ public class SunAudioDevice extends AudioDevice
 
   public void playMethod(SoundRecord paramSoundRecord) throws IllegalArgumentException
   {
-    if (paramSoundRecord.getSound() instanceof SunSound)
+    if ((paramSoundRecord.getSound() instanceof SunSound))
     {
       ((SunSound)paramSoundRecord.getSound()).play(paramSoundRecord);
 
@@ -87,7 +87,7 @@ public class SunAudioDevice extends AudioDevice
 
   public void stopMethod(SoundRecord paramSoundRecord) throws IllegalArgumentException
   {
-    if (paramSoundRecord.getSound() instanceof SunSound)
+    if ((paramSoundRecord.getSound() instanceof SunSound))
     {
       ((SunSound)paramSoundRecord.getSound()).stop(paramSoundRecord);
 

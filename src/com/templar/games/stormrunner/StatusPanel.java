@@ -192,65 +192,66 @@ public class StatusPanel extends SimpleContainer
 
   public boolean isMinimized()
   {
-    return (!(this.button.getOn()));
+    return !this.button.getOn();
   }
 
   public void setMinimized(boolean paramBoolean)
   {
     try
     {
-      if (!(paramBoolean))
+      if (!paramBoolean)
       {
-        if (this.Collapser != null)
+        if (this.Collapser != null) {
           this.Collapser.politeStop();
-
+        }
         this.button.setOn(true);
 
-        if (getLocation().y <= this.LocationHolder.y)
+        if (getLocation().y > this.LocationHolder.y)
+        {
+          GameApplet.audio.play("PanelZip");
+
+          if (this.PanelState == 0)
+          {
+            this.roster.setOn(true);
+            this.stat.setOn(false);
+          }
+          else
+          {
+            this.roster.setOn(false);
+            this.stat.setOn(true);
+          }
+
+          this.CurrentY = getLocation().y;
+
+          this.Collapser = new UtilityThread(10, this, getClass().getMethod("maximizeStep", null), false);
+          this.Collapser.start();
+
           return;
+        }
+
+      }
+      else
+      {
+        if (this.Collapser != null) {
+          this.Collapser.politeStop();
+        }
+        this.button.setOn(false);
+
+        if (getLocation().y > this.LocationHolder.y)
+          return;
+        Enumeration localEnumeration = this.listeners.elements();
+        while (localEnumeration.hasMoreElements()) {
+          ((ActionListener)localEnumeration.nextElement()).actionPerformed(
+            new ActionEvent(this, 1001, "Roster Minimized"));
+        }
 
         GameApplet.audio.play("PanelZip");
 
-        if (this.PanelState == 0)
-        {
-          this.roster.setOn(true);
-          this.stat.setOn(false);
-        }
-        else
-        {
-          this.roster.setOn(false);
-          this.stat.setOn(true);
-        }
-
-        this.CurrentY = getLocation().y;
-
-        this.Collapser = new UtilityThread(10, this, getClass().getMethod("maximizeStep", null), false);
+        this.CurrentY = this.LocationHolder.y;
+        this.Collapser = new UtilityThread(10, this, getClass().getMethod("minimizeStep", null), false);
         this.Collapser.start();
-
-        return;
       }
-
-      if (this.Collapser != null)
-        this.Collapser.politeStop();
-
-      this.button.setOn(false);
-
-      if (getLocation().y > this.LocationHolder.y) { return;
-      }
-
-      Enumeration localEnumeration = this.listeners.elements();
-      while (localEnumeration.hasMoreElements()) {
-        ((ActionListener)localEnumeration.nextElement()).actionPerformed(
-          new ActionEvent(this, 1001, "Roster Minimized"));
-      }
-
-      GameApplet.audio.play("PanelZip");
-
-      this.CurrentY = this.LocationHolder.y;
-      this.Collapser = new UtilityThread(10, this, getClass().getMethod("minimizeStep", null), false);
-      this.Collapser.start();
-
-      label274: return;
+      return;
     }
     catch (NoSuchMethodException localNoSuchMethodException)
     {
@@ -261,13 +262,14 @@ public class StatusPanel extends SimpleContainer
   public synchronized void actionPerformed(ActionEvent paramActionEvent)
   {
     String str = paramActionEvent.getActionCommand();
-    if ((str.compareTo("run") == 0) && 
-      (this.state.getCurrentRobot() != null) && 
-      (this.state.getCurrentRobot().getProgram() != null))
+    if (str.compareTo("run") == 0)
     {
-      this.state.currentRobot.getProgram().setExecuting(true);
+      if ((this.state.getCurrentRobot() != null) && 
+        (this.state.getCurrentRobot().getProgram() != null))
+      {
+        this.state.currentRobot.getProgram().setExecuting(true);
+      }
     }
-
     if (str.compareTo("P:up") == 0)
     {
       if ((this.scrolling == 1) || (this.ScrollY != 0))
@@ -331,13 +333,14 @@ public class StatusPanel extends SimpleContainer
         }
       }
     }
-    if ((str.compareTo("stop") == 0) && 
-      (this.state.getCurrentRobot() != null) && 
-      (this.state.getCurrentRobot().getProgram() != null))
+    if (str.compareTo("stop") == 0)
     {
-      this.state.getCurrentRobot().stop();
+      if ((this.state.getCurrentRobot() != null) && 
+        (this.state.getCurrentRobot().getProgram() != null))
+      {
+        this.state.getCurrentRobot().stop();
+      }
     }
-
     if (str.compareTo("button") == 0)
     {
       if (getLocation().y > this.LocationHolder.y)
@@ -367,9 +370,9 @@ public class StatusPanel extends SimpleContainer
 
       if (this.PanelState == 0)
       {
-        if (this.RosterMenu.getSelection() instanceof Robot)
+        if ((this.RosterMenu.getSelection() instanceof Robot))
         {
-          localObject = (Robot)this.RosterMenu.getSelection();
+          Robot localObject = (Robot)this.RosterMenu.getSelection();
 
           if (localObject != this.state.getCurrentRobot())
           {
@@ -397,9 +400,9 @@ public class StatusPanel extends SimpleContainer
   {
     if (this.Scroller != null) return;
 
-    if (this.MessagesPanel.getAdded())
+    if (this.MessagesPanel.getAdded()) {
       remove(this.MessagesPanel);
-
+    }
     remove(this.StatMenu);
     add(this.RosterMenu, 0);
     repaint();
@@ -410,9 +413,9 @@ public class StatusPanel extends SimpleContainer
   {
     if (this.Scroller != null) return;
 
-    if (this.MessagesPanel.getAdded())
+    if (this.MessagesPanel.getAdded()) {
       remove(this.MessagesPanel);
-
+    }
     remove(this.RosterMenu);
     add(this.StatMenu, 0);
     repaint();
@@ -421,34 +424,36 @@ public class StatusPanel extends SimpleContainer
 
   public synchronized boolean scrollDown()
   {
-    ScrollMenu localScrollMenu = (this.PanelState == 0) ? this.RosterMenu : this.StatMenu;
-    int i = (localScrollMenu.stepDown(2)) ? 0 : 1;
+    ScrollMenu localScrollMenu = this.PanelState == 0 ? this.RosterMenu : this.StatMenu;
+    int i = localScrollMenu.stepDown(2) ? 0 : 1;
     this.ScrollY += 1;
-    if ((((i != 0) || (this.scrolling == -1))) && ((
-      (i != 0) || (this.ScrollY % 5 == 0))))
+    if ((i != 0) || (this.scrolling == -1))
     {
-      this.Scroller = null;
-      this.ScrollY = 0;
-      notify();
-      return false;
+      if ((i != 0) || (this.ScrollY % 5 == 0))
+      {
+        this.Scroller = null;
+        this.ScrollY = 0;
+        notify();
+        return false;
+      }
     }
-
     return true;
   }
 
   public synchronized boolean scrollUp() {
-    ScrollMenu localScrollMenu = (this.PanelState == 0) ? this.RosterMenu : this.StatMenu;
-    int i = (localScrollMenu.stepUp(2)) ? 0 : 1;
+    ScrollMenu localScrollMenu = this.PanelState == 0 ? this.RosterMenu : this.StatMenu;
+    int i = localScrollMenu.stepUp(2) ? 0 : 1;
     this.ScrollY -= 1;
-    if ((((i != 0) || (this.scrolling == -1))) && ((
-      (i != 0) || (this.ScrollY % 5 == 0))))
+    if ((i != 0) || (this.scrolling == -1))
     {
-      this.Scroller = null;
-      this.ScrollY = 0;
-      notify();
-      return false;
+      if ((i != 0) || (this.ScrollY % 5 == 0))
+      {
+        this.Scroller = null;
+        this.ScrollY = 0;
+        notify();
+        return false;
+      }
     }
-
     return true;
   }
 
@@ -508,17 +513,17 @@ public class StatusPanel extends SimpleContainer
 
   public void populateRosterPanel()
   {
+    Enumeration localEnumeration = this.state.getAllRobots().elements();
+    OrderedTable localOrderedTable = new OrderedTable();
     Object localObject;
     String str;
     TextContainer localTextContainer;
-    Enumeration localEnumeration = this.state.getAllRobots().elements();
-    OrderedTable localOrderedTable = new OrderedTable();
     while (localEnumeration.hasMoreElements())
     {
       localObject = (Robot)localEnumeration.nextElement();
       str = ((Robot)localObject).toString();
-      str = str.substring(0, str.indexOf(10));
-      str = str + ((this.state.isRobotActive((Robot)localObject)) ? " - Active" : " - Stored");
+      str = str.substring(0, str.indexOf('\n'));
+      str = str + (this.state.isRobotActive((Robot)localObject) ? " - Active" : " - Stored");
       localTextContainer = new TextContainer(str, TEXTCOLOUR, TEXTFONT);
       localTextContainer.setPadding(new Insets(0, 0, 0, this.RosterMenu.getSize().width - localTextContainer.getSize().width));
       localOrderedTable.put(localTextContainer, localObject);
@@ -537,7 +542,7 @@ public class StatusPanel extends SimpleContainer
   }
 
   public void populateStatPanel() {
-    if (this.RosterMenu.getSelection() instanceof Robot)
+    if ((this.RosterMenu.getSelection() instanceof Robot))
     {
       Robot localRobot = (Robot)this.RosterMenu.getSelection();
       if (localRobot != null)
@@ -555,26 +560,26 @@ public class StatusPanel extends SimpleContainer
   }
 
   public void addRosterListener(ActionListener paramActionListener) {
-    if (!(this.listeners.contains(paramActionListener)))
+    if (!this.listeners.contains(paramActionListener))
       this.listeners.addElement(paramActionListener);
   }
 
   public void removeRosterListener(ActionListener paramActionListener) {
     if (this.listeners.contains(paramActionListener))
-      this.listeners.removeElement(paramActionListener);  }
-
+      this.listeners.removeElement(paramActionListener); 
+  }
   public int getPanelState() {
     return this.PanelState; } 
-  public void setGameState(GameState paramGameState) { this.state = paramGameState;
-  }
+  public void setGameState(GameState paramGameState) { this.state = paramGameState; }
 
-  public synchronized void addStatusMessage(String paramString) {
+  public synchronized void addStatusMessage(String paramString)
+  {
     setMinimized(false);
     GameApplet.audio.play("ButtonError");
 
-    if (!(this.MessagesPanel.getAdded()))
+    if (!this.MessagesPanel.getAdded())
     {
-      super.remove(0);
+      remove(0);
       add(this.MessagesPanel, 0);
       repaint();
     }

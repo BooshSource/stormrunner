@@ -68,7 +68,7 @@ public class OptionsPanel extends SimpleContainer
     this.cont = new ImageButton(localGameApplet.getImage("com/templar/games/stormrunner/media/images/titlescreen/title_continue.jpg"), 
       null, 
       localGameApplet.getImage("com/templar/games/stormrunner/media/images/titlescreen/title_continue-ro.jpg"));
-    String str = String.valueOf(1.1000000000000001D);
+    String str = String.valueOf(1.1D);
     this.version = new TextContainer(str, Color.yellow, new Font("SansSerif", 0, 9));
     this.background.setLocation(0, 0);
     this.background.setSize(480, 360);
@@ -188,7 +188,7 @@ public class OptionsPanel extends SimpleContainer
 
   public void addNotify()
   {
-    addNotify();
+    super.addNotify();
 
     if (this.appletRef.isMidGame())
     {
@@ -215,7 +215,7 @@ public class OptionsPanel extends SimpleContainer
     this.save.resetImage();
     this.help.resetImage();
     this.about.resetImage();
-    removeNotify();
+    super.removeNotify();
   }
 
   public void setEnabled(boolean paramBoolean)

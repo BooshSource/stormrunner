@@ -24,16 +24,16 @@ public class Starter extends Applet
   {
     try
     {
-      this.ButtonTitle = super.getParameter("ButtonTitle");
+      this.ButtonTitle = getParameter("ButtonTitle");
       if (this.ButtonTitle == null) {
         this.ButtonTitle = "Start Game";
       }
 
-      String str1 = super.getParameter("BaseURL");
+      String str1 = getParameter("BaseURL");
       if (str1 != null)
         this.BaseURL = new URL(str1);
       else {
-        this.BaseURL = super.getDocumentBase();
+        this.BaseURL = getDocumentBase();
       }
 
       int i = 1;
@@ -42,17 +42,17 @@ public class Starter extends Applet
       {
         String str2 = "URL " + String.valueOf(i);
         String str3 = "Target " + String.valueOf(i);
-        String str5 = super.getParameter(str3);
+        String str5 = getParameter(str3);
         if (str5 == null) {
           j = 0;
         }
         else {
-          String str4 = super.getParameter(str2);
+          String str4 = getParameter(str2);
           this.Pages.addElement(new URL(this.BaseURL, str4));
           this.PageTargets.addElement(str5);
         }
 
-        ++i;
+        i++;
       }
       while (j != 0);
     }
@@ -69,9 +69,9 @@ public class Starter extends Applet
 
   public void actionPerformed(ActionEvent paramActionEvent)
   {
-    for (int i = 0; i < this.Pages.size(); ++i)
+    for (int i = 0; i < this.Pages.size(); i++)
     {
-      super.getAppletContext().showDocument((URL)this.Pages.elementAt(i), (String)this.PageTargets.elementAt(i));
+      getAppletContext().showDocument((URL)this.Pages.elementAt(i), (String)this.PageTargets.elementAt(i));
     }
   }
 }

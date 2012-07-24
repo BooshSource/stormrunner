@@ -41,7 +41,7 @@ public class Hammer extends Instruction
 
   public boolean verifyRobot(Robot paramRobot)
   {
-    return (paramRobot.getAssembly("Piledriver") != null);
+    return paramRobot.getAssembly("Piledriver") != null;
   }
 
   public boolean execute(Robot paramRobot)
@@ -60,7 +60,7 @@ public class Hammer extends Instruction
       this.state += 1;
       return false;
     case 1:
-      if (!(localAnimationComponent.nextImage()))
+      if (!localAnimationComponent.nextImage())
       {
         GameApplet.audio.play("Piledriver-Strike");
         localAnimationComponent.setSequence(localPiledriver.getAnimationSequence(2), null, false);
@@ -73,25 +73,26 @@ public class Hammer extends Instruction
           while (localEnumeration.hasMoreElements())
           {
             PhysicalObject localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
-            if ((localPhysicalObject instanceof Trigger) && 
-              ((((Trigger)localPhysicalObject).activateOnEvent() & 0x10) > 0))
-            {
-              ((Trigger)localPhysicalObject).activate(paramRobot, 16);
-            }
+            if (!(localPhysicalObject instanceof Trigger))
+              continue;
+            if ((((Trigger)localPhysicalObject).activateOnEvent() & 0x10) <= 0)
+              continue;
+            ((Trigger)localPhysicalObject).activate(paramRobot, 16);
           }
         }
+
       }
 
       return false;
     case 2:
       if (localAnimationComponent.nextImage())
-        break label222;
+        break;
       this.state = 0;
       return true;
     }
 
-    label222: return false; }
-
+    return false;
+  }
   public boolean boundaryCheck(Robot paramRobot) {
     return false;
   }

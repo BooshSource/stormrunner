@@ -28,20 +28,20 @@ public class Arachnae extends Chassis
 
   public int getPlacement()
   {
-    return 0; }
-
+    return 0;
+  }
   public int getImpassibility() {
     return 200;
   }
 
   public int getSpeed() {
-    return 5; }
-
+    return 5;
+  }
   public String getID() { return "Arachnae"; } 
   public int getAnimationFrames() { return 4; } 
   public String toString() { return getID(); } 
-  public double getWeight() { return 2.0099999999999998D; } 
-  public double getWeightCapacity() { return 1.1299999999999999D; } 
+  public double getWeight() { return 2.01D; } 
+  public double getWeightCapacity() { return 1.13D; } 
   public int getSalvageCost() { return 23; } 
   public int getEnergyCost() { return 13; } 
   public int getSecurityLevel() { return 3; } 
@@ -55,23 +55,23 @@ public class Arachnae extends Chassis
 
   public Image[] getCells(ImageRetriever paramImageRetriever, int paramInt1, int paramInt2)
   {
-    Image[] arrayOfImage;
     Integer localInteger = new Integer(paramInt1);
     if (animationList == null)
       animationList = new Hashtable();
     Object localObject = animationList.get(localInteger);
+    Image[] arrayOfImage;
     if (localObject == null)
     {
       Vector localVector = new Vector();
-      for (int i = 0; i < ((paramInt1 % 90 == 0) ? getAnimationFrames() : 1); ++i)
+      for (int i = 0; i < (paramInt1 % 90 == 0 ? getAnimationFrames() : 1); i++)
         localVector.addElement(paramImageRetriever.getImage("com/templar/games/stormrunner/media/images/robot/chassis/" + getID() + "/walk" + i + "_" + paramInt1 + ".gif"));
       arrayOfImage = new Image[localVector.size()];
       localVector.copyInto(arrayOfImage);
       animationList.put(localInteger, arrayOfImage);
     }
     else {
-      arrayOfImage = (Image[])localObject; }
-    return arrayOfImage;
+      arrayOfImage = (Image[])localObject;
+    }return arrayOfImage;
   }
 
   public int[] getAnimationSequence(int paramInt)

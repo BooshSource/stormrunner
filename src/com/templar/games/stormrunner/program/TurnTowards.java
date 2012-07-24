@@ -40,11 +40,11 @@ public class TurnTowards extends Instruction
 
   public boolean execute(Robot paramRobot)
   {
-    if (!(this.animating))
+    if (!this.animating)
       paramRobot.setState(2, this.where.getDirection(paramRobot));
     this.animating = TurnInstruction.updateState(paramRobot);
     paramRobot.repaint();
-    return (!(this.animating));
+    return !this.animating;
   }
 
   public void terminate(Robot paramRobot)
@@ -54,7 +54,7 @@ public class TurnTowards extends Instruction
 
   public boolean checkContext(Object paramObject)
   {
-    return ((paramObject instanceof Conditional) && (((Conditional)paramObject).getSensor() instanceof DirectionalSensor));
+    return ((paramObject instanceof Conditional)) && ((((Conditional)paramObject).getSensor() instanceof DirectionalSensor));
   }
 
   public void setContext(Object paramObject)
@@ -77,13 +77,13 @@ public class TurnTowards extends Instruction
   public boolean verifyRobot(Robot paramRobot)
   {
     Vector localVector = paramRobot.getSensors();
-    int i = 0;
+    boolean b = false;
 
-    for (int j = 0; j < localVector.size(); ++j)
-      if (localVector.elementAt(j) instanceof DirectionalSensor)
-        i = 1;
-
-    return i;
+    for (int j = 0; j < localVector.size(); j++) {
+      if ((localVector.elementAt(j) instanceof DirectionalSensor))
+        b = true;
+    }
+    return b;
   }
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)

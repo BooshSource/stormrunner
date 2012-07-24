@@ -46,8 +46,8 @@ public class YesNoDialog extends Dialog
 
   public void actionPerformed(ActionEvent paramActionEvent) {
     this.response = paramActionEvent.getActionCommand();
-    setVisible(false); }
-
+    setVisible(false);
+  }
   public String getResponse() { return this.response;
   }
 }

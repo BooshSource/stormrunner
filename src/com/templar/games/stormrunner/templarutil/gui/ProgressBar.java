@@ -81,18 +81,21 @@ public class ProgressBar extends SimpleContainer
     if ((i != -1) && (paramString.indexOf("%%") != i))
     {
       this.MessageLeft = paramString.substring(0, i);
-      if (i >= paramString.length()) return;
-      this.MessageRight = paramString.substring(i + 1);
+      if (i < paramString.length()) {
+        this.MessageRight = paramString.substring(i + 1);
 
-      return;
+        return;
+      }
+
     }
-
-    this.MessageLeft = paramString;
-    this.MessageRight = "";
+    else
+    {
+      this.MessageLeft = paramString;
+      this.MessageRight = "";
+    }
   }
 
-  public void setBackground(Color paramColor)
-  {
+  public void setBackground(Color paramColor) {
     this.BackgroundColour = paramColor;
     this.Background = null;
   }
@@ -127,7 +130,7 @@ public class ProgressBar extends SimpleContainer
   }
 
   public void setTileForegroundImage(boolean paramBoolean) {
-    this.Stretch = (!(paramBoolean));
+    this.Stretch = (!paramBoolean);
   }
 
   public void update(Graphics paramGraphics)
@@ -147,8 +150,8 @@ public class ProgressBar extends SimpleContainer
       paramGraphics.fillRect(0, 0, getSize().width, getSize().height);
     }
     else if (this.Background != null) {
-      int k = 0; for (l = this.Background.getWidth(null); k < getSize().width; k += l)
-        paramGraphics.drawImage(this.Background, k, 0, l, getSize().height, null);
+      int k = 0; for (int m = this.Background.getWidth(null); k < getSize().width; k += m)
+        paramGraphics.drawImage(this.Background, k, 0, m, getSize().height, null);
     } else {
       Debug.println("ProgressBar: Error, nothing to draw background with.");
     }
@@ -167,9 +170,9 @@ public class ProgressBar extends SimpleContainer
         paramGraphics.drawImage(this.BarTile, 0, 0, j, getSize().height, null);
       }
       else {
-        localObject = paramGraphics.create(0, 0, j, getSize().height);
-        l = 0; for (int i1 = this.BarTile.getWidth(null); l < j; l += i1)
-          ((Graphics)localObject).drawImage(this.BarTile, l, 0, i1, getSize().height, null);
+       Graphics localObject = paramGraphics.create(0, 0, j, getSize().height);
+        int m = 0; for (int n = this.BarTile.getWidth(null); m < j; m += n)
+          ((Graphics)localObject).drawImage(this.BarTile, m, 0, n, getSize().height, null);
         ((Graphics)localObject).dispose();
       }
     }
@@ -182,7 +185,7 @@ public class ProgressBar extends SimpleContainer
     ((StringBuffer)localObject).append("%");
     ((StringBuffer)localObject).append(this.MessageRight);
 
-    int l = this.MessageFM.stringWidth(((StringBuffer)localObject).toString());
+    int m = this.MessageFM.stringWidth(((StringBuffer)localObject).toString());
     if (this.XORColour == null) {
       if (this.ForegroundColour == null)
       {
@@ -192,15 +195,15 @@ public class ProgressBar extends SimpleContainer
       {
         paramGraphics.setXORMode(this.BackgroundColour);
       }
-
     }
     else
+    {
       paramGraphics.setXORMode(this.XORColour);
+    }
+    paramGraphics.drawString(((StringBuffer)localObject).toString(), getSize().width / 2 - m / 2, getSize().height / 2 + this.MessageFM.getAscent() / 2);
 
-    paramGraphics.drawString(((StringBuffer)localObject).toString(), getSize().width / 2 - l / 2, getSize().height / 2 + this.MessageFM.getAscent() / 2);
-
-    paramGraphics.setPaintMode(); }
-
+    paramGraphics.setPaintMode();
+  }
   public int getValue() { return this.Value; } 
   public int getMaximum() { return this.Maximum;
   }

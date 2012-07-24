@@ -29,20 +29,20 @@ public class Hermes extends Chassis
 
   public int getPlacement()
   {
-    return 0; }
-
+    return 0;
+  }
   public int getImpassibility() {
     return 50;
   }
 
   public int getSpeed() {
-    return 15; }
-
+    return 15;
+  }
   public String getID() { return "Hermes"; } 
   public int getAnimationFrames() { return 4; } 
   public String toString() { return getID(); } 
   public double getWeight() { return 2.27D; } 
-  public double getWeightCapacity() { return 1.4099999999999999D; } 
+  public double getWeightCapacity() { return 1.41D; } 
   public int getSalvageCost() { return 20; } 
   public int getEnergyCost() { return 12; } 
   public int getSecurityLevel() { return 2; } 
@@ -55,15 +55,15 @@ public class Hermes extends Chassis
 
   public Image[] getCells(ImageRetriever paramImageRetriever, int paramInt1, int paramInt2)
   {
-    Image[] arrayOfImage;
     Integer localInteger = new Integer(paramInt1 << 3 | paramInt2);
     if (animationList == null)
       animationList = new Hashtable();
     Object localObject = animationList.get(localInteger);
+    Image[] arrayOfImage;
     if (localObject == null)
     {
       Vector localVector = new Vector();
-      for (int i = 0; i < ((paramInt1 % 90 == 0) ? getAnimationFrames() : 1); ++i)
+      for (int i = 0; i < (paramInt1 % 90 == 0 ? getAnimationFrames() : 1); i++)
         localVector.addElement(paramImageRetriever.getImage("com/templar/games/stormrunner/media/images/robot/chassis/" + getID() + 
           "/walk" + i + "_" + paramInt1 + Robot.convertBias(paramInt2) + ".gif"));
       arrayOfImage = new Image[localVector.size()];
@@ -71,8 +71,8 @@ public class Hermes extends Chassis
       animationList.put(localInteger, arrayOfImage);
     }
     else {
-      arrayOfImage = (Image[])localObject; }
-    return arrayOfImage;
+      arrayOfImage = (Image[])localObject;
+    }return arrayOfImage;
   }
 
   public int[] getAnimationSequence(int paramInt)

@@ -19,8 +19,8 @@ public class SoundRecord
 
   public void notify(String paramString, int paramInt) {
     if (this.Listener != null)
-      this.Listener.soundStopped(paramString, paramInt);  }
-
+      this.Listener.soundStopped(paramString, paramInt); 
+  }
   public boolean isLooping() {
     return this.Looping; } 
   public String getName() { return this.Name; } 

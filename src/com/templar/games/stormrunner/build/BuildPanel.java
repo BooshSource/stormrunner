@@ -199,7 +199,7 @@ public class BuildPanel extends ControllableBufferContainer
     this.RobotNamer.addImageListener(this);
 
     Color[] arrayOfColor = { Color.green, Color.green, Color.green, Color.green, Color.green, Color.green, Color.green, Color.yellow, Color.yellow, Color.red };
-    this.WeightGauge = new DigitalGauge(0D, 10.0D, 10, arrayOfColor);
+    this.WeightGauge = new DigitalGauge(0.0D, 10.0D, 10, arrayOfColor);
     this.WeightGauge.setBoundingAngles(190, 350);
     this.WeightGauge.setBackground(Color.black);
     this.WeightGauge.setBounds(16, 142, 55, 55);
@@ -356,22 +356,22 @@ public class BuildPanel extends ControllableBufferContainer
     if (this.RobotOnRamp != null)
     {
       RobotPart[] arrayOfRobotPart = this.RobotOnRamp.getRobotParts();
-      double d = 0D;
-      for (int i = 0; i < arrayOfRobotPart.length; ++i)
+      double d = 0.0D;
+      for (int i = 0; i < arrayOfRobotPart.length; i++) {
         if (!(arrayOfRobotPart[i] instanceof Chassis))
           d += arrayOfRobotPart[i].getWeight();
-
+      }
       return d;
     }
 
-    return 0D;
+    return 0.0D;
   }
 
   protected boolean checkWeightCapacity(double paramDouble)
   {
     double d = currentRobotWeight();
 
-    return (d <= paramDouble);
+    return d <= paramDouble;
   }
 
   protected boolean checkWeight(double paramDouble)
@@ -379,7 +379,7 @@ public class BuildPanel extends ControllableBufferContainer
     Chassis localChassis = this.RobotOnRamp.getChassis();
     if (localChassis != null)
     {
-      return (localChassis.getWeightCapacity() >= paramDouble + currentRobotWeight());
+      return localChassis.getWeightCapacity() >= paramDouble + currentRobotWeight();
     }
 
     return false;
@@ -392,7 +392,7 @@ public class BuildPanel extends ControllableBufferContainer
 
     if (i + paramInt1 >= 0)
     {
-      return (j + paramInt2 >= 0);
+      return j + paramInt2 >= 0;
     }
 
     return false;
@@ -412,69 +412,61 @@ public class BuildPanel extends ControllableBufferContainer
         return true;
       }
 
-      error("Error: Cannot supply " + (paramInt2 * -1) + " Energy Units.");
+      error("Error: Cannot supply " + paramInt2 * -1 + " Energy Units.");
       return false;
     }
 
-    error("Error: Cannot supply " + (paramInt1 * -1) + " Polymetals.");
+    error("Error: Cannot supply " + paramInt1 * -1 + " Polymetals.");
     return false;
   }
 
   protected void populateMenu(String paramString)
   {
-    Class localClass1;
     try
     {
-      localClass1 = Class.forName(paramString);
+      Class localClass1 = Class.forName(paramString);
 
       Vector localVector = this.state.getRobotPartPatterns();
       OrderedTable localOrderedTable = new OrderedTable();
 
-      for (int i = 0; i < localVector.size(); ++i)
+      for (int i = 0; i < localVector.size(); i++)
       {
         RobotPart localRobotPart = (RobotPart)localVector.elementAt(i);
-        if (localClass1.isInstance(localRobotPart))
+        if (!localClass1.isInstance(localRobotPart)) {
+          continue;
+        }
+        ImageButton localImageButton = null;
+        String str = "com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart.getIconAppearance();
+        int j = localRobotPart.getSecurityLevel();
+
+        if (j > this.state.getSecurityLevel())
         {
-          ImageButton localImageButton = null;
-          String str = "com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart.getIconAppearance();
-          int j = localRobotPart.getSecurityLevel();
-
-          if (j > this.state.getSecurityLevel())
+          localImageButton = new ImageButton(this.ir.getImage(str + "-no.gif"));
+          localImageButton.setActionCommand("disabled part");
+          localImageButton.addActionListener(this);
+        }
+        else if (this.RobotOnRamp != null)
+        {
+          RobotPart[] arrayOfRobotPart = this.RobotOnRamp.getRobotParts();
+          Class localClass2 = localRobotPart.getClass();
+          int k = 0;
+          for (int m = 0; m < arrayOfRobotPart.length; m++)
           {
-            localImageButton = new ImageButton(this.ir.getImage(str + "-no.gif"));
-            localImageButton.setActionCommand("disabled part");
+            if (!localClass2.isInstance(arrayOfRobotPart[m]))
+            {
+              continue;
+            }
+
+            localImageButton = new ImageButton(this.ir.getImage(str + "-on.gif"));
+
+            localImageButton.setActionCommand("installed part");
             localImageButton.addActionListener(this);
+            localImageButton.setVerboseEvents(true);
+
+            k = 1;
           }
-          else if (this.RobotOnRamp != null)
-          {
-            RobotPart[] arrayOfRobotPart = this.RobotOnRamp.getRobotParts();
-            Class localClass2 = localRobotPart.getClass();
-            int k = 0;
-            for (int l = 0; l < arrayOfRobotPart.length; ++l)
-            {
-              if (localClass2.isInstance(arrayOfRobotPart[l]))
-              {
-                localImageButton = new ImageButton(this.ir.getImage(str + "-on.gif"));
 
-                localImageButton.setActionCommand("installed part");
-                localImageButton.addActionListener(this);
-                localImageButton.setVerboseEvents(true);
-
-                k = 1;
-              }
-            }
-
-            if (k == 0)
-            {
-              localImageButton = new ImageButton(this.ir.getImage(str + "-ok.gif"), null, this.ir.getImage(str + "-ro.gif"));
-
-              localImageButton.setActionCommand("available part");
-              localImageButton.addActionListener(this);
-              localImageButton.setVerboseEvents(true);
-            }
-
-          }
-          else
+          if (k == 0)
           {
             localImageButton = new ImageButton(this.ir.getImage(str + "-ok.gif"), null, this.ir.getImage(str + "-ro.gif"));
 
@@ -483,11 +475,19 @@ public class BuildPanel extends ControllableBufferContainer
             localImageButton.setVerboseEvents(true);
           }
 
-          localImageButton.addImageListener(this);
+        }
+        else
+        {
+          localImageButton = new ImageButton(this.ir.getImage(str + "-ok.gif"), null, this.ir.getImage(str + "-ro.gif"));
 
-          localOrderedTable.put(localImageButton, localRobotPart);
+          localImageButton.setActionCommand("available part");
+          localImageButton.addActionListener(this);
+          localImageButton.setVerboseEvents(true);
         }
 
+        localImageButton.addImageListener(this);
+
+        localOrderedTable.put(localImageButton, localRobotPart);
       }
 
       this.PartsList.resetScroll();
@@ -512,7 +512,7 @@ public class BuildPanel extends ControllableBufferContainer
     this.RCXName.setText("");
     this.bay.clearRamp();
     this.PartsList.setContents(null);
-    this.WeightGauge.setValue(0D);
+    this.WeightGauge.setValue(0.0D);
     this.SensorList = new RobotPart[3];
     this.SensorSlots = 0;
     this.RearAssembly = null;
@@ -551,7 +551,7 @@ public class BuildPanel extends ControllableBufferContainer
       Class localClass3 = Class.forName("com.templar.games.stormrunner.assembly.Assembly");
 
       RobotPart[] arrayOfRobotPart = paramRobot.getRobotParts();
-      for (int i = 0; i < arrayOfRobotPart.length; ++i)
+      for (int i = 0; i < arrayOfRobotPart.length; i++)
       {
         RobotPart localRobotPart = arrayOfRobotPart[i];
         if (localClass1.isInstance(localRobotPart))
@@ -563,9 +563,9 @@ public class BuildPanel extends ControllableBufferContainer
         else if (localClass2.isInstance(localRobotPart))
         {
           this.bay.setChassisImages(localRobotPart.getID() + "Front", localRobotPart.getID() + "Rear");
-        }
-        else if (localClass3.isInstance(localRobotPart))
-        {
+        } else {
+          if (!localClass3.isInstance(localRobotPart))
+            continue;
           Assembly localAssembly = (Assembly)localRobotPart;
           if (localAssembly.getPlacement() == 1)
           {
@@ -576,9 +576,9 @@ public class BuildPanel extends ControllableBufferContainer
           {
             this.bay.setTopAssemblyImage(localAssembly.getID());
             this.TopAssembly = localAssembly;
-          }
-          else if (localAssembly.getPlacement() == 2)
-          {
+          } else {
+            if (localAssembly.getPlacement() != 2)
+              continue;
             this.bay.setFrontAssemblyImage(localAssembly.getID());
             this.FrontAssembly = localAssembly;
           }
@@ -619,14 +619,11 @@ public class BuildPanel extends ControllableBufferContainer
 
   public synchronized void actionPerformed(ActionEvent paramActionEvent)
   {
-    String str;
     try
     {
-      Object localObject2;
-      int l;
-      str = paramActionEvent.getActionCommand();
+      String str = paramActionEvent.getActionCommand();
       Object localObject1 = paramActionEvent.getSource();
-
+      Object localObject2;
       if (this.Retrieving)
       {
         if (str.compareTo("Roster Minimized") == 0)
@@ -638,762 +635,793 @@ public class BuildPanel extends ControllableBufferContainer
           return;
         }
 
-        if (str.compareTo("Roster Selected") != 0)
-          break label3517;
-
-        localObject2 = this.state.getCurrentRobot();
-
-        if (this.state.isRobotStored((Robot)localObject2))
+        if (str.compareTo("Roster Selected") == 0)
         {
-          this.Retrieving = false;
+          localObject2 = this.state.getCurrentRobot();
 
-          this.applet.getStatusPanel().setMinimized(true);
+          if (this.state.isRobotStored((Robot)localObject2))
+          {
+            this.Retrieving = false;
 
+            this.applet.getStatusPanel().setMinimized(true);
+
+            this.Description.setText("");
+
+            retrieveRobot((Robot)localObject2);
+
+            return;
+          }
+
+          error("Error: Robot is not in the storage area.");
+
+          return;
+        }
+      }
+      else
+      {
+        int m;
+        if (localObject1 == this.RobotNamer)
+        {
+          if (str.length() == 0)
+          {
+            this.Description.setText("RCX must be named properly.");
+
+            return;
+          }
+
+          localObject2 = this.state.getAllRobots();
+          int j = 0;
+          for (m = 0; m < ((Vector)localObject2).size(); m++) {
+            if (((Robot)((Vector)localObject2).elementAt(m)).getName().compareTo(str) == 0)
+              j = 1;
+          }
+          if (j != 0)
+          {
+            error("Error: A robot named " + str + " already exists.");
+
+            return;
+          }
+
+          this.RobotOnRamp.setName(str);
+          this.RCXName.setText(str);
+
+          remove(this.RobotNamer);
+          add(this.RCXName, 0);
           this.Description.setText("");
 
-          retrieveRobot((Robot)localObject2);
+          setInternalFocus(null);
 
-          return;
-        }
+          this.Naming = false;
 
-        error("Error: Robot is not in the storage area.");
-
-        return;
-      }
-
-      if (localObject1 == this.RobotNamer)
-      {
-        if (str.length() == 0)
-        {
-          this.Description.setText("RCX must be named properly.");
-
-          return;
-        }
-
-        localObject2 = this.state.getAllRobots();
-        int j = 0;
-        for (l = 0; l < ((Vector)localObject2).size(); ++l)
-          if (((Robot)((Vector)localObject2).elementAt(l)).getName().compareTo(str) == 0)
-            j = 1;
-
-        if (j != 0)
-        {
-          error("Error: A robot named " + str + " already exists.");
-
-          return;
-        }
-
-        this.RobotOnRamp.setName(str);
-        this.RCXName.setText(str);
-
-        remove(this.RobotNamer);
-        add(this.RCXName, 0);
-        this.Description.setText("");
-
-        setInternalFocus(null);
-
-        this.Naming = false;
-
-        if (this.LastActionCommand.compareTo("naming for engage") == 0)
-        {
-          engageRobot();
-        }
-        if (this.LastActionCommand.compareTo("naming for storage") != 0)
-          break label3517;
-        storeRobot();
-
-        return;
-      }
-
-      if (this.Naming) { return;
-      }
-
-      if (str.startsWith("I:"))
-      {
-        if ((localObject1 == this.LeftArrow) || (localObject1 == this.RightArrow))
-          break label3517;
-        localObject2 = (ImageButton)localObject1;
-        RobotPart localRobotPart1 = (RobotPart)this.PartsList.getContents().get(localObject2);
-
-        this.Description.setText(localRobotPart1.getDescription());
-
-        return;
-      }
-
-      if (str.startsWith("O:"))
-      {
-        if ((localObject1 == this.LeftArrow) || (localObject1 == this.RightArrow))
-          break label3517;
-        this.Description.setText("");
-
-        return;
-      }
-
-      if (str.compareTo("P:scroll left") == 0)
-      {
-        this.ScrollThread = new UtilityThread(50, this.PartsList, this.PartsList.getClass().getMethod("stepLeft", null), false);
-        this.ScrollThread.start();
-
-        return;
-      }
-
-      if (str.compareTo("R:scroll left") == 0)
-      {
-        if (this.ScrollThread == null) break label3517;
-        this.ScrollThread.politeStop();
-
-        return;
-      }
-
-      if (str.compareTo("P:scroll right") == 0)
-      {
-        this.ScrollThread = new UtilityThread(50, this.PartsList, this.PartsList.getClass().getMethod("stepRight", null), false);
-        this.ScrollThread.start();
-
-        return;
-      }
-
-      if (str.compareTo("R:scroll right") == 0)
-      {
-        if (this.ScrollThread == null) break label3517;
-        this.ScrollThread.politeStop();
-
-        return;
-      }
-
-      if (str.startsWith("R:")) { return;
-      }
-
-      if (str.compareTo("Sequence Complete.") == 0)
-      {
-        int i = 0;
-
-        if (this.LastActionCommand != null)
-        {
-          int k;
-          if (this.LastActionCommand.compareTo("dismantle") == 0)
+          if (this.LastActionCommand.compareTo("naming for engage") == 0)
           {
-            k = 20;
-            l = 45;
-            localObject4 = this.RobotOnRamp.getRobotParts();
-            for (int i1 = 0; i1 < localObject4.length; ++i1)
-            {
-              l += localObject4[i1].getEnergyCost();
-              k += localObject4[i1].getSalvageCost();
-            }
-            transact(k, l);
-
-            this.bay.setChassisImages(null, null);
-            this.bay.setSensorImages(null, null, null);
-
-            clearRamp();
+            engageRobot();
           }
-          else if (this.LastActionCommand.compareTo("store robot") == 0)
+          if (this.LastActionCommand.compareTo("naming for storage") == 0)
           {
-            clearRamp();
-          }
-          else if (this.LastActionCommand.compareTo("changed chassis") == 0)
-          {
-            if ((this.PolymetalChange != 0) || (this.EnergyUnitChange != 0))
-            {
-              transact(this.PolymetalChange, this.EnergyUnitChange);
-              this.PolymetalChange = 0;
-              this.EnergyUnitChange = 0;
-            }
-
-            if (this.RobotOnRamp.getChassis() != null)
-            {
-              this.bay.setChassisImages(this.ChassisFront, this.ChassisRear);
-
-              this.bay.start("AddChassis", this);
-
-              this.FrontArmEngaged = false;
-
-              i = 1;
-
-              this.RampUp = true;
-            }
-            else
-            {
-              this.FrontArmEngaged = true;
-
-              this.RampUp = false;
-            }
-          }
-          else if (this.LastActionCommand.compareTo("changed sensor") == 0)
-          {
-            if (this.PolymetalChange < 0)
-              k = 1;
-            else {
-              k = 0;
-            }
-
-            if ((this.PolymetalChange != 0) || (this.EnergyUnitChange != 0))
-            {
-              transact(this.PolymetalChange, this.EnergyUnitChange);
-              this.PolymetalChange = 0;
-              this.EnergyUnitChange = 0;
-            }
-
-            if (k != 0)
-              this.bay.setSensorImage(this.SensorSlots, this.SensorChange);
-            else {
-              this.bay.setSensorImage(this.SensorRemoved, null);
-            }
-
-            this.bay.start("RetractSensorArm", this);
-
-            i = 1;
-          }
-          else if (this.LastActionCommand.startsWith("changed assembly"))
-          {
-            if (this.PolymetalChange < 0)
-              k = 1;
-            else {
-              k = 0;
-            }
-
-            if ((this.PolymetalChange != 0) || (this.EnergyUnitChange != 0))
-            {
-              transact(this.PolymetalChange, this.EnergyUnitChange);
-              this.PolymetalChange = 0;
-              this.EnergyUnitChange = 0;
-            }
-
-            if (k != 0)
-            {
-              if (this.LastActionCommand.endsWith("rear"))
-                this.bay.start("RaiseBackArm", this);
-              else if (this.LastActionCommand.endsWith("top"))
-                this.bay.start("RaiseTopArm", this);
-              else if (this.LastActionCommand.endsWith("front")) {
-                this.bay.start("RetractFrontAssemblyArm", this);
-              }
-
-            }
-            else if (this.LastActionCommand.endsWith("rear"))
-              this.bay.start("RaiseBackAssembly", this);
-            else if (this.LastActionCommand.endsWith("top"))
-              this.bay.start("RaiseTopAssembly", this);
-            else if (this.LastActionCommand.endsWith("front")) {
-              this.bay.start("RetractFrontAssembly", this);
-            }
-
-            i = 1;
-          }
-
-          this.LastActionCommand = null;
-        }
-
-        if ((this.RobotOnRamp != null) && (this.RobotOnRamp.getChassis() != null))
-          this.WeightGauge.setValue(currentRobotWeight());
-
-        if (i != 0) break label3517;
-        this.SequenceComplete = true;
-
-        return;
-      }
-
-      if (!(this.SequenceComplete))
-      {
-        error("Error: Bay in use.");
-
-        return;
-      }
-
-      if (str.compareTo("new rcx") == 0)
-      {
-        if (this.BayOccupied)
-        {
-          error("Error: Bay occupied.");
-
-          return;
-        }
-
-        if (!(transact(-20, -45)))
-          break label3517;
-
-        this.SequenceComplete = false;
-        this.bay.start("NewRCX", this);
-
-        this.BayOccupied = true;
-
-        this.FrontArmEngaged = true;
-
-        this.RobotOnRamp = new Robot(this.ir);
-
-        return;
-      }
-
-      if (str.compareTo("tools") == 0)
-      {
-        populateMenu("com.templar.games.stormrunner.assembly.Assembly");
-
-        return;
-      }
-
-      if (str.compareTo("chassis") == 0)
-      {
-        populateMenu("com.templar.games.stormrunner.chassis.Chassis");
-
-        return;
-      }
-
-      if (str.compareTo("sensors") == 0)
-      {
-        populateMenu("com.templar.games.stormrunner.sensor.Sensor");
-
-        return;
-      }
-
-      if (str.compareTo("store") == 0)
-      {
-        if (this.BayOccupied)
-        {
-          if (this.RobotOnRamp.getChassis() != null)
-          {
-            if (this.RobotOnRamp.getName().compareTo("[UNNAMED]") == 0)
-            {
-              this.Naming = true;
-
-              remove(this.RCXName);
-              add(this.RobotNamer, 0);
-
-              setInternalFocus(this.RobotNamer);
-
-              this.Description.setText("Please identify the new RCX.");
-
-              this.LastActionCommand = "naming for storage";
-
-              return;
-            }
-
             storeRobot();
 
             return;
           }
 
-          error("Error: Robots must have a chassis to enter the storage area.");
-
-          return;
         }
-
-        error("Error: No equipment to store.");
-
-        return;
-      }
-
-      if (str.compareTo("retrieve") == 0)
-      {
-        if (!(this.BayOccupied))
+        else
         {
-          if (this.state.getStoredRobots().size() > 0)
-          {
-            this.Retrieving = true;
-
-            this.Description.setText("Select a robot from the Roster below.");
-
-            this.applet.getStatusPanel().setMinimized(false);
-            this.applet.getStatusPanel().showRoster();
-
-            this.applet.getStatusPanel().addRosterListener(this);
-
+          if (this.Naming) {
             return;
           }
-
-          error("Error: No robots to retrieve.");
-
-          return;
-        }
-
-        error("Error: Bay is occupied.");
-
-        return;
-      }
-
-      if (str.compareTo("dismantle") == 0)
-      {
-        if (this.BayOccupied)
-        {
-          this.PartsList.setContents(null);
-
-          this.SequenceComplete = false;
-
-          if (this.FrontArmEngaged)
-            this.bay.start("DismantleSuspendedRCX", this);
-          else {
-            this.bay.start("DismantleRCX", this);
-          }
-
-          this.LastActionCommand = str;
-
-          return;
-        }
-
-        error("Error: No equipment to dismantle.");
-
-        return;
-      }
-
-      if (str.compareTo("engage") == 0)
-      {
-        if (this.BayOccupied)
-        {
-          if (this.RobotOnRamp.getChassis() != null)
+          if (str.startsWith("I:"))
           {
-            if (this.InternalFocus == null)
+            if ((localObject1 != this.LeftArrow) && (localObject1 != this.RightArrow))
             {
-              if (this.RobotOnRamp.getName().compareTo("[UNNAMED]") == 0)
-              {
-                this.Naming = true;
+              localObject2 = (ImageButton)localObject1;
+              RobotPart localRobotPart1 = (RobotPart)this.PartsList.getContents().get(localObject2);
 
-                remove(this.RCXName);
-                add(this.RobotNamer, 0);
-
-                setInternalFocus(this.RobotNamer);
-
-                this.Description.setText("Please identify the new RCX.");
-
-                this.LastActionCommand = "naming for engage";
-
-                return;
-              }
-
-              engageRobot();
+              this.Description.setText(localRobotPart1.getDescription());
 
               return;
             }
 
-            System.err.println("Inconsistency: attempting to engage, InternalFocus not null.");
-
-            return;
           }
-
-          error("Error: RCX cannot be engaged without a chassis.");
-
-          return;
-        }
-
-        error("Error: No RCX to engage.");
-
-        return;
-      }
-
-      if (str.compareTo("disabled part") == 0)
-      {
-        error("Error: Insufficient security level.");
-
-        return;
-      }
-
-      if (str.compareTo("P:available part") == 0)
-      {
-        if (this.RobotOnRamp != null)
-        {
-          ImageButton localImageButton1;
-          Object localObject5;
-          localOrderedTable = this.PartsList.getContents();
-          localRobotPart2 = (RobotPart)localOrderedTable.get(paramActionEvent.getSource());
-          localObject3 = localRobotPart2.getClass();
-          localObject4 = (RobotPart)((Class)localObject3).newInstance();
-
-          localClass1 = Class.forName("com.templar.games.stormrunner.sensor.Sensor");
-          localClass2 = Class.forName("com.templar.games.stormrunner.chassis.Chassis");
-          Class localClass3 = Class.forName("com.templar.games.stormrunner.assembly.Assembly");
-
-          Chassis localChassis = this.RobotOnRamp.getChassis();
-          if ((localClass2.isInstance(localObject4)) && (localChassis != null))
+          else if (str.startsWith("O:"))
           {
-            this.PolymetalChange = (localChassis.getSalvageCost() - ((RobotPart)localObject4).getSalvageCost());
-            this.EnergyUnitChange = (localChassis.getEnergyCost() - ((RobotPart)localObject4).getEnergyCost());
+            if ((localObject1 != this.LeftArrow) && (localObject1 != this.RightArrow))
+            {
+              this.Description.setText("");
+
+              return;
+            }
+
           }
           else
           {
-            this.PolymetalChange = (-((RobotPart)localObject4).getSalvageCost());
-            this.EnergyUnitChange = (-((RobotPart)localObject4).getEnergyCost());
-          }
-
-          if (!(checkTransaction(this.PolymetalChange, this.EnergyUnitChange)))
-            break label2999;
-
-          if (localClass2.isInstance(localObject4))
-          {
-            if (checkWeightCapacity(((Chassis)localObject4).getWeightCapacity()))
+            if (str.compareTo("P:scroll left") == 0)
             {
-              localImageButton1 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
-              localImageButton1.setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
-              localImageButton1.setActionCommand("installed part");
+              this.ScrollThread = new UtilityThread(50, this.PartsList, this.PartsList.getClass().getMethod("stepLeft", null), false);
+              this.ScrollThread.start();
 
-              localObject5 = ((RobotPart)localObject4).getID();
-              this.ChassisFront = localObject5 + "Front";
-              this.ChassisRear = localObject5 + "Rear";
+              return;
+            }
 
-              this.SequenceComplete = false;
+            if (str.compareTo("R:scroll left") == 0)
+            {
+              if (this.ScrollThread != null) {
+                this.ScrollThread.politeStop();
 
-              if (localChassis != null)
-              {
-                Enumeration localEnumeration = localOrderedTable.elements();
-                RobotPart localRobotPart3 = (RobotPart)localEnumeration.nextElement();
-                while ((localEnumeration.hasMoreElements()) && (localRobotPart3.getID().compareTo(localChassis.getID()) != 0))
-                {
-                  localRobotPart3 = (RobotPart)localEnumeration.nextElement();
-                }
-                ImageButton localImageButton2 = (ImageButton)localOrderedTable.getKey(localRobotPart3);
-                localImageButton2.setImages(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localChassis.getIconAppearance() + "-ok.gif"), null, this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localChassis.getIconAppearance() + "-ro.gif"));
-                localImageButton2.setActionCommand("available part");
+                return;
               }
-
-              this.RobotOnRamp.setChassis((Chassis)localObject4);
-
-              this.WeightGauge.setMax(((Chassis)localObject4).getWeightCapacity());
-
-              this.LastActionCommand = "changed chassis";
-
-              if (!(this.FrontArmEngaged)) {
-                this.bay.start("RemoveChassis", this);
+            }
+            else
+            {
+              if (str.compareTo("P:scroll right") == 0)
+              {
+                this.ScrollThread = new UtilityThread(50, this.PartsList, this.PartsList.getClass().getMethod("stepRight", null), false);
+                this.ScrollThread.start();
 
                 return;
               }
 
-              actionPerformed(new ActionEvent(this, 1001, "Sequence Complete."));
-
-              return;
-            }
-
-            error("Error: This chassis cannot support the weight of the components attached to the RCX. Please choose a chassis with a higher capacity or remove RCX components.");
-
-            return;
-          }
-
-          if (localClass1.isInstance(localObject4))
-          {
-            if (this.SensorSlots >= 3)
-            {
-              error("Error: RCX can only hold 3 sensors.");
-
-              return;
-            }
-
-            if ((localChassis == null) || (checkWeight(((RobotPart)localObject4).getWeight())))
-            {
-              this.SequenceComplete = false;
-
-              localImageButton1 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
-              localImageButton1.setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
-              localImageButton1.setActionCommand("installed part");
-
-              this.RobotOnRamp.addSensor((Sensor)localObject4);
-
-              this.SensorChange = ((RobotPart)localObject4).getID();
-
-              this.SensorList[this.SensorSlots] = localRobotPart2;
-              this.SensorSlots += 1;
-
-              this.LastActionCommand = "changed sensor";
-
-              this.bay.start("ExtendSensorArm", this);
-
-              return;
-            }
-
-            error("Error: The current chassis cannot support the weight of this component.");
-
-            return;
-          }
-
-          if (!(localClass3.isInstance(localObject4)))
-            break label2999;
-
-          if ((localChassis == null) || (checkWeight(((RobotPart)localObject4).getWeight())))
-          {
-            int i4 = ((Assembly)localObject4).getPlacement();
-            if (i4 == 2)
-            {
-              if (this.FrontAssembly != null)
+              if (str.compareTo("R:scroll right") == 0)
               {
-                error("Error: You must remove the " + this.FrontAssembly.getID() + " in order to instll this component.");
+                if (this.ScrollThread != null) {
+                  this.ScrollThread.politeStop();
+
+                  return;
+                }
               }
               else
               {
-                this.SequenceComplete = false;
-                this.FrontAssembly = ((RobotPart)localObject4);
+                if (str.startsWith("R:"))
+                  return;
+                RobotPart localObject4;
+                RobotPart[] localSalvage;
+                if (str.compareTo("Sequence Complete.") == 0)
+                {
+                  int i = 0;
 
-                localObject5 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
-                ((ImageButton)localObject5).setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
-                ((ImageButton)localObject5).setActionCommand("installed part");
+                  if (this.LastActionCommand != null)
+                  {
+                    int k;
+                    if (this.LastActionCommand.compareTo("dismantle") == 0)
+                    {
+                      k = 20;
+                      m = 45;
+                      localSalvage = this.RobotOnRamp.getRobotParts();
+                      for (int n = 0; n < localSalvage.length; n++)
+                      {
+                        m += localSalvage[n].getEnergyCost();
+                        k += localSalvage[n].getSalvageCost();
+                      }
+                      transact(k, m);
 
-                this.RobotOnRamp.addAssembly((Assembly)localObject4);
+                      this.bay.setChassisImages(null, null);
+                      this.bay.setSensorImages(null, null, null);
 
-                this.LastActionCommand = "changed assembly: front";
+                      clearRamp();
+                    }
+                    else if (this.LastActionCommand.compareTo("store robot") == 0)
+                    {
+                      clearRamp();
+                    }
+                    else if (this.LastActionCommand.compareTo("changed chassis") == 0)
+                    {
+                      if ((this.PolymetalChange != 0) || (this.EnergyUnitChange != 0))
+                      {
+                        transact(this.PolymetalChange, this.EnergyUnitChange);
+                        this.PolymetalChange = 0;
+                        this.EnergyUnitChange = 0;
+                      }
 
-                this.bay.resetFrontAssemblyLayers();
-                this.bay.setFrontAssemblyImage(((RobotPart)localObject4).getID());
-                this.bay.start("ExtendFrontAssembly", this);
+                      if (this.RobotOnRamp.getChassis() != null)
+                      {
+                        this.bay.setChassisImages(this.ChassisFront, this.ChassisRear);
+
+                        this.bay.start("AddChassis", this);
+
+                        this.FrontArmEngaged = false;
+
+                        i = 1;
+
+                        this.RampUp = true;
+                      }
+                      else
+                      {
+                        this.FrontArmEngaged = true;
+
+                        this.RampUp = false;
+                      }
+                    }
+                    else if (this.LastActionCommand.compareTo("changed sensor") == 0)
+                    {
+                      if (this.PolymetalChange < 0)
+                        k = 1;
+                      else {
+                        k = 0;
+                      }
+
+                      if ((this.PolymetalChange != 0) || (this.EnergyUnitChange != 0))
+                      {
+                        transact(this.PolymetalChange, this.EnergyUnitChange);
+                        this.PolymetalChange = 0;
+                        this.EnergyUnitChange = 0;
+                      }
+
+                      if (k != 0)
+                        this.bay.setSensorImage(this.SensorSlots, this.SensorChange);
+                      else {
+                        this.bay.setSensorImage(this.SensorRemoved, null);
+                      }
+
+                      this.bay.start("RetractSensorArm", this);
+
+                      i = 1;
+                    }
+                    else if (this.LastActionCommand.startsWith("changed assembly"))
+                    {
+                      if (this.PolymetalChange < 0)
+                        k = 1;
+                      else {
+                        k = 0;
+                      }
+
+                      if ((this.PolymetalChange != 0) || (this.EnergyUnitChange != 0))
+                      {
+                        transact(this.PolymetalChange, this.EnergyUnitChange);
+                        this.PolymetalChange = 0;
+                        this.EnergyUnitChange = 0;
+                      }
+
+                      if (k != 0)
+                      {
+                        if (this.LastActionCommand.endsWith("rear"))
+                          this.bay.start("RaiseBackArm", this);
+                        else if (this.LastActionCommand.endsWith("top"))
+                          this.bay.start("RaiseTopArm", this);
+                        else if (this.LastActionCommand.endsWith("front")) {
+                          this.bay.start("RetractFrontAssemblyArm", this);
+                        }
+
+                      }
+                      else if (this.LastActionCommand.endsWith("rear"))
+                        this.bay.start("RaiseBackAssembly", this);
+                      else if (this.LastActionCommand.endsWith("top"))
+                        this.bay.start("RaiseTopAssembly", this);
+                      else if (this.LastActionCommand.endsWith("front")) {
+                        this.bay.start("RetractFrontAssembly", this);
+                      }
+
+                      i = 1;
+                    }
+
+                    this.LastActionCommand = null;
+                  }
+
+                  if ((this.RobotOnRamp != null) && (this.RobotOnRamp.getChassis() != null)) {
+                    this.WeightGauge.setValue(currentRobotWeight());
+                  }
+                  if (i == 0) {
+                    this.SequenceComplete = true;
+
+                    return;
+                  }
+
+                }
+                else
+                {
+                  if (!this.SequenceComplete)
+                  {
+                    error("Error: Bay in use.");
+
+                    return;
+                  }
+
+                  if (str.compareTo("new rcx") == 0)
+                  {
+                    if (this.BayOccupied)
+                    {
+                      error("Error: Bay occupied.");
+
+                      return;
+                    }
+
+                    if (transact(-20, -45))
+                    {
+                      this.SequenceComplete = false;
+                      this.bay.start("NewRCX", this);
+
+                      this.BayOccupied = true;
+
+                      this.FrontArmEngaged = true;
+
+                      this.RobotOnRamp = new Robot(this.ir);
+
+                      return;
+                    }
+
+                  }
+                  else
+                  {
+                    if (str.compareTo("tools") == 0)
+                    {
+                      populateMenu("com.templar.games.stormrunner.assembly.Assembly");
+
+                      return;
+                    }
+
+                    if (str.compareTo("chassis") == 0)
+                    {
+                      populateMenu("com.templar.games.stormrunner.chassis.Chassis");
+
+                      return;
+                    }
+
+                    if (str.compareTo("sensors") == 0)
+                    {
+                      populateMenu("com.templar.games.stormrunner.sensor.Sensor");
+
+                      return;
+                    }
+
+                    if (str.compareTo("store") == 0)
+                    {
+                      if (this.BayOccupied)
+                      {
+                        if (this.RobotOnRamp.getChassis() != null)
+                        {
+                          if (this.RobotOnRamp.getName().compareTo("[UNNAMED]") == 0)
+                          {
+                            this.Naming = true;
+
+                            remove(this.RCXName);
+                            add(this.RobotNamer, 0);
+
+                            setInternalFocus(this.RobotNamer);
+
+                            this.Description.setText("Please identify the new RCX.");
+
+                            this.LastActionCommand = "naming for storage";
+
+                            return;
+                          }
+
+                          storeRobot();
+
+                          return;
+                        }
+
+                        error("Error: Robots must have a chassis to enter the storage area.");
+
+                        return;
+                      }
+
+                      error("Error: No equipment to store.");
+
+                      return;
+                    }
+
+                    if (str.compareTo("retrieve") == 0)
+                    {
+                      if (!this.BayOccupied)
+                      {
+                        if (this.state.getStoredRobots().size() > 0)
+                        {
+                          this.Retrieving = true;
+
+                          this.Description.setText("Select a robot from the Roster below.");
+
+                          this.applet.getStatusPanel().setMinimized(false);
+                          this.applet.getStatusPanel().showRoster();
+
+                          this.applet.getStatusPanel().addRosterListener(this);
+
+                          return;
+                        }
+
+                        error("Error: No robots to retrieve.");
+
+                        return;
+                      }
+
+                      error("Error: Bay is occupied.");
+
+                      return;
+                    }
+
+                    if (str.compareTo("dismantle") == 0)
+                    {
+                      if (this.BayOccupied)
+                      {
+                        this.PartsList.setContents(null);
+
+                        this.SequenceComplete = false;
+
+                        if (this.FrontArmEngaged)
+                          this.bay.start("DismantleSuspendedRCX", this);
+                        else {
+                          this.bay.start("DismantleRCX", this);
+                        }
+
+                        this.LastActionCommand = str;
+
+                        return;
+                      }
+
+                      error("Error: No equipment to dismantle.");
+
+                      return;
+                    }
+
+                    if (str.compareTo("engage") == 0)
+                    {
+                      if (this.BayOccupied)
+                      {
+                        if (this.RobotOnRamp.getChassis() != null)
+                        {
+                          if (this.InternalFocus == null)
+                          {
+                            if (this.RobotOnRamp.getName().compareTo("[UNNAMED]") == 0)
+                            {
+                              this.Naming = true;
+
+                              remove(this.RCXName);
+                              add(this.RobotNamer, 0);
+
+                              setInternalFocus(this.RobotNamer);
+
+                              this.Description.setText("Please identify the new RCX.");
+
+                              this.LastActionCommand = "naming for engage";
+
+                              return;
+                            }
+
+                            engageRobot();
+
+                            return;
+                          }
+
+                          System.err.println("Inconsistency: attempting to engage, InternalFocus not null.");
+
+                          return;
+                        }
+
+                        error("Error: RCX cannot be engaged without a chassis.");
+
+                        return;
+                      }
+
+                      error("Error: No RCX to engage.");
+
+                      return;
+                    }
+
+                    if (str.compareTo("disabled part") == 0)
+                    {
+                      error("Error: Insufficient security level.");
+
+                      return;
+                    }
+
+                    if (str.compareTo("P:available part") == 0)
+                    {
+                      if (this.RobotOnRamp != null)
+                      {
+                        OrderedTable localOrderedTable = this.PartsList.getContents();
+                        RobotPart localRobotPart2 = (RobotPart)localOrderedTable.get(paramActionEvent.getSource());
+                        Class localObject3 = localRobotPart2.getClass();
+                        localObject4 = (RobotPart)((Class)localObject3).newInstance();
+
+                        Class localClass1 = Class.forName("com.templar.games.stormrunner.sensor.Sensor");
+                        Class localClass2 = Class.forName("com.templar.games.stormrunner.chassis.Chassis");
+                        Class localClass3 = Class.forName("com.templar.games.stormrunner.assembly.Assembly");
+
+                        Chassis localChassis = this.RobotOnRamp.getChassis();
+                        if ((localClass2.isInstance(localObject4)) && (localChassis != null))
+                        {
+                          this.PolymetalChange = (localChassis.getSalvageCost() - ((RobotPart)localObject4).getSalvageCost());
+                          this.EnergyUnitChange = (localChassis.getEnergyCost() - ((RobotPart)localObject4).getEnergyCost());
+                        }
+                        else
+                        {
+                          this.PolymetalChange = (-((RobotPart)localObject4).getSalvageCost());
+                          this.EnergyUnitChange = (-((RobotPart)localObject4).getEnergyCost());
+                        }
+
+                        if (checkTransaction(this.PolymetalChange, this.EnergyUnitChange))
+                        {
+                          ImageButton localImageButton1;
+                          Object localObject5;
+                          if (localClass2.isInstance(localObject4))
+                          {
+                            if (checkWeightCapacity(((Chassis)localObject4).getWeightCapacity()))
+                            {
+                              localImageButton1 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
+                              localImageButton1.setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
+                              localImageButton1.setActionCommand("installed part");
+
+                              localObject5 = ((RobotPart)localObject4).getID();
+                              this.ChassisFront = (localObject5 + "Front");
+                              this.ChassisRear = (localObject5 + "Rear");
+
+                              this.SequenceComplete = false;
+
+                              if (localChassis != null)
+                              {
+                                Enumeration localEnumeration = localOrderedTable.elements();
+                                RobotPart localRobotPart3 = (RobotPart)localEnumeration.nextElement();
+                                while ((localEnumeration.hasMoreElements()) && (localRobotPart3.getID().compareTo(localChassis.getID()) != 0))
+                                {
+                                  localRobotPart3 = (RobotPart)localEnumeration.nextElement();
+                                }
+                                ImageButton localImageButton2 = (ImageButton)localOrderedTable.getKey(localRobotPart3);
+                                localImageButton2.setImages(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localChassis.getIconAppearance() + "-ok.gif"), null, this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localChassis.getIconAppearance() + "-ro.gif"));
+                                localImageButton2.setActionCommand("available part");
+                              }
+
+                              this.RobotOnRamp.setChassis((Chassis)localObject4);
+
+                              this.WeightGauge.setMax(((Chassis)localObject4).getWeightCapacity());
+
+                              this.LastActionCommand = "changed chassis";
+
+                              if (!this.FrontArmEngaged) {
+                                this.bay.start("RemoveChassis", this);
+
+                                return;
+                              }
+
+                              actionPerformed(new ActionEvent(this, 1001, "Sequence Complete."));
+
+                              return;
+                            }
+
+                            error("Error: This chassis cannot support the weight of the components attached to the RCX. Please choose a chassis with a higher capacity or remove RCX components.");
+
+                            return;
+                          }
+
+                          if (localClass1.isInstance(localObject4))
+                          {
+                            if (this.SensorSlots >= 3)
+                            {
+                              error("Error: RCX can only hold 3 sensors.");
+
+                              return;
+                            }
+
+                            if ((localChassis == null) || (checkWeight(((RobotPart)localObject4).getWeight())))
+                            {
+                              this.SequenceComplete = false;
+
+                              localImageButton1 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
+                              localImageButton1.setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
+                              localImageButton1.setActionCommand("installed part");
+
+                              this.RobotOnRamp.addSensor((Sensor)localObject4);
+
+                              this.SensorChange = ((RobotPart)localObject4).getID();
+
+                              this.SensorList[this.SensorSlots] = localRobotPart2;
+                              this.SensorSlots += 1;
+
+                              this.LastActionCommand = "changed sensor";
+
+                              this.bay.start("ExtendSensorArm", this);
+
+                              return;
+                            }
+
+                            error("Error: The current chassis cannot support the weight of this component.");
+
+                            return;
+                          }
+
+                          if (localClass3.isInstance(localObject4))
+                          {
+                            if ((localChassis == null) || (checkWeight(((RobotPart)localObject4).getWeight())))
+                            {
+                              int i3 = ((Assembly)localObject4).getPlacement();
+                              if (i3 == 2)
+                              {
+                                if (this.FrontAssembly != null)
+                                {
+                                  error("Error: You must remove the " + this.FrontAssembly.getID() + " in order to instll this component.");
+                                }
+                                else
+                                {
+                                  this.SequenceComplete = false;
+                                  this.FrontAssembly = ((RobotPart)localObject4);
+
+                                  localObject5 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
+                                  ((ImageButton)localObject5).setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
+                                  ((ImageButton)localObject5).setActionCommand("installed part");
+
+                                  this.RobotOnRamp.addAssembly((Assembly)localObject4);
+
+                                  this.LastActionCommand = "changed assembly: front";
+
+                                  this.bay.resetFrontAssemblyLayers();
+                                  this.bay.setFrontAssemblyImage(((RobotPart)localObject4).getID());
+                                  this.bay.start("ExtendFrontAssembly", this);
+                                }
+                              }
+                              if (i3 == 1)
+                              {
+                                if (this.RearAssembly != null)
+                                {
+                                  error("Error: You must remove the " + this.RearAssembly.getID() + " in order to install this component.");
+
+                                  return;
+                                }
+
+                                this.SequenceComplete = false;
+                                this.RearAssembly = ((RobotPart)localObject4);
+
+                                localObject5 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
+                                ((ImageButton)localObject5).setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
+                                ((ImageButton)localObject5).setActionCommand("installed part");
+
+                                this.RobotOnRamp.addAssembly((Assembly)localObject4);
+
+                                this.LastActionCommand = "changed assembly: rear";
+
+                                this.bay.resetRearAssemblyLayers();
+                                this.bay.setRearAssemblyImage(((RobotPart)localObject4).getID());
+                                this.bay.start("LowerBackAssembly", this);
+
+                                return;
+                              }
+
+                              if (i3 == 4)
+                              {
+                                if (this.TopAssembly != null)
+                                {
+                                  error("Error: You must remove the " + this.TopAssembly.getID() + " in order to install this component.");
+
+                                  return;
+                                }
+
+                                this.SequenceComplete = false;
+                                this.TopAssembly = ((RobotPart)localObject4);
+
+                                localObject5 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
+                                ((ImageButton)localObject5).setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
+                                ((ImageButton)localObject5).setActionCommand("installed part");
+
+                                this.RobotOnRamp.addAssembly((Assembly)localObject4);
+
+                                this.LastActionCommand = "changed assembly: top";
+
+                                this.bay.resetTopAssemblyLayers();
+                                this.bay.setTopAssemblyImage(((RobotPart)localObject4).getID());
+                                this.bay.start("LowerTopAssembly", this);
+
+                                return;
+                              }
+
+                            }
+                            else
+                            {
+                              error("Error: The current chassis cannot support the weight of this component.");
+
+                              return;
+                            }
+
+                          }
+
+                        }
+
+                      }
+                      else
+                      {
+                        error("Error: Must create or retrieve an RCX to install components.");
+                      }
+                      return;
+                    }
+
+                    if (str.compareTo("P:installed part") != 0) {
+                      return;
+                    }
+                    OrderedTable localOrderedTable = this.PartsList.getContents();
+                    RobotPart localRobotPart2 = (RobotPart)localOrderedTable.get(paramActionEvent.getSource());
+
+                    this.PolymetalChange = localRobotPart2.getSalvageCost();
+                    this.EnergyUnitChange = localRobotPart2.getEnergyCost();
+
+                    Object localObject3 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
+                    ((ImageButton)localObject3).setImages(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-ok.gif"), null, this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-ro.gif"));
+                    ((ImageButton)localObject3).setActionCommand("available part");
+
+                    Class localClass0 = Class.forName("com.templar.games.stormrunner.chassis.Chassis");
+                    Class localClass1 = Class.forName("com.templar.games.stormrunner.sensor.Sensor");
+                    Class localClass2 = Class.forName("com.templar.games.stormrunner.assembly.Assembly");
+                    if (localClass0.isInstance(localRobotPart2))
+                    {
+                      this.ChassisFront = null;
+                      this.ChassisRear = null;
+
+                      this.SequenceComplete = false;
+
+                      this.bay.start("RemoveChassis", this);
+
+                      this.RobotOnRamp.setChassis(null);
+
+                      this.LastActionCommand = "changed chassis";
+
+                      return;
+                    }
+
+                    if (localClass1.isInstance(localRobotPart2))
+                    {
+                      this.SequenceComplete = false;
+
+                      this.RobotOnRamp.removeSensor(((Sensor)localRobotPart2).getID());
+
+                      this.SensorChange = null;
+
+                      this.SensorSlots -= 1;
+
+                      for (int i1 = 0; i1 <= this.SensorSlots; i1++) {
+                        if (this.SensorList[i1].getID().compareTo(localRobotPart2.getID()) == 0) {
+                          this.SensorRemoved = (i1 + 1);
+                        }
+                      }
+                      for (int i2 = this.SensorRemoved - 1; i2 < this.SensorList.length; i2++) {
+                        if (i2 + 1 < this.SensorList.length)
+                          this.SensorList[i2] = this.SensorList[(i2 + 1)];
+                        else {
+                          this.SensorList[i2] = null;
+                        }
+                      }
+                      this.LastActionCommand = "changed sensor";
+
+                      this.bay.start("ExtendSensorArm", this);
+
+                      return;
+                    }
+
+                    if (!localClass2.isInstance(localRobotPart2))
+                      return;
+                    this.SequenceComplete = false;
+
+                    this.RobotOnRamp.removeAssembly(((Assembly)localRobotPart2).getID());
+
+                    if (((Assembly)localRobotPart2).getPlacement() == 1)
+                    {
+                      this.RearAssembly = null;
+
+                      this.LastActionCommand = "changed assembly: rear";
+
+                      this.bay.start("LowerBackArm", this);
+
+                      return;
+                    }
+
+                    if (((Assembly)localRobotPart2).getPlacement() == 4)
+                    {
+                      this.TopAssembly = null;
+
+                      this.LastActionCommand = "changed assembly: top";
+
+                      this.bay.start("LowerTopArm", this);
+
+                      return;
+                    }
+
+                    if (((Assembly)localRobotPart2).getPlacement() != 2) return;
+                    this.FrontAssembly = null;
+
+                    this.LastActionCommand = "changed assembly: front";
+
+                    this.bay.start("ExtendFrontAssemblyArm", this);
+                  }
+                }
               }
             }
-            if (i4 == 1)
-            {
-              if (this.RearAssembly != null)
-              {
-                error("Error: You must remove the " + this.RearAssembly.getID() + " in order to install this component.");
-
-                return;
-              }
-
-              this.SequenceComplete = false;
-              this.RearAssembly = ((RobotPart)localObject4);
-
-              localObject5 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
-              ((ImageButton)localObject5).setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
-              ((ImageButton)localObject5).setActionCommand("installed part");
-
-              this.RobotOnRamp.addAssembly((Assembly)localObject4);
-
-              this.LastActionCommand = "changed assembly: rear";
-
-              this.bay.resetRearAssemblyLayers();
-              this.bay.setRearAssemblyImage(((RobotPart)localObject4).getID());
-              this.bay.start("LowerBackAssembly", this);
-
-              return;
-            }
-
-            if (i4 != 4)
-              break label2999;
-            if (this.TopAssembly != null)
-            {
-              error("Error: You must remove the " + this.TopAssembly.getID() + " in order to install this component.");
-
-              return;
-            }
-
-            this.SequenceComplete = false;
-            this.TopAssembly = ((RobotPart)localObject4);
-
-            localObject5 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
-            ((ImageButton)localObject5).setImage(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-on.gif"));
-            ((ImageButton)localObject5).setActionCommand("installed part");
-
-            this.RobotOnRamp.addAssembly((Assembly)localObject4);
-
-            this.LastActionCommand = "changed assembly: top";
-
-            this.bay.resetTopAssemblyLayers();
-            this.bay.setTopAssemblyImage(((RobotPart)localObject4).getID());
-            this.bay.start("LowerTopAssembly", this);
-
-            return;
           }
-
-          error("Error: The current chassis cannot support the weight of this component.");
-
-          return;
         }
-
-        error("Error: Must create or retrieve an RCX to install components.");
-
-        label2999: return;
       }
-
-      if (str.compareTo("P:installed part") != 0) { return;
-      }
-
-      OrderedTable localOrderedTable = this.PartsList.getContents();
-      RobotPart localRobotPart2 = (RobotPart)localOrderedTable.get(paramActionEvent.getSource());
-
-      this.PolymetalChange = localRobotPart2.getSalvageCost();
-      this.EnergyUnitChange = localRobotPart2.getEnergyCost();
-
-      Object localObject3 = (ImageButton)localOrderedTable.getKey(localRobotPart2);
-      ((ImageButton)localObject3).setImages(this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-ok.gif"), null, this.ir.getImage("com/templar/games/stormrunner/media/images/build/robotparts/" + localRobotPart2.getIconAppearance() + "-ro.gif"));
-      ((ImageButton)localObject3).setActionCommand("available part");
-
-      Object localObject4 = Class.forName("com.templar.games.stormrunner.chassis.Chassis");
-      Class localClass1 = Class.forName("com.templar.games.stormrunner.sensor.Sensor");
-      Class localClass2 = Class.forName("com.templar.games.stormrunner.assembly.Assembly");
-      if (((Class)localObject4).isInstance(localRobotPart2))
-      {
-        this.ChassisFront = null;
-        this.ChassisRear = null;
-
-        this.SequenceComplete = false;
-
-        this.bay.start("RemoveChassis", this);
-
-        this.RobotOnRamp.setChassis(null);
-
-        this.LastActionCommand = "changed chassis";
-
-        return;
-      }
-
-      if (localClass1.isInstance(localRobotPart2))
-      {
-        this.SequenceComplete = false;
-
-        this.RobotOnRamp.removeSensor(((Sensor)localRobotPart2).getID());
-
-        this.SensorChange = null;
-
-        this.SensorSlots -= 1;
-
-        for (int i2 = 0; i2 <= this.SensorSlots; ++i2)
-          if (this.SensorList[i2].getID().compareTo(localRobotPart2.getID()) == 0)
-            this.SensorRemoved = (i2 + 1);
-
-
-        for (int i3 = this.SensorRemoved - 1; i3 < this.SensorList.length; ++i3)
-          if (i3 + 1 < this.SensorList.length)
-            this.SensorList[i3] = this.SensorList[(i3 + 1)];
-          else
-            this.SensorList[i3] = null;
-
-
-        this.LastActionCommand = "changed sensor";
-
-        this.bay.start("ExtendSensorArm", this);
-
-        return;
-      }
-
-      if (!(localClass2.isInstance(localRobotPart2))) { return;
-      }
-
-      this.SequenceComplete = false;
-
-      this.RobotOnRamp.removeAssembly(((Assembly)localRobotPart2).getID());
-
-      if (((Assembly)localRobotPart2).getPlacement() == 1)
-      {
-        this.RearAssembly = null;
-
-        this.LastActionCommand = "changed assembly: rear";
-
-        this.bay.start("LowerBackArm", this);
-
-        return;
-      }
-
-      if (((Assembly)localRobotPart2).getPlacement() == 4)
-      {
-        this.TopAssembly = null;
-
-        this.LastActionCommand = "changed assembly: top";
-
-        this.bay.start("LowerTopArm", this);
-
-        return;
-      }
-
-      if (((Assembly)localRobotPart2).getPlacement() != 2) return;
-
-      this.FrontAssembly = null;
-
-      this.LastActionCommand = "changed assembly: front";
-
-      this.bay.start("ExtendFrontAssemblyArm", this);
-
-      label3517: return;
+      return;
     }
     catch (ClassNotFoundException localClassNotFoundException)
     {
@@ -1424,12 +1452,12 @@ public class BuildPanel extends ControllableBufferContainer
     Component localComponent = paramImageEvent.getSource();
 
     if ((localComponent.getParent() != null) && (localComponent.getParent().getParent() == this.PartsList)) {
-      super.taintBuffer(this.PartsList.getBounds());
+      taintBuffer(this.PartsList.getBounds());
 
       return;
     }
 
-    super.taintBuffer(paramImageEvent.getSource().getBounds());
+    taintBuffer(paramImageEvent.getSource().getBounds());
   }
 
   public Component getInternalFocus()
@@ -1462,8 +1490,8 @@ public class BuildPanel extends ControllableBufferContainer
 
   public void setGameState(GameState paramGameState)
   {
-    this.state = paramGameState; }
-
+    this.state = paramGameState;
+  }
   public boolean isBayOccupied() { return this.BayOccupied; } 
   public Robot getRobotOnRamp() { return this.RobotOnRamp;
   }

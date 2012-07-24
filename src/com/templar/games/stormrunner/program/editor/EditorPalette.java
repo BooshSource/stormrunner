@@ -136,27 +136,27 @@ public class EditorPalette extends SimpleContainer
     Robot localRobot = this.CurrentEditor.getRobot();
     if (localRobot != null)
     {
-      if (new ArmPickUp().verifyRobot(localRobot))
+      if (new ArmPickUp().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("PickUp"));
-
-      if (new ArmPutDown().verifyRobot(localRobot))
+      }
+      if (new ArmPutDown().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("PutDown"));
-
-      if (new ArmStore().verifyRobot(localRobot))
+      }
+      if (new ArmStore().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("Store"));
-
-      if (new ArmRetrieve().verifyRobot(localRobot))
+      }
+      if (new ArmRetrieve().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("Retrieve"));
-
-      if (new TurnTowards().verifyRobot(localRobot))
+      }
+      if (new TurnTowards().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("TurnTowards"));
-
-      if (new TurnAway().verifyRobot(localRobot))
+      }
+      if (new TurnAway().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("TurnAway"));
-
-      if (new Hammer().verifyRobot(localRobot))
+      }
+      if (new Hammer().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("Hammer"));
-
+      }
       if (new Launch().verifyRobot(localRobot)) {
         this.CommandsList.addElement(this.CurrentEditor.getProgramComponent("Launch"));
       }
@@ -197,7 +197,7 @@ public class EditorPalette extends SimpleContainer
     Component[] arrayOfComponent = getComponents();
 
     int i = 0;
-    for (int j = 0; j < arrayOfComponent.length; ++j)
+    for (int j = 0; j < arrayOfComponent.length; j++)
     {
       Component localComponent = getComponent(j);
       localComponent.setLocation(0, i);
@@ -273,13 +273,12 @@ public class EditorPalette extends SimpleContainer
 
   public void actionPerformed(ActionEvent paramActionEvent)
   {
-    if (!(this.Disabled))
+    if (!this.Disabled)
     {
-      Object localObject;
       this.CurrentEditor.stopProgram();
 
       this.CurrentEditor.cancelEditParameter();
-
+      Object localObject;
       if (paramActionEvent.getActionCommand().compareTo("save") == 0)
       {
         localObject = new SaveMenu(this.CurrentEditor);
@@ -307,11 +306,11 @@ public class EditorPalette extends SimpleContainer
   {
     if (this.CurrentActive != null)
     {
-      int i = this.CurrentActive.getLocation().x + paramInt1 - getLocation().x;
-      int j = this.CurrentActive.getLocation().y + paramInt2 - getLocation().y;
+      int i = this.CurrentActive.getLocation().x + (paramInt1 - getLocation().x);
+      int j = this.CurrentActive.getLocation().y + (paramInt2 - getLocation().y);
       this.CurrentActive.setLocationWhileDragging(i, j);
     }
 
-    setLocation(paramInt1, paramInt2);
+    super.setLocation(paramInt1, paramInt2);
   }
 }

@@ -46,10 +46,10 @@ public class Melted extends Death
       this.comp = new AnimationComponent[1];
       this.comp[0] = new AnimationComponent();
       arrayOfImage = new Image[9];
-      for (i = 0; i < 5; ++i)
+      for (i = 0; i < 5; i++)
         arrayOfImage[i] = GameApplet.thisApplet.getImage(
           "com/templar/games/stormrunner/media/images/robot/melting/r_firedeath_a0" + (i + 1) + ".gif");
-      for (int j = 0; j < 4; ++j)
+      for (int j = 0; j < 4; j++)
         arrayOfImage[(5 + j)] = GameApplet.thisApplet.getImage(
           "com/templar/games/stormrunner/media/images/robot/melting/r_firedeath_b0" + (j + 1) + ".gif");
       this.comp[0].setCells(arrayOfImage);
@@ -68,14 +68,14 @@ public class Melted extends Death
       this.dyingFrame += 1;
       return;
     case 1:
-      if (this.comp[0].nextImage()) return;
-
+      if (this.comp[0].nextImage())
+        break;
       paramRobot.getEnvironment().removeObject(this.fx);
       arrayOfImage = new Image[23];
-      for (i = 1; i <= 23; ++i)
+      for (i = 1; i <= 23; i++)
         arrayOfImage[(i - 1)] = GameApplet.thisApplet.getImage(
-          "com/templar/games/stormrunner/media/images/robot/Explosion/r_explode_" + 
-          ((java.lang.Integer.toString(i).length() < 2) ? "0" + i : String.valueOf(i)) + ".gif");
+          "com/templar/games/stormrunner/media/images/robot/Explosion/r_explode_" + (
+          Integer.toString(i).length() < 2 ? "0" + i : String.valueOf(i)) + ".gif");
       this.comp[0].reset();
       this.comp[0].setCells(arrayOfImage);
       this.comp[0].setSequence(Falling.EXPLOSION_SEQUENCE, null, false);
@@ -102,8 +102,8 @@ public class Melted extends Death
       paramRobot.setVisible(false);
       return;
     case 6:
-      if (this.comp[0].nextImage()) return;
-
+      if (this.comp[0].nextImage())
+        break;
       paramRobot.setDead(true);
       paramRobot.getEnvironment().getShroud().setVisible(
         paramRobot.getPosition().getMapPoint(), 2, false, false, true);

@@ -10,6 +10,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,8 +36,8 @@ public class PhysicalObject extends ImageComposite
   protected String frame;
   protected String layer;
   protected transient Renderer CurrentRenderer;
-  protected transient Vector Playing;
-  protected transient Vector Looping;
+  protected transient Vector Playing = new Vector();
+  protected transient Vector Looping = new Vector();
   transient boolean imListening;
   transient MouseHandler mouseHandler;
 
@@ -62,9 +63,9 @@ public class PhysicalObject extends ImageComposite
     if (arrayOfString != null)
     {
       Image[] arrayOfImage = new Image[arrayOfString.length];
-      for (int i = 0; i < arrayOfString.length; ++i)
+      for (int i = 0; i < arrayOfString.length; i++)
         arrayOfImage[i] = GameApplet.thisApplet.getImage(arrayOfString[i]);
-      super.setImages(arrayOfImage);
+      setImages(arrayOfImage);
     }
   }
 
@@ -74,12 +75,12 @@ public class PhysicalObject extends ImageComposite
     paramObjectOutput.writeObject(this.LastPosition);
     paramObjectOutput.writeObject(this.LastCell);
     boolean[][] arrayOfBoolean = new boolean[this.shape.length][this.shape[0].length];
-    for (int i = 0; i < this.shape.length; ++i)
-      for (int j = 0; j < this.shape[0].length; ++j)
+    for (int i = 0; i < this.shape.length; i++)
+      for (int j = 0; j < this.shape[0].length; j++)
         if (this.shape[i][j] == null)
-          arrayOfBoolean[i][j] = 0;
+          arrayOfBoolean[i][j] = false;
         else
-          arrayOfBoolean[i][j] = 1;
+          arrayOfBoolean[i][j] = true;
     paramObjectOutput.writeObject(arrayOfBoolean);
     paramObjectOutput.writeObject(this.ID);
     paramObjectOutput.writeBoolean(this.animated);
@@ -91,11 +92,11 @@ public class PhysicalObject extends ImageComposite
   public void writeExternal(ObjectOutput paramObjectOutput) throws IOException
   {
     writeExternalWithoutImages(paramObjectOutput);
-    Image[] arrayOfImage = super.getImages();
+    Image[] arrayOfImage = getImages();
     if (arrayOfImage != null)
     {
       String[] arrayOfString = new String[arrayOfImage.length];
-      for (int i = 0; i < arrayOfImage.length; ++i)
+      for (int i = 0; i < arrayOfImage.length; i++)
         arrayOfString[i] = GameApplet.thisApplet.getImageFilename(arrayOfImage[i]);
       paramObjectOutput.writeObject(arrayOfString);
 
@@ -107,20 +108,17 @@ public class PhysicalObject extends ImageComposite
 
   public PhysicalObject()
   {
-    this.Playing = new Vector();
-    this.Looping = new Vector();
-
     this.ID = "";
     this.shape = new PhysicalObject[1][1];
     this.shape[0][0] = this;
     this.url_target = null;
     this.frame = "";
     this.layer = "";
-    this.mouseHandler = new MouseHandler(this);
+    this.mouseHandler = new MouseHandler();
   }
 
-  public PhysicalObject(Scene paramScene, Position paramPosition, boolean paramBoolean)
-  {
+  public PhysicalObject(Scene paramScene, Position paramPosition, boolean paramBoolean) {
+    this();
     this.environment = paramScene;
     this.location = paramPosition;
     this.LastPosition = paramPosition;
@@ -130,7 +128,7 @@ public class PhysicalObject extends ImageComposite
 
   public PhysicalObject(Scene paramScene, Position paramPosition, Image[] paramArrayOfImage, boolean paramBoolean) {
     this(paramScene, paramPosition, paramBoolean);
-    super.setImages(paramArrayOfImage);
+    setImages(paramArrayOfImage);
   }
 
   public PhysicalObject(Scene paramScene, Position paramPosition, Image[] paramArrayOfImage, boolean[][] paramArrayOfBoolean, boolean paramBoolean) {
@@ -144,13 +142,13 @@ public class PhysicalObject extends ImageComposite
   }
 
   public void setLayer(String paramString) {
-    this.layer = paramString; }
-
+    this.layer = paramString;
+  }
   public String getLayer() { return this.layer; }
 
   public void setID(String paramString) {
-    this.ID = paramString; }
-
+    this.ID = paramString;
+  }
   public String getID() { return this.ID; }
 
   public void setEnvironment(Scene paramScene) {
@@ -230,9 +228,9 @@ public class PhysicalObject extends ImageComposite
   {
     if (paramURL != null)
     {
-      if (!(this.imListening))
+      if (!this.imListening) {
         addMouseListener(this.mouseHandler);
-
+      }
     }
     else if (this.imListening)
       removeMouseListener(this.mouseHandler);
@@ -248,9 +246,9 @@ public class PhysicalObject extends ImageComposite
   public void setShape(boolean[][] paramArrayOfBoolean)
   {
     this.shape = new PhysicalObject[paramArrayOfBoolean.length][paramArrayOfBoolean[0].length];
-    for (int i = 0; i < paramArrayOfBoolean.length; ++i)
-      for (int j = 0; j < paramArrayOfBoolean[0].length; ++j)
-        if (paramArrayOfBoolean[i][j] != 0)
+    for (int i = 0; i < paramArrayOfBoolean.length; i++)
+      for (int j = 0; j < paramArrayOfBoolean[0].length; j++)
+        if (paramArrayOfBoolean[i][j] != false)
           this.shape[i][j] = this;
         else
           this.shape[i][j] = null;
@@ -263,12 +261,12 @@ public class PhysicalObject extends ImageComposite
 
   public void setVisible(boolean paramBoolean)
   {
-    if (this.animated)
+    if (this.animated) {
       if (paramBoolean)
-        super.startDrawing();
+        startDrawing();
       else
-        super.stopDrawing();
-
+        stopDrawing();
+    }
     super.setVisible(paramBoolean);
   }
 
@@ -297,9 +295,9 @@ public class PhysicalObject extends ImageComposite
         this.LastCell.y = this.LastPosition.y;
       }
     }
-    else
+    else {
       this.LastCell = new Position(paramPosition);
-
+    }
     Position localPosition = this.location;
 
     this.location = paramPosition;
@@ -325,25 +323,25 @@ public class PhysicalObject extends ImageComposite
 
   public void place(Vector[][] paramArrayOfVector)
   {
-    int i = this.location.x; for (int j = 0; j < this.shape.length; ) {
-      int k = this.location.y; for (int l = 0; l < this.shape[0].length; )
+    int i = this.location.x; for (int j = 0; j < this.shape.length; j++) {
+      int k = this.location.y; for (int m = 0; m < this.shape[0].length; m++)
       {
-        if (this.shape[j][l] != null)
+        if (this.shape[j][m] != null)
         {
           if ((i >= 0) && (i < paramArrayOfVector.length) && (k >= 0) && (k < paramArrayOfVector[0].length))
           {
             if (paramArrayOfVector[i][k] == null)
               paramArrayOfVector[i][k] = new Vector(1, 1);
-            if (!(paramArrayOfVector[i][k].contains(this.shape[j][l])))
-              paramArrayOfVector[i][k].addElement(this.shape[j][l]);
+            if (!paramArrayOfVector[i][k].contains(this.shape[j][m]))
+              paramArrayOfVector[i][k].addElement(this.shape[j][m]);
           }
           else {
-            Debug.println("Tried to place an object outside the map: " + j + "," + l + " at " + i + "," + k);
+            Debug.println("Tried to place an object outside the map: " + j + "," + m + " at " + i + "," + k);
           }
         }
-        ++k; ++l;
+        k++;
       }
-      ++i; ++j;
+      i++;
     }
   }
 
@@ -365,23 +363,23 @@ public class PhysicalObject extends ImageComposite
 
   public void paint(Graphics paramGraphics) {
     if (this.CurrentRenderer != null) {
-      if (!(this.CurrentRenderer.isInWindow(this)))
+      if (!this.CurrentRenderer.isInWindow(this))
       {
-        super.stopDrawing();
+        stopDrawing();
         return;
       }
 
-      super.startDrawing();
+      startDrawing();
     }
-    paint(paramGraphics);
+    super.paint(paramGraphics);
   }
 
   public boolean[][] getShape() {
     boolean[][] arrayOfBoolean = new boolean[this.shape.length][this.shape[0].length];
-    for (int i = 0; i < this.shape.length; ++i)
-      for (int j = 0; j < this.shape[0].length; ++j)
+    for (int i = 0; i < this.shape.length; i++)
+      for (int j = 0; j < this.shape[0].length; j++)
         if (this.shape[i][j] != null)
-          arrayOfBoolean[i][j] = 1;
+          arrayOfBoolean[i][j] = true;
     return arrayOfBoolean;
   }
 
@@ -390,7 +388,7 @@ public class PhysicalObject extends ImageComposite
     String str = getClass().getName();
     localStringBuffer.append(str.substring(str.lastIndexOf(".") + 1));
     localStringBuffer.append("[");
-    localStringBuffer.append("Environment:" + ((this.environment == null) ? "null" : new StringBuffer("Scene@").append(this.environment.hashCode()).toString()));
+    localStringBuffer.append("Environment:" + (this.environment == null ? "null" : new StringBuffer("Scene@").append(this.environment.hashCode()).toString()));
     localStringBuffer.append(",");
     localStringBuffer.append(this.ID);
     localStringBuffer.append(",");
@@ -415,9 +413,9 @@ public class PhysicalObject extends ImageComposite
     localStringBuffer.append(",");
     localStringBuffer.append(this.shape[0].length);
     localStringBuffer.append("\n");
-    for (int i = 0; i < this.shape[0].length; ++i)
+    for (int i = 0; i < this.shape[0].length; i++)
     {
-      for (int j = 0; j < this.shape.length; ++j)
+      for (int j = 0; j < this.shape.length; j++)
         if (this.shape[j][i] == null)
           localStringBuffer.append(".");
         else
@@ -425,5 +423,17 @@ public class PhysicalObject extends ImageComposite
       localStringBuffer.append("\n");
     }
     return localStringBuffer.toString();
+  }
+
+  class MouseHandler extends MouseAdapter
+  {
+    public void mousePressed(MouseEvent paramMouseEvent)
+    {
+      PhysicalObject.this.handleMouseClick(paramMouseEvent);
+    }
+
+    MouseHandler()
+    {
+    }
   }
 }

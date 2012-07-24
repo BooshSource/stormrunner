@@ -45,8 +45,8 @@ public class HighlightBox extends Component
       this.Space = paramInsets;
     this.Target = paramComponent;
 
-    super.setLocation(paramComponent.getLocation().x - this.Space.left, paramComponent.getLocation().y - this.Space.top);
-    super.setSize(paramComponent.getSize().width + this.Space.left + this.Space.right, paramComponent.getSize().height + this.Space.top + this.Space.bottom);
+    setLocation(paramComponent.getLocation().x - this.Space.left, paramComponent.getLocation().y - this.Space.top);
+    setSize(paramComponent.getSize().width + this.Space.left + this.Space.right, paramComponent.getSize().height + this.Space.top + this.Space.bottom);
 
     paramComponent.addComponentListener(this);
 
@@ -69,21 +69,21 @@ public class HighlightBox extends Component
 
   public void componentMoved(ComponentEvent paramComponentEvent)
   {
-    super.setLocation(this.Target.getLocation().x - this.Space.left, this.Target.getLocation().y - this.Space.top);
+    setLocation(this.Target.getLocation().x - this.Space.left, this.Target.getLocation().y - this.Space.top);
   }
 
   public void componentResized(ComponentEvent paramComponentEvent)
   {
-    super.setSize(this.Target.getSize().width + this.Space.left + this.Space.right, this.Target.getSize().height + this.Space.top + this.Space.bottom); }
-
-  public void componentHidden(ComponentEvent paramComponentEvent) { }
-
+    setSize(this.Target.getSize().width + this.Space.left + this.Space.right, this.Target.getSize().height + this.Space.top + this.Space.bottom);
+  }
+  public void componentHidden(ComponentEvent paramComponentEvent) {
+  }
   public void componentShown(ComponentEvent paramComponentEvent) {
   }
 
   public void componentRemoved(ContainerEvent paramContainerEvent) {
-    if ((paramContainerEvent.getChild() == this.Target) && (super.getParent() != null))
-      super.getParent().remove(this);
+    if ((paramContainerEvent.getChild() == this.Target) && (getParent() != null))
+      getParent().remove(this);
   }
 
   public void componentAdded(ContainerEvent paramContainerEvent) {
@@ -97,9 +97,9 @@ public class HighlightBox extends Component
   {
     paramGraphics.setColor(this.HighlightColor);
 
-    for (int i = 0; i < this.LineThickness; ++i)
+    for (int i = 0; i < this.LineThickness; i++)
     {
-      paramGraphics.drawRect(i, i, super.getSize().width - 1 - i * 2, super.getSize().height - 1 - i * 2);
+      paramGraphics.drawRect(i, i, getSize().width - 1 - i * 2, getSize().height - 1 - i * 2);
     }
   }
 }

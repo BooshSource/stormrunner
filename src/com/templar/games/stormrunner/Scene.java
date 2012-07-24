@@ -18,7 +18,7 @@ public class Scene
   implements Externalizable
 {
   static final long serialVersionUID = 4886718345L;
-  public static final double VERSION = 0.40000000000000002D;
+  public static final double VERSION = 0.4D;
   protected Map sceneMap;
   protected transient Vector[][] objectMap;
   protected Vector actorsList;
@@ -86,7 +86,7 @@ public class Scene
     {
       PhysicalObject localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
       localPhysicalObject.place(this.objectMap);
-      if (localPhysicalObject instanceof Actor)
+      if ((localPhysicalObject instanceof Actor))
         this.actorsList.addElement(localPhysicalObject);
     }
     this.objectList = paramVector;
@@ -105,12 +105,12 @@ public class Scene
 
   public Vector[][] getObjectMap()
   {
-    return this.objectMap; }
-
-  public Map getMap() { return this.sceneMap;
+    return this.objectMap;
   }
+  public Map getMap() { return this.sceneMap; }
 
-  public Vector getObjectAt(int paramInt1, int paramInt2) {
+  public Vector getObjectAt(int paramInt1, int paramInt2)
+  {
     try {
       return this.objectMap[paramInt1][paramInt2];
     }
@@ -165,18 +165,18 @@ public class Scene
     }
     if (localVector != null)
     {
-      int i = 0;
-      for (int j = 0; j < localVector.size(); ++j)
+     boolean b = false;
+      for (int j = 0; j < localVector.size(); j++)
       {
-        if (localVector.elementAt(j) instanceof Obstacle)
-          i = 1;
+        if ((localVector.elementAt(j) instanceof Obstacle)) {
+          b = true;
+        }
       }
-
-      return i;
+      return b;
     }
 
-    return false; }
-
+    return false;
+  }
   public void setLayers(Vector paramVector) { this.layers = paramVector; } 
   public Vector getLayers() { return this.layers; } 
   public Vector getActors() { return this.actorsList; } 
@@ -188,7 +188,7 @@ public class Scene
   }
 
   public boolean mightBeDescribedAs(String paramString) {
-    return (this.description.toLowerCase().indexOf(paramString.toLowerCase()) != -1);
+    return this.description.toLowerCase().indexOf(paramString.toLowerCase()) != -1;
   }
 
   public Shroud getShroud() {
@@ -197,7 +197,7 @@ public class Scene
 
   public void addObject(PhysicalObject paramPhysicalObject) {
     paramPhysicalObject.place(this.objectMap);
-    if (paramPhysicalObject instanceof Actor)
+    if ((paramPhysicalObject instanceof Actor))
       this.actorsList.addElement(paramPhysicalObject);
     this.objectList.addElement(paramPhysicalObject);
 
@@ -209,29 +209,27 @@ public class Scene
 
   private void removeObject(PhysicalObject paramPhysicalObject, Point paramPoint)
   {
-    for (int i = paramPoint.x; i < paramPoint.x + paramPhysicalObject.getShapeSize().width; ++i)
-      for (int j = paramPoint.y; j < paramPoint.y + paramPhysicalObject.getShapeSize().height; )
-      {
-        try {
+    for (int i = paramPoint.x; i < paramPoint.x + paramPhysicalObject.getShapeSize().width; i++)
+      for (int j = paramPoint.y; j < paramPoint.y + paramPhysicalObject.getShapeSize().height; j++)
+        try
+        {
           if ((this.objectMap[i][j] == null) || 
-            (!(this.objectMap[i][j].contains(paramPhysicalObject))))
-            break label91;
+            (!this.objectMap[i][j].contains(paramPhysicalObject)))
+            continue;
           this.objectMap[i][j].removeElement(paramPhysicalObject);
-          if (this.objectMap[i][j].size() != 0) break label91;
-          this.objectMap[i][j] = null;
+          if (this.objectMap[i][j].size() == 0)
+            this.objectMap[i][j] = null;
         }
         catch (ArrayIndexOutOfBoundsException localArrayIndexOutOfBoundsException)
         {
         }
-        label91: ++j;
-      }
   }
 
   public void removeObject(PhysicalObject paramPhysicalObject)
   {
     removeObject(paramPhysicalObject, paramPhysicalObject.getPosition().getMapPoint());
     this.objectList.removeElement(paramPhysicalObject);
-    if (paramPhysicalObject instanceof Actor)
+    if ((paramPhysicalObject instanceof Actor))
       this.actorsList.removeElement(paramPhysicalObject);
     if (this.renderer != null)
       this.renderer.removeObject(paramPhysicalObject);

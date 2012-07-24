@@ -65,7 +65,7 @@ public class Conditional
   {
     try
     {
-      return super.clone();
+      return clone();
     }
     catch (CloneNotSupportedException localCloneNotSupportedException) {
     }
@@ -89,10 +89,10 @@ public class Conditional
 
   public void setNextConditional(Conditional paramConditional)
   {
-    this.next = paramConditional; }
-
-  public void setPreviousInstruction(Instruction paramInstruction) { }
-
+    this.next = paramConditional;
+  }
+  public void setPreviousInstruction(Instruction paramInstruction) {
+  }
   public Instruction getPreviousInstruction() {
     return null;
   }
@@ -108,9 +108,9 @@ public class Conditional
 
   public boolean detachNext(Linkable paramLinkable)
   {
-    int i = 0;
+    boolean b = false;
 
-    if (paramLinkable instanceof ConditionalList)
+    if ((paramLinkable instanceof ConditionalList))
     {
       ConditionalList localConditionalList = (ConditionalList)paramLinkable;
       if ((localConditionalList.getPreviousConditional() == this) && (this.next == localConditionalList))
@@ -118,19 +118,19 @@ public class Conditional
         this.next.setPreviousConditional(null);
         this.next = null;
 
-        i = 1;
+        b = true;
       }
 
     }
 
-    return i;
+    return b;
   }
 
   public boolean attachNext(Linkable paramLinkable)
   {
-    int i = 0;
+   boolean b = false;
 
-    if (paramLinkable instanceof ConditionalList)
+    if ((paramLinkable instanceof ConditionalList))
     {
       ConditionalList localConditionalList = (ConditionalList)paramLinkable;
       if (localConditionalList.getPreviousConditional() == null)
@@ -138,59 +138,59 @@ public class Conditional
         localConditionalList.setPreviousConditional(this);
         this.next = ((Conditional)localConditionalList);
 
-        i = 1;
+        b = true;
       }
 
     }
 
-    return i;
+    return b;
   }
 
   public boolean detachPrevious(Linkable paramLinkable)
   {
-    int i = 0;
+    boolean b=false;
 
-    if (paramLinkable instanceof ConditionalList)
+    if ((paramLinkable instanceof ConditionalList))
     {
       ConditionalList localConditionalList = (ConditionalList)paramLinkable;
-      if ((localConditionalList.getNextConditional() == this) && (((this.prev == localConditionalList) || (this.prev == null))))
+      if ((localConditionalList.getNextConditional() == this) && ((this.prev == localConditionalList) || (this.prev == null)))
       {
         if (this.prev != null)
           this.prev.setNextConditional(null);
-        else
+        else {
           localConditionalList.setNextConditional(null);
-
+        }
         this.prev = null;
 
-        i = 1;
+        b = true;
       }
 
     }
 
-    return i;
+    return b;
   }
 
   public boolean attachPrevious(Linkable paramLinkable)
   {
-    int i = 0;
+    boolean b=false;
 
-    if (paramLinkable instanceof ConditionalList)
+    if ((paramLinkable instanceof ConditionalList))
     {
       ConditionalList localConditionalList = (ConditionalList)paramLinkable;
       if (localConditionalList.getNextConditional() == null)
       {
         localConditionalList.setNextConditional(this);
-        if (paramLinkable instanceof Conditional)
+        if ((paramLinkable instanceof Conditional))
           this.prev = ((Conditional)paramLinkable);
-        else
+        else {
           this.prev = null;
-
-        i = 1;
+        }
+        b=true;
       }
 
     }
 
-    return i;
+    return b;
   }
 
   public String toString()

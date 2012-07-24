@@ -1,6 +1,5 @@
 package com.templar.games.stormrunner.deaths;
 
-//import [Z;
 import com.templar.games.stormrunner.GameApplet;
 import com.templar.games.stormrunner.Map;
 import com.templar.games.stormrunner.PhysicalObject;
@@ -39,7 +38,9 @@ public class Falling extends Death
   public static final int[] EXPLOSION_SEQUENCE = { 0, 
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 9, 10, 11, 12, 9, 10, 11, 12, 13, 14, 15, 16, 
     14, 15, 16, 17, 18, 19, 20, 18, 19, 20, 21, 22 };
+
   Position initialRobotPosition = new Position();
+
   int dyingFrame = 0;
   int velocity = 0;
   int fallTime = 0;
@@ -74,11 +75,11 @@ public class Falling extends Death
 
   public void deathStep(Robot paramRobot)
   {
-    Object localObject1;
-    int i1;
+    Position localPosition = paramRobot.getPosition();
     Object localObject2;
     Object localObject3;
-    Position localPosition = paramRobot.getPosition();
+    int n;
+    Image[] localObject1=null;////
     switch (this.dyingFrame)
     {
     case 0:
@@ -104,9 +105,9 @@ public class Falling extends Death
       {
         paramRobot.setOrientation(180);
         int j = 0;
-        for (int l = localPoint1.y; (l < paramRobot.getEnvironment().getMap().getSize().height) && (j == 0); ++l)
+        for (int m = localPoint1.y; (m < paramRobot.getEnvironment().getMap().getSize().height) && (j == 0); m++)
         {
-          Vector localVector = paramRobot.getEnvironment().getObjectAt(localPoint1.x, l);
+          Vector localVector = paramRobot.getEnvironment().getObjectAt(localPoint1.x, m);
 
           if (localVector != null)
           {
@@ -116,17 +117,17 @@ public class Falling extends Death
             {
               localObject3 = (PhysicalObject)((Enumeration)localObject2).nextElement();
 
-              if (localObject3 instanceof CliffTrigger)
+              if ((localObject3 instanceof CliffTrigger))
                 j = 0;
             }
-            if (j != 0)
-              localPoint2 = new Point(localPoint1.x, l);
-
+            if (j != 0) {
+              localPoint2 = new Point(localPoint1.x, m);
+            }
           }
           else
           {
             j = 1;
-            localPoint2 = new Point(localPoint1.x, l);
+            localPoint2 = new Point(localPoint1.x, m);
           }
         }
         if (localPoint2 == null)
@@ -147,12 +148,12 @@ public class Falling extends Death
       if (localPosition.dx != 0)
       {
         double d = Math.sqrt(Math.abs(localPosition.dx) * 2 / 2);
-        Debug.println((localPosition.dx * 2) + "," + (localPosition.dx * 2 / 2) + "," + d);
-        i1 = (int)d;
-        Debug.println("time to fall is " + i1);
+        Debug.println(localPosition.dx * 2 + "," + localPosition.dx * 2 / 2 + "," + d);
+        n = (int)d;
+        Debug.println("time to fall is " + n);
         try
         {
-          this.xstep = (Math.abs(localPosition.dx) / i1);
+          this.xstep = (Math.abs(localPosition.dx) / n);
           Debug.println("xstep each frame is " + this.xstep);
         }
         catch (ArithmeticException localArithmeticException)
@@ -185,32 +186,32 @@ public class Falling extends Death
         Debug.println("final position: " + localPosition);
         paramRobot.setPosition(new Position(localPosition.x, localPosition.y, 0, 0));
         this.dyingFrame += 1;
-        localObject1 = new Image[23];
-        for (i1 = 1; i1 <= 23; ++i1)
-          localObject1[(i1 - 1)] = GameApplet.thisApplet.getImage(
-            "com/templar/games/stormrunner/media/images/robot/Explosion/r_explode_" + 
-            ((java.lang.Integer.toString(i1).length() < 2) ? "0" + i1 : String.valueOf(i1)) + ".gif");
+        Image[] localImages = new Image[23];
+        for (n = 1; n <= 23; n++)
+        	localImages[(n - 1)] = GameApplet.thisApplet.getImage(
+            "com/templar/games/stormrunner/media/images/robot/Explosion/r_explode_" + (
+            Integer.toString(n).length() < 2 ? "0" + n : String.valueOf(n)) + ".gif");
         paramRobot.getAnimationComponents().clear();
         paramRobot.setLayer("Robot");
         paramRobot.getEnvironment().removeObject(paramRobot);
         paramRobot.getEnvironment().addObject(paramRobot);
-        localObject2 = { 
+        Image[] localLoadedImage = new Image[] { 
           GameApplet.thisApplet.getImage(
           "com/templar/games/stormrunner/media/images/robot/Wreckage/r_wreck_track.gif") };
 
-        paramRobot.setImages(localObject2);
+        paramRobot.setImages(localLoadedImage);
         localObject3 = paramRobot.getEnvironment().getObjectAt(localPosition.getMapPoint());
         if (localObject3 != null)
         {
-          localObject4 = ((Vector)localObject3).elements();
-          while (((Enumeration)localObject4).hasMoreElements())
+          Enumeration localObject4 = ((Vector)localObject3).elements();
+          while ((localObject4).hasMoreElements())
           {
             PhysicalObject localPhysicalObject = (PhysicalObject)((Enumeration)localObject4).nextElement();
-            if ((localPhysicalObject instanceof Robot) && (paramRobot != localPhysicalObject))
+            if (((localPhysicalObject instanceof Robot)) && (paramRobot != localPhysicalObject))
               ((Robot)localPhysicalObject).setDeath(new InstantDeath());
           }
         }
-        Object localObject4 = new AnimationComponent[1];
+        AnimationComponent[] localObject4 = new AnimationComponent[1];
         this.explode = new AnimationComponent(localObject1);
         localObject4[0] = this.explode;
         localObject4[0].setSequence(EXPLOSION_SEQUENCE, null, false);
@@ -234,17 +235,18 @@ public class Falling extends Death
 
       return;
     case 2:
-      if (!(this.explode.nextImage()))
+      if (!this.explode.nextImage())
       {
+    	  Salvage localSalvage;
         paramRobot.setDead(true);
         paramRobot.getEnvironment().getShroud().setVisible(
           this.initialRobotPosition.getMapPoint(), 2, false, false, true);
         paramRobot.getEnvironment().removeObject(this.mask);
-        localObject1 = new Salvage(paramRobot.getEnvironment(), new Position(localPosition.getMapPoint()), paramRobot.getImages(), false);
-        [Z[] arrayOf[Z = { { true } };
-        ((PhysicalObject)localObject1).setShape(arrayOf[Z);
-        ((PhysicalObject)localObject1).setLayer("Robot");
-        paramRobot.getEnvironment().addObject((PhysicalObject)localObject1);
+        localSalvage = new Salvage(paramRobot.getEnvironment(), new Position(localPosition.getMapPoint()), paramRobot.getImages(), false);
+        boolean[][] arrayOfBoolean = { { true } };
+        ((PhysicalObject)localSalvage).setShape(arrayOfBoolean);
+        ((PhysicalObject)localSalvage).setLayer("Robot");
+        paramRobot.getEnvironment().addObject((PhysicalObject)localSalvage);
         paramRobot.getEnvironment().getRenderer().repaint();
         GameApplet.audio.play("DeathAlarm");
         GameApplet.thisApplet.sendStatusMessage(

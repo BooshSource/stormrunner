@@ -31,10 +31,10 @@ public class ListLayout
 
   public void setGap(int paramInt)
   {
-    this.ItemGap = paramInt; }
-
-  public void addLayoutComponent(String paramString, Component paramComponent) { }
-
+    this.ItemGap = paramInt;
+  }
+  public void addLayoutComponent(String paramString, Component paramComponent) {
+  }
   public void removeLayoutComponent(Component paramComponent) {
   }
 
@@ -42,15 +42,15 @@ public class ListLayout
     Component[] arrayOfComponent = paramContainer.getComponents();
 
     this.counter = 0;
-    for (int i = 0; i < arrayOfComponent.length; ++i)
+    for (int i = 0; i < arrayOfComponent.length; i++)
     {
       Component localComponent = paramContainer.getComponent(i);
 
       if (this.horizontal)
         localComponent.setLocation(this.counter, 0);
-      else
+      else {
         localComponent.setLocation(0, this.counter);
-
+      }
       localComponent.setSize(localComponent.getSize());
 
       if (this.horizontal)
@@ -73,9 +73,9 @@ public class ListLayout
 
   public Dimension minimumLayoutSize(Container paramContainer)
   {
-    if (this.horizontal)
+    if (this.horizontal) {
       return new Dimension(this.counter, this.max);
-
+    }
     return new Dimension(this.max, this.counter);
   }
 }

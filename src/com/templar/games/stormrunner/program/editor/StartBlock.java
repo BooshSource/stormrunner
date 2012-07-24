@@ -47,67 +47,65 @@ public class StartBlock extends ProgramComponent
 
   public Instruction getPreviousInstruction() {
     return null; } 
-  public Conditional getPreviousConditional() { return null; }
-
-  public void setPreviousInstruction(Instruction paramInstruction) { }
-
-  public void setPreviousConditional(Conditional paramConditional) { }
+  public Conditional getPreviousConditional() { return null; } 
+  public void setPreviousInstruction(Instruction paramInstruction) {
+  }
+  public void setPreviousConditional(Conditional paramConditional) {
+  }
 
   public boolean detachNext(Linkable paramLinkable) {
+    boolean b = false;
     Object localObject;
-    int i = 0;
-
-    if (paramLinkable instanceof Instruction)
+    if ((paramLinkable instanceof Instruction))
     {
       localObject = (Instruction)paramLinkable;
       if ((((Instruction)localObject).getPreviousInstruction() == null) && (this.CurrentProgram.getFirstInstruction() == localObject))
       {
         this.CurrentProgram.setFirstInstruction(null);
 
-        i = 1;
+        b = true;
       }
     }
-    else if (paramLinkable instanceof Conditional)
+    else if ((paramLinkable instanceof Conditional))
     {
       localObject = (Conditional)paramLinkable;
       if ((((Conditional)localObject).getPreviousConditional() == null) && (this.CurrentProgram.getFirstConditional() == localObject))
       {
         this.CurrentProgram.setFirstConditional(null);
 
-        i = 1;
+        b = true;
       }
     }
 
-    return i;
+    return b;
   }
 
   public boolean attachNext(Linkable paramLinkable)
   {
+    boolean b=false;
     Object localObject;
-    int i = 0;
-
-    if (paramLinkable instanceof Instruction)
+    if ((paramLinkable instanceof Instruction))
     {
       localObject = (Instruction)paramLinkable;
       if ((((Instruction)localObject).getPreviousInstruction() == null) && (this.CurrentProgram.getFirstInstruction() == null))
       {
         this.CurrentProgram.setFirstInstruction((Instruction)localObject);
 
-        i = 1;
+        b = true;
       }
     }
-    else if (paramLinkable instanceof Conditional)
+    else if ((paramLinkable instanceof Conditional))
     {
       localObject = (Conditional)paramLinkable;
       if ((((Conditional)localObject).getPreviousConditional() == null) && (this.CurrentProgram.getFirstConditional() == null))
       {
         this.CurrentProgram.setFirstConditional((Conditional)localObject);
 
-        i = 1;
+        b = true;
       }
     }
 
-    return i;
+    return b;
   }
 
   public boolean detachPrevious(Linkable paramLinkable)

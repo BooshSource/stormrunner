@@ -17,7 +17,7 @@ public class MonitoredInputStream extends InputStream
   public int read() throws IOException {
     int i = this.wrapped.read();
     if (i != -1)
-      addBytesRead(2497820024345985025L);
+      addBytesRead(1L);
     return i;
   }
 

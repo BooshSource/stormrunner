@@ -22,7 +22,7 @@ public class RepeatForeverEnd extends ProgramComponent
 
   public ProgramComponent copy()
   {
-    RepeatForeverEnd localRepeatForeverEnd = new RepeatForeverEnd(super.getNormalImage(), this.OurPalette);
+    RepeatForeverEnd localRepeatForeverEnd = new RepeatForeverEnd(getNormalImage(), this.OurPalette);
     localRepeatForeverEnd.DropTargets = this.DropTargets;
     return localRepeatForeverEnd;
   }

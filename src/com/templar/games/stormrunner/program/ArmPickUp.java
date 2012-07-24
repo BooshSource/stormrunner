@@ -42,10 +42,9 @@ public class ArmPickUp extends Instruction
 
   public boolean execute(Robot paramRobot)
   {
-    boolean bool;
     this.ArmAnimator = paramRobot.getAnimationComponent("GrabberArm");
     this.Arm = ((GrabberArm)paramRobot.getAssembly("GrabberArm"));
-
+    boolean bool;
     switch (this.state)
     {
     case 0:
@@ -61,16 +60,16 @@ public class ArmPickUp extends Instruction
 
           return true;
         }
-        for (int i = localVector.size() - 1; i >= 0; --i)
+        for (int i = localVector.size() - 1; i >= 0; i--)
         {
-          if (localVector.elementAt(i) instanceof PortableObject)
-          {
-            localPortableObject2 = (PortableObject)localVector.elementAt(i);
+          if (!(localVector.elementAt(i) instanceof PortableObject))
+            continue;
+          localPortableObject2 = (PortableObject)localVector.elementAt(i);
 
-            this.Arm.setCarrying(localPortableObject2);
-            break;
-          }
+          this.Arm.setCarrying(localPortableObject2);
+          break;
         }
+
         if (localPortableObject2 == null)
         {
           paramRobot.playSound("Robot-NotCompute");
@@ -91,7 +90,7 @@ public class ArmPickUp extends Instruction
     case 1:
       bool = this.ArmAnimator.nextImage();
 
-      if (!(bool))
+      if (!bool)
       {
         paramRobot.getEnvironment().removeObject((PhysicalObject)this.Arm.getCarrying());
 
@@ -103,7 +102,7 @@ public class ArmPickUp extends Instruction
     case 2:
       bool = this.ArmAnimator.nextImage();
 
-      if (!(bool))
+      if (!bool)
         this.state += 1;
       return false;
     case 3:
@@ -112,15 +111,15 @@ public class ArmPickUp extends Instruction
 
       PortableObject localPortableObject1 = this.Arm.getCarrying();
 
-      if ((localPortableObject1 instanceof FoundRobotPart) || (localPortableObject1 instanceof Datalog))
+      if (((localPortableObject1 instanceof FoundRobotPart)) || ((localPortableObject1 instanceof Datalog)))
       {
         paramRobot.playSound("Robot-Alert");
       }
 
-      if ((localPortableObject1 instanceof Trigger) && 
-        ((((Trigger)localPortableObject1).activateOnEvent() & 0x1) > 0))
+      if (((localPortableObject1 instanceof Trigger)) && 
+        ((((Trigger)localPortableObject1).activateOnEvent() & 0x1) > 0)) {
         ((Trigger)localPortableObject1).activate(paramRobot, 1);
-
+      }
       this.state = 0;
       return true;
     }
@@ -130,7 +129,7 @@ public class ArmPickUp extends Instruction
 
   public boolean verifyRobot(Robot paramRobot)
   {
-    return (paramRobot.getAssembly("GrabberArm") != null);
+    return paramRobot.getAssembly("GrabberArm") != null;
   }
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)

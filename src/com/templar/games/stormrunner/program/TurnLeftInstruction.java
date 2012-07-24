@@ -39,7 +39,7 @@ public class TurnLeftInstruction extends Instruction
   {
     int i = paramRobot.getOrientation();
 
-    if (!(this.animating))
+    if (!this.animating)
     {
       i -= 90;
       if (i < 0) i = 270;
@@ -49,7 +49,7 @@ public class TurnLeftInstruction extends Instruction
     this.animating = TurnInstruction.updateState(paramRobot);
     paramRobot.repaint();
 
-    return (!(this.animating));
+    return !this.animating;
   }
 
   public static String getDescription() {
@@ -58,8 +58,8 @@ public class TurnLeftInstruction extends Instruction
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)
   {
-    return false; }
-
+    return false;
+  }
   public boolean boundaryCheck(Robot paramRobot) { return false; }
 
   public void terminate(Robot paramRobot) {

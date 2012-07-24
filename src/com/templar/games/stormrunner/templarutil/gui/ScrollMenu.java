@@ -13,6 +13,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -31,9 +32,9 @@ public class ScrollMenu extends Container
   protected Component CurrentSelection;
   protected Color Background;
   protected Color Border;
-  protected Insets BorderPadding;
+  protected Insets BorderPadding = new Insets(0, 0, 0, 0);
   protected Insets ItemPadding;
-  protected int ScrollStepLength;
+  protected int ScrollStepLength = 10;
   protected boolean Horizontal;
   protected ListLayout layout;
   protected Color PrimaryHighlightColor;
@@ -42,9 +43,9 @@ public class ScrollMenu extends Container
   protected Enumeration ListEnum;
   protected MouseHandler mh;
   protected ComponentHandler ch;
-  protected Vector ActionRecipients;
-  protected Vector ItemRecipients;
-  protected Vector ImageListeners;
+  protected Vector ActionRecipients = new Vector();
+  protected Vector ItemRecipients = new Vector();
+  protected Vector ImageListeners = new Vector();
 
   public ScrollMenu()
   {
@@ -53,14 +54,6 @@ public class ScrollMenu extends Container
 
   public ScrollMenu(boolean paramBoolean)
   {
-    this.BorderPadding = new Insets(0, 0, 0, 0);
-
-    this.ScrollStepLength = 10;
-
-    this.ActionRecipients = new Vector();
-    this.ItemRecipients = new Vector();
-    this.ImageListeners = new Vector();
-
     this.ScrollPane = new SimpleContainer();
 
     this.layout = new ListLayout(paramBoolean);
@@ -68,10 +61,10 @@ public class ScrollMenu extends Container
 
     this.ScrollPane.setLocation(0, 0);
 
-    super.add(this.ScrollPane);
+    add(this.ScrollPane);
 
-    this.mh = new MouseHandler(this);
-    this.ch = new ComponentHandler(this);
+    this.mh = new MouseHandler();
+    this.ch = new ComponentHandler();
     this.ScrollPane.addMouseListener(this.mh);
     this.List = new OrderedTable();
   }
@@ -135,8 +128,8 @@ public class ScrollMenu extends Container
 
     this.List = paramOrderedTable;
 
-    Component[] arrayOfComponent = super.getComponents();
-    for (int i = 0; i < arrayOfComponent.length; ++i)
+    Component[] arrayOfComponent = getComponents();
+    for (int i = 0; i < arrayOfComponent.length; i++)
     {
       arrayOfComponent[i].removeComponentListener(this.ch);
     }
@@ -154,9 +147,9 @@ public class ScrollMenu extends Container
         {
           Component localComponent = (Component)this.ListEnum.nextElement();
 
-          if ((this.ItemPadding != null) && (localComponent instanceof Paddable))
+          if ((this.ItemPadding != null) && ((localComponent instanceof Paddable))) {
             ((Paddable)localComponent).setPadding(this.ItemPadding);
-
+          }
           this.ScrollPane.add(localComponent);
 
           localComponent.addComponentListener(this.ch);
@@ -197,9 +190,9 @@ public class ScrollMenu extends Container
 
   public Object getSelection()
   {
-    if (this.CurrentSelection != null)
+    if (this.CurrentSelection != null) {
       return this.List.get(this.CurrentSelection);
-
+    }
     return null;
   }
 
@@ -221,14 +214,14 @@ public class ScrollMenu extends Container
 
     int i = this.List.indexOf(this.CurrentSelection);
 
-    return (i == paramInt);
+    return i == paramInt;
   }
 
   public int getSelectedIndex()
   {
-    if (this.CurrentSelection == null)
+    if (this.CurrentSelection == null) {
       return -1;
-
+    }
     return this.List.indexOf(this.CurrentSelection);
   }
 
@@ -255,7 +248,7 @@ public class ScrollMenu extends Container
   {
     appearanceChanged();
 
-    if ((this.PrimaryHighlightColor != null) && (paramComponent instanceof Highlightable)) {
+    if ((this.PrimaryHighlightColor != null) && ((paramComponent instanceof Highlightable))) {
       ((Highlightable)paramComponent).highlight(this.PrimaryHighlightColor, this.SecondaryHighlightColor);
     }
 
@@ -271,7 +264,7 @@ public class ScrollMenu extends Container
   {
     if (this.CurrentSelection != null)
     {
-      if (this.CurrentSelection instanceof Highlightable)
+      if ((this.CurrentSelection instanceof Highlightable))
       {
         appearanceChanged();
 
@@ -291,25 +284,24 @@ public class ScrollMenu extends Container
 
   public void makeVisible(Component paramComponent)
   {
+    appearanceChanged();
     int i;
     int j;
     int k;
-    appearanceChanged();
-
     if (this.Horizontal)
     {
-      if (getSize().width >= this.ScrollPane.getSize().width) { return;
+      if (getSize().width < this.ScrollPane.getSize().width)
+      {
+        i = 0;
+        j = getSize().width - this.ScrollPane.getSize().width - this.BorderPadding.left - this.BorderPadding.right;
+        k = Math.min(Math.max(this.ScrollPane.getLocation().x - paramComponent.getLocation().x, j), i);
+        this.ScrollPane.setLocation(k, this.ScrollPane.getLocation().y);
+
+        return;
       }
 
-      i = 0;
-      j = getSize().width - this.ScrollPane.getSize().width - this.BorderPadding.left - this.BorderPadding.right;
-      k = Math.min(Math.max(this.ScrollPane.getLocation().x - paramComponent.getLocation().x, j), i);
-      this.ScrollPane.setLocation(k, this.ScrollPane.getLocation().y);
-
-      return;
     }
-
-    if (getSize().height < this.ScrollPane.getSize().height)
+    else if (getSize().height < this.ScrollPane.getSize().height)
     {
       i = 0;
       j = getSize().height - this.ScrollPane.getSize().height - this.BorderPadding.top - this.BorderPadding.bottom;
@@ -398,9 +390,9 @@ public class ScrollMenu extends Container
     {
       Component localComponent = (Component)this.ListEnum.nextElement();
 
-      if ((this.ItemPadding != null) && (localComponent instanceof Paddable))
+      if ((this.ItemPadding != null) && ((localComponent instanceof Paddable))) {
         ((Paddable)localComponent).setPadding(this.ItemPadding);
-
+      }
       this.ScrollPane.add(localComponent);
 
       this.ScrollPane.doLayout();
@@ -427,7 +419,7 @@ public class ScrollMenu extends Container
       int i = Math.min(this.ScrollPane.getLocation().y + paramInt, 0);
       this.ScrollPane.setLocation(this.ScrollPane.getLocation().x, i);
 
-      return (i != 0);
+      return i != 0;
     }
 
     return false;
@@ -448,7 +440,7 @@ public class ScrollMenu extends Container
       int j = Math.max(this.ScrollPane.getLocation().y - paramInt, i);
       this.ScrollPane.setLocation(this.ScrollPane.getLocation().x, j);
 
-      return (j != i);
+      return j != i;
     }
 
     return false;
@@ -468,7 +460,7 @@ public class ScrollMenu extends Container
       int i = Math.min(this.ScrollPane.getLocation().x + paramInt, 0);
       this.ScrollPane.setLocation(i, this.ScrollPane.getLocation().y);
 
-      return (i != 0);
+      return i != 0;
     }
 
     return false;
@@ -489,7 +481,7 @@ public class ScrollMenu extends Container
       int j = Math.max(this.ScrollPane.getLocation().x - paramInt, i);
       this.ScrollPane.setLocation(j, this.ScrollPane.getLocation().y);
 
-      return (j != i);
+      return j != i;
     }
 
     return false;
@@ -581,51 +573,41 @@ public class ScrollMenu extends Container
 
   public void appearanceChanged()
   {
-    for (int i = 0; i < this.ImageListeners.size(); ++i)
+    for (int i = 0; i < this.ImageListeners.size(); i++)
     {
       ImageListener localImageListener = (ImageListener)this.ImageListeners.elementAt(i);
       localImageListener.imageChanged(new ImageEvent(this, 6));
     }
   }
-  
-  
-  class ComponentHandler extends ComponentAdapter
+
+  protected class MouseHandler extends MouseAdapter
   {
-    private final ScrollMenu this$0;
-
-    public void componentResized()
-    {
-      this.this$0.refreshScrollSize();
-    }
-
-    protected ComponentHandler(ScrollMenu paramScrollMenu)
-    {
-      this.this$0 = paramScrollMenu;
-    }
-  }
-  
-  class MouseHandler extends MouseAdapter
-  {
-    private final ScrollMenu this$0;
-
     public void mousePressed(MouseEvent paramMouseEvent)
     {
-      Component localComponent = this.this$0.ScrollPane.getComponentAt(paramMouseEvent.getX(), paramMouseEvent.getY());
+      Component localComponent = ScrollMenu.this.ScrollPane.getComponentAt(paramMouseEvent.getX(), paramMouseEvent.getY());
 
       if (localComponent != null)
       {
-        this.this$0.deselect();
+        ScrollMenu.this.deselect();
 
-        if (localComponent != this.this$0.ScrollPane)
+        if (localComponent != ScrollMenu.this.ScrollPane)
         {
-          this.this$0.select(localComponent);
+          ScrollMenu.this.select(localComponent);
         }
       }
     }
 
-    protected MouseHandler(ScrollMenu paramScrollMenu)
+    protected MouseHandler() {
+    }
+  }
+
+  protected class ComponentHandler extends ComponentAdapter {
+    public void componentResized(ComponentEvent paramComponentEvent) {
+      ScrollMenu.this.refreshScrollSize();
+    }
+
+    protected ComponentHandler()
     {
-      this.this$0 = paramScrollMenu;
     }
   }
 }

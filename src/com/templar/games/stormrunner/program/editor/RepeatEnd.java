@@ -23,7 +23,7 @@ public class RepeatEnd extends ProgramComponent
 
   public ProgramComponent copy()
   {
-    RepeatEnd localRepeatEnd = new RepeatEnd(super.getNormalImage(), this.OurPalette);
+    RepeatEnd localRepeatEnd = new RepeatEnd(getNormalImage(), this.OurPalette);
     localRepeatEnd.DropTargets = this.DropTargets;
     return localRepeatEnd;
   }
@@ -49,15 +49,15 @@ public class RepeatEnd extends ProgramComponent
   }
 
   public Instruction getPreviousInstruction() {
-    return null; }
-
+    return null;
+  }
   public void setPreviousInstruction(Instruction paramInstruction) {
   }
 
   public boolean detachNext(Linkable paramLinkable) {
-    int i = 0;
+    boolean b = false;
 
-    if (paramLinkable instanceof Instruction)
+    if ((paramLinkable instanceof Instruction))
     {
       Instruction localInstruction = (Instruction)paramLinkable;
       if ((localInstruction.getPreviousInstruction() == null) && (getNextInstruction() == localInstruction))
@@ -65,7 +65,7 @@ public class RepeatEnd extends ProgramComponent
         localInstruction.setPreviousInstruction(null);
         setNextInstruction(null);
 
-        i = 1;
+        b = true;
       }
       else {
         System.out.println("RepeatEnd: Asked to detachNext() from something we are not attached to.");
@@ -73,14 +73,14 @@ public class RepeatEnd extends ProgramComponent
     } else {
       System.out.println("RepeatEnd: Asked to detachNext() from something that's not an Instruction.");
     }
-    return i;
+    return b;
   }
 
   public boolean attachNext(Linkable paramLinkable)
   {
-    int i = 0;
+    boolean b = false;
 
-    if (paramLinkable instanceof Instruction)
+    if ((paramLinkable instanceof Instruction))
     {
       Instruction localInstruction = (Instruction)paramLinkable;
       if ((localInstruction.getPreviousInstruction() == null) && (getNextInstruction() == null))
@@ -88,7 +88,7 @@ public class RepeatEnd extends ProgramComponent
         localInstruction.setPreviousInstruction((Instruction)this.BoundSource.getProgramPart());
         setNextInstruction(localInstruction);
 
-        i = 1;
+        b=true;
       }
       else {
         System.out.println("RepeatEnd: Asked to attachNext() to something that's already attached.");
@@ -96,7 +96,7 @@ public class RepeatEnd extends ProgramComponent
     } else {
       System.out.println("RepeatEnd: Asked to attachNext() to something that's not an Instruction.");
     }
-    return i;
+    return b;
   }
 
   public boolean detachPrevious(Linkable paramLinkable)

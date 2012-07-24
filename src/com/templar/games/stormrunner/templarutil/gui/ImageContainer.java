@@ -23,6 +23,7 @@ public class ImageContainer extends Container
   private boolean Added = false;
   private boolean Frozen = false;
   protected Object FreezeLock = new Object();
+
   private boolean BufferTainted = true;
   private boolean TaintEntireScreen = true;
   private Rectangle TaintArea;
@@ -76,9 +77,9 @@ public class ImageContainer extends Container
   {
     if (parentCheck(paramComponent))
     {
-      if (paramComponent instanceof ImageContainer)
+      if ((paramComponent instanceof ImageContainer))
       {
-        localObject = (ImageContainer)paramComponent;
+       ImageContainer localObject = (ImageContainer)paramComponent;
         this.ImageContainerChildren.addElement(paramComponent);
         ((ImageContainer)localObject).setImageContainerParent(this);
         ((ImageContainer)localObject).initializeBuffer();
@@ -88,9 +89,9 @@ public class ImageContainer extends Container
 
       if (paramInt == -1)
         this.Children.addElement(paramComponent);
-      else
+      else {
         this.Children.insertElementAt(paramComponent, paramInt);
-
+      }
       Object localObject = paramComponent.getBounds();
       taintBuffer((Rectangle)localObject);
 
@@ -113,7 +114,7 @@ public class ImageContainer extends Container
 
   public void unregisterAll()
   {
-    for (int i = 0; i < this.Children.size(); ++i)
+    for (int i = 0; i < this.Children.size(); i++)
     {
       Component localComponent = (Component)this.Children.elementAt(i);
       detachFrom(localComponent);
@@ -137,7 +138,7 @@ public class ImageContainer extends Container
   public Component[] getChildren()
   {
     Component[] arrayOfComponent = new Component[this.Children.size()];
-    for (int i = 0; i < this.Children.size(); ++i)
+    for (int i = 0; i < this.Children.size(); i++)
     {
       arrayOfComponent[i] = ((Component)this.Children.elementAt(i));
     }
@@ -164,7 +165,7 @@ public class ImageContainer extends Container
 
   public boolean getFrozen()
   {
-    synchronized (localObject1)
+    synchronized (this.FreezeLock)
     {
       return this.Frozen;
     }
@@ -177,8 +178,8 @@ public class ImageContainer extends Container
 
     if (this.ImageContainerParent != null)
     {
-      int i = (this.BufferSize == null) ? getSize().width : this.BufferSize.width;
-      int j = (this.BufferSize == null) ? getSize().height : this.BufferSize.height;
+      int i = this.BufferSize == null ? getSize().width : this.BufferSize.width;
+      int j = this.BufferSize == null ? getSize().height : this.BufferSize.height;
       Rectangle localRectangle = new Rectangle(getLocation().x, getLocation().y, i, j);
       this.ImageContainerParent.taintBuffer(localRectangle);
     }
@@ -188,7 +189,7 @@ public class ImageContainer extends Container
   {
     this.BufferTainted = true;
 
-    if (!(this.TaintEntireScreen))
+    if (!this.TaintEntireScreen)
     {
       if (this.TaintArea == null)
       {
@@ -222,39 +223,39 @@ public class ImageContainer extends Container
 
   private void attachTo(Component paramComponent)
   {
-    if (paramComponent instanceof ImageComponent) {
+    if ((paramComponent instanceof ImageComponent)) {
       ((ImageComponent)paramComponent).addImageListener(this);
-    } else if (paramComponent instanceof ImageComposite) {
+    } else if ((paramComponent instanceof ImageComposite)) {
       ((ImageComposite)paramComponent).addImageListener(this);
-    } else if ((paramComponent instanceof Container) && (paramComponent instanceof ReportingContainer))
+    } else if (((paramComponent instanceof Container)) && ((paramComponent instanceof ReportingContainer)))
     {
       Container localContainer = (Container)paramComponent;
       ((ReportingContainer)paramComponent).addReportingContainerListener(this);
       Component[] arrayOfComponent = localContainer.getComponents();
-      for (int i = 0; i < arrayOfComponent.length; ++i)
+      for (int i = 0; i < arrayOfComponent.length; i++) {
         attachTo(arrayOfComponent[i]);
+      }
     }
-
-    if (paramComponent instanceof ReportingComponent)
+    if ((paramComponent instanceof ReportingComponent))
       ((ReportingComponent)paramComponent).addReportingComponentListener(this);
   }
 
   private void detachFrom(Component paramComponent)
   {
-    if (paramComponent instanceof ImageComponent) {
+    if ((paramComponent instanceof ImageComponent)) {
       ((ImageComponent)paramComponent).removeImageListener(this);
-    } else if (paramComponent instanceof ImageComposite) {
+    } else if ((paramComponent instanceof ImageComposite)) {
       ((ImageComposite)paramComponent).removeImageListener(this);
-    } else if ((paramComponent instanceof Container) && (paramComponent instanceof ReportingContainer))
+    } else if (((paramComponent instanceof Container)) && ((paramComponent instanceof ReportingContainer)))
     {
       Container localContainer = (Container)paramComponent;
       ((ReportingContainer)paramComponent).removeReportingContainerListener(this);
       Component[] arrayOfComponent = localContainer.getComponents();
-      for (int i = 0; i < arrayOfComponent.length; ++i)
+      for (int i = 0; i < arrayOfComponent.length; i++) {
         detachFrom(arrayOfComponent[i]);
+      }
     }
-
-    if (paramComponent instanceof ReportingComponent)
+    if ((paramComponent instanceof ReportingComponent))
       ((ReportingComponent)paramComponent).removeReportingComponentListener(this);
   }
 
@@ -271,7 +272,7 @@ public class ImageContainer extends Container
   public Rectangle translateToScreen(Component paramComponent, Rectangle paramRectangle, Container paramContainer)
   {
     Rectangle localRectangle = new Rectangle(paramRectangle);
-    Container localContainer = (paramContainer == null) ? paramComponent.getParent() : paramContainer;
+    Container localContainer = paramContainer == null ? paramComponent.getParent() : paramContainer;
 
     while (localContainer != null)
     {
@@ -301,7 +302,7 @@ public class ImageContainer extends Container
   public void allComponentsRemoved(Container paramContainer)
   {
     Component[] arrayOfComponent = paramContainer.getComponents();
-    for (int i = 0; i < arrayOfComponent.length; ++i)
+    for (int i = 0; i < arrayOfComponent.length; i++)
     {
       componentRemoved(paramContainer, arrayOfComponent[i]);
     }
@@ -326,9 +327,9 @@ public class ImageContainer extends Container
   protected void processChange(Rectangle paramRectangle)
   {
     Rectangle localRectangle1 = getBounds();
-    if (this.BufferSize != null)
+    if (this.BufferSize != null) {
       localRectangle1.setSize(this.BufferSize);
-
+    }
     if (paramRectangle.intersects(localRectangle1))
     {
       paramRectangle = paramRectangle.intersection(localRectangle1);
@@ -363,10 +364,10 @@ public class ImageContainer extends Container
 
     this.Added = true;
 
-    if (this.BufferImage == null)
+    if (this.BufferImage == null) {
       initializeBuffer();
-
-    for (int i = 0; i < this.ImageContainerChildren.size(); ++i)
+    }
+    for (int i = 0; i < this.ImageContainerChildren.size(); i++)
     {
       ImageContainer localImageContainer = (ImageContainer)this.ImageContainerChildren.elementAt(i);
       if (localImageContainer.BufferImage == null)
@@ -394,14 +395,12 @@ public class ImageContainer extends Container
 
   private void initializeBuffer()
   {
-    Object localObject;
-    if (this.BufferGraphics != null)
+    if (this.BufferGraphics != null) {
       this.BufferGraphics.dispose();
-
-    if (this.BufferImage != null) {
-      this.BufferImage.flush();
     }
-
+    if (this.BufferImage != null)
+      this.BufferImage.flush();
+    Object localObject;
     if (this.ImageContainerParent == null)
     {
       localObject = this;
@@ -409,12 +408,12 @@ public class ImageContainer extends Container
     else
     {
       ImageContainer localImageContainer = this.ImageContainerParent;
-      while (localImageContainer.getImageContainerParent() != null)
+      while (localImageContainer.getImageContainerParent() != null) {
         localImageContainer = localImageContainer.getImageContainerParent();
-
+      }
       localObject = localImageContainer;
 
-      if (!(localImageContainer.Added))
+      if (!localImageContainer.Added)
       {
         return;
       }
@@ -422,12 +421,12 @@ public class ImageContainer extends Container
 
     if (this.BufferSize == null)
       this.BufferImage = ((Component)localObject).createImage(getSize().width, getSize().height);
-    else
+    else {
       this.BufferImage = ((Component)localObject).createImage(this.BufferSize.width, this.BufferSize.height);
-
+    }
     this.BufferGraphics = this.BufferImage.getGraphics();
 
-    for (int i = 0; i < this.ImageContainerChildren.size(); ++i) {
+    for (int i = 0; i < this.ImageContainerChildren.size(); i++) {
       ((ImageContainer)this.ImageContainerChildren.elementAt(i)).initializeBuffer();
     }
 
@@ -458,8 +457,8 @@ public class ImageContainer extends Container
       Object localObject;
       if (this.CurrentBlit != null)
       {
-        localObject = (this.BufferSize == null) ? getSize() : this.BufferSize;
-        localRectangle1 = this.BufferGraphics.getClipBounds();
+        localObject = this.BufferSize == null ? getSize() : this.BufferSize;
+        Rectangle localRectangle1 = this.BufferGraphics.getClipBounds();
         this.BufferGraphics.setClip(0, 0, ((Dimension)localObject).width, ((Dimension)localObject).height);
         this.BufferGraphics.copyArea(0, 0, ((Dimension)localObject).width, ((Dimension)localObject).height, this.CurrentBlit.x, this.CurrentBlit.y);
         this.BufferGraphics.setClip(localRectangle1);
@@ -467,7 +466,7 @@ public class ImageContainer extends Container
         this.CurrentBlit = null;
       }
 
-      Rectangle localRectangle1 = new Rectangle(0, 0, this.BufferSize.width, this.BufferSize.height);
+      Rectangle localRectangle1 = this.BufferSize == null ? getBounds() : new Rectangle(0, 0, this.BufferSize.width, this.BufferSize.height);
       if (this.TaintEntireScreen) {
         localObject = localRectangle1;
       }
@@ -482,83 +481,89 @@ public class ImageContainer extends Container
 
       this.BufferGraphics.setClip((Shape)localObject);
 
-      for (int i = this.Children.size() - 1; i >= 0; --i)
+      for (int i = this.Children.size() - 1; i >= 0; i--)
       {
         Component localComponent = (Component)this.Children.elementAt(i);
-        if (localComponent instanceof ImageContainer)
+        if ((localComponent instanceof ImageContainer))
         {
           ImageContainer localImageContainer = (ImageContainer)localComponent;
           localImageContainer.refreshBuffer();
           this.BufferGraphics.drawImage(localImageContainer.BufferImage, localComponent.getLocation().x, localComponent.getLocation().y, null);
-        } else {
+        }
+        else
+        {
           Rectangle localRectangle2;
-          if (localComponent instanceof Container)
+          if ((localComponent instanceof Container))
           {
             Component[] arrayOfComponent = ((Container)this.Children.elementAt(i)).getComponents();
 
-            for (int j = 0; j < arrayOfComponent.length; ++j)
+            for (int j = 0; j < arrayOfComponent.length; j++)
             {
               localComponent = arrayOfComponent[j];
 
               localRectangle2 = translateToScreen(localComponent);
-              if (localRectangle2.intersects((Rectangle)localObject))
-              {
-                drawComponent(this.BufferGraphics, localComponent, localRectangle2);
-              }
+              if (!localRectangle2.intersects((Rectangle)localObject))
+                continue;
+              drawComponent(this.BufferGraphics, localComponent, localRectangle2);
             }
+
           }
           else
           {
             localRectangle2 = translateToScreen(localComponent);
-            if (localRectangle2.intersects((Rectangle)localObject))
-            {
-              drawComponent(this.BufferGraphics, localComponent, localRectangle2);
-            }
+            if (!localRectangle2.intersects((Rectangle)localObject))
+              continue;
+            drawComponent(this.BufferGraphics, localComponent, localRectangle2);
           }
         }
       }
     }
   }
 
-  private void drawComponent(Graphics paramGraphics, Component paramComponent, Rectangle paramRectangle) {
+  private void drawComponent(Graphics paramGraphics, Component paramComponent, Rectangle paramRectangle)
+  {
     if (paramComponent.isVisible())
     {
       ImageComponent localImageComponent;
-      if (paramComponent instanceof ImageComponent)
+      if ((paramComponent instanceof ImageComponent))
       {
         localImageComponent = (ImageComponent)paramComponent;
-        if (localImageComponent.getImage() == null) { return;
+        if (localImageComponent.getImage() != null)
+        {
+          localImageComponent.deliverImagePaintedEvent();
+
+          paramGraphics.drawImage(localImageComponent.getImage(), paramRectangle.x, paramRectangle.y, localImageComponent);
+
+          return;
         }
 
-        localImageComponent.deliverImagePaintedEvent();
-
-        paramGraphics.drawImage(localImageComponent.getImage(), paramRectangle.x, paramRectangle.y, localImageComponent);
-
-        return;
       }
-
-      if (paramComponent instanceof ImageComposite)
+      else if ((paramComponent instanceof ImageComposite))
       {
         ImageComposite localImageComposite = (ImageComposite)paramComponent;
         ImageComponent[] arrayOfImageComponent = localImageComposite.getImageComponents();
-        if ((arrayOfImageComponent == null) || (arrayOfImageComponent.length <= 0)) { return;
-        }
-
-        for (int i = arrayOfImageComponent.length - 1; i >= 0; --i)
+        if ((arrayOfImageComponent != null) && (arrayOfImageComponent.length > 0))
         {
-          localImageComponent = arrayOfImageComponent[i];
-
-          if (localImageComponent.getImage() != null)
+          for (int i = arrayOfImageComponent.length - 1; i >= 0; i--)
           {
+            localImageComponent = arrayOfImageComponent[i];
+
+            if (localImageComponent.getImage() == null)
+            {
+              continue;
+            }
             localImageComponent.deliverImagePaintedEvent();
 
             paramGraphics.drawImage(localImageComponent.getImage(), paramRectangle.x, paramRectangle.y, localImageComponent);
           }
+          return;
         }
-        return;
-      }
 
-      paramComponent.paint(paramGraphics);
+      }
+      else
+      {
+        paramComponent.paint(paramGraphics);
+      }
     }
   }
 }

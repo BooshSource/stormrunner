@@ -53,17 +53,17 @@ public class Mask extends Actor
   public Mask(Scene paramScene, Position paramPosition, Image[] paramArrayOfImage, boolean[][] paramArrayOfBoolean, boolean paramBoolean) {
     super(paramScene, paramPosition, paramArrayOfImage, paramBoolean);
     this.runOnTick = paramBoolean;
-    for (int i = 0; i < paramArrayOfBoolean.length; ++i)
-      for (int j = 0; j < paramArrayOfBoolean[0].length; ++j)
-        paramArrayOfBoolean[i][j] = 1;
+    for (int i = 0; i < paramArrayOfBoolean.length; i++)
+      for (int j = 0; j < paramArrayOfBoolean[0].length; j++)
+        paramArrayOfBoolean[i][j] = true;
     setShape(paramArrayOfBoolean);
   }
 
   public Mask(Scene paramScene, Position paramPosition, Image[] paramArrayOfImage, boolean[][] paramArrayOfBoolean, boolean paramBoolean, URL paramURL, String paramString) {
     super(paramScene, paramPosition, paramArrayOfImage, paramBoolean);
-    for (int i = 0; i < paramArrayOfBoolean.length; ++i)
-      for (int j = 0; j < paramArrayOfBoolean[0].length; ++j)
-        paramArrayOfBoolean[i][j] = 1;
+    for (int i = 0; i < paramArrayOfBoolean.length; i++)
+      for (int j = 0; j < paramArrayOfBoolean[0].length; j++)
+        paramArrayOfBoolean[i][j] = true;
     setShape(paramArrayOfBoolean);
     setClickTarget(paramURL, paramString);
   }
@@ -73,13 +73,13 @@ public class Mask extends Actor
     {
       ImageComponent[] arrayOfImageComponent = getImageComponents();
       int i = 0; int j = 0;
-      for (int k = 0; k < arrayOfImageComponent.length; ++k)
+      for (int k = 0; k < arrayOfImageComponent.length; k++)
       {
-        if (arrayOfImageComponent[k] instanceof AnimationComponent)
-        {
-          ++i;
-          if (!(((AnimationComponent)arrayOfImageComponent[k]).nextImage()))
-            ++j;
+        if (!(arrayOfImageComponent[k] instanceof AnimationComponent))
+          continue;
+        i++;
+        if (!((AnimationComponent)arrayOfImageComponent[k]).nextImage()) {
+          j++;
         }
       }
       if ((j == i) && (i != 0))

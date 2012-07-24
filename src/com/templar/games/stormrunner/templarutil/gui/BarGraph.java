@@ -7,6 +7,8 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Vector;
 
 public class BarGraph extends Frame
@@ -19,7 +21,9 @@ public class BarGraph extends Frame
     super("Tick Graph");
 
     setSize(250, 300);
-    addWindowListener(new 1(this));
+    addWindowListener(new WindowAdapter() { public void windowClosing(WindowEvent paramWindowEvent) { BarGraph.this.setVisible(false); BarGraph.this.dispose();
+      }
+    });
     this.active = false;
     if (GameApplet.thisApplet != null)
       this.active = (GameApplet.thisApplet.getParameter("GRAPH") != null);
@@ -60,7 +64,7 @@ public class BarGraph extends Frame
       if (i >= 150)
         localColor = Color.red;
       paramGraphics.setColor(localColor);
-      paramGraphics.drawLine(199, 250 - i + 1, 199, 250);
+      paramGraphics.drawLine(199, 250 - (i + 1), 199, 250);
       this.queue.removeElementAt(0);
     }
   }
@@ -75,6 +79,6 @@ public class BarGraph extends Frame
 
   public void setVisible(boolean paramBoolean) {
     if (this.active)
-      setVisible(paramBoolean);
+      super.setVisible(paramBoolean);
   }
 }

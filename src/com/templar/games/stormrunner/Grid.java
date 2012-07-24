@@ -47,7 +47,7 @@ public class Grid extends Component
 
     this.GridOn = paramBoolean;
 
-    super.repaint();
+    repaint();
   }
 
   public void burnGridOn()
@@ -94,8 +94,8 @@ public class Grid extends Component
 
   protected void updateGridSize()
   {
-    int i = (int)Math.floor(super.getSize().width / this.CellWidth);
-    int j = (int)Math.floor(super.getSize().height / this.CellHeight);
+    int i = (int)Math.floor(getSize().width / this.CellWidth);
+    int j = (int)Math.floor(getSize().height / this.CellHeight);
     this.GridSize = new Dimension(i, j);
   }
 
@@ -107,11 +107,11 @@ public class Grid extends Component
     if ((this.BurnStepX > this.GridSize.width + this.BurnSteps) && (this.BurnStepY > this.GridSize.height + this.BurnSteps))
     {
       this.BurnOn = false;
-      super.repaint();
+      repaint();
       return false;
     }
 
-    super.repaint(this.BurnRate);
+    repaint(this.BurnRate);
     return true;
   }
 
@@ -123,11 +123,11 @@ public class Grid extends Component
     if ((this.BurnStepX > this.GridSize.width + this.BurnSteps) && (this.BurnStepY > this.GridSize.height + this.BurnSteps))
     {
       this.BurnOff = false;
-      super.repaint();
+      repaint();
       return false;
     }
 
-    super.repaint(this.BurnRate);
+    repaint(this.BurnRate);
     return true;
   }
 
@@ -148,41 +148,41 @@ public class Grid extends Component
 
   public void paint(Graphics paramGraphics)
   {
-    int i;
     int j;
     int k;
-    int l;
+    int m;
+    int n;
+    int i;
     int i1;
     int i2;
-    int i3;
     if (this.BurnOff)
     {
       j = Math.max(this.BurnStepX - this.BurnSteps, 0);
       k = Math.max(this.BurnStepY - this.BurnSteps, 0);
-      l = j; for (i1 = j * this.CellWidth; l <= this.GridSize.width; )
+      m = j; for (n = j * this.CellWidth; m <= this.GridSize.width; n += this.CellWidth)
       {
-        i = this.BurnStepX - l + 1;
+        i = this.BurnStepX - m + 1;
         if (i > 0)
           paramGraphics.setColor(brighten(this.GridColor, this.BurnWeight * i));
-        else
+        else {
           paramGraphics.setColor(this.GridColor);
+        }
+        paramGraphics.drawLine(n, 0, n, getSize().height);
 
-        paramGraphics.drawLine(i1, 0, i1, super.getSize().height);
-
-        ++l; i1 += this.CellWidth;
+        m++;
       }
 
-      i2 = k; for (i3 = k * this.CellHeight; i2 <= this.GridSize.height; )
+      i1 = k; for (i2 = k * this.CellHeight; i1 <= this.GridSize.height; i2 += this.CellHeight)
       {
-        i = this.BurnStepY - i2 + 1;
+        i = this.BurnStepY - i1 + 1;
         if (i > 0)
           paramGraphics.setColor(brighten(this.GridColor, this.BurnWeight * i));
-        else
+        else {
           paramGraphics.setColor(this.GridColor);
+        }
+        paramGraphics.drawLine(0, i2, getSize().width, i2);
 
-        paramGraphics.drawLine(0, i3, super.getSize().width, i3);
-
-        ++i2; i3 += this.CellHeight;
+        i1++;
       }
       return;
     }
@@ -191,30 +191,30 @@ public class Grid extends Component
     {
       j = Math.min(this.BurnStepX, this.GridSize.width);
       k = Math.min(this.BurnStepY, this.GridSize.height);
-      l = 0; for (i1 = 0; l <= j; )
+      m = 0; for (n = 0; m <= j; n += this.CellWidth)
       {
-        i = l - this.BurnStepX + this.BurnSteps;
+        i = m - this.BurnStepX + this.BurnSteps;
         if (i > 0)
           paramGraphics.setColor(brighten(this.GridColor, this.BurnWeight * i));
-        else
+        else {
           paramGraphics.setColor(this.GridColor);
+        }
+        paramGraphics.drawLine(n, 0, n, getSize().height);
 
-        paramGraphics.drawLine(i1, 0, i1, super.getSize().height);
-
-        ++l; i1 += this.CellWidth;
+        m++;
       }
 
-      i2 = 0; for (i3 = 0; i2 <= k; )
+      i1 = 0; for (i2 = 0; i1 <= k; i2 += this.CellHeight)
       {
-        i = i2 - this.BurnStepY + this.BurnSteps;
+        i = i1 - this.BurnStepY + this.BurnSteps;
         if (i > 0)
           paramGraphics.setColor(brighten(this.GridColor, this.BurnWeight * i));
-        else
+        else {
           paramGraphics.setColor(this.GridColor);
+        }
+        paramGraphics.drawLine(0, i2, getSize().width, i2);
 
-        paramGraphics.drawLine(0, i3, super.getSize().width, i3);
-
-        ++i2; i3 += this.CellHeight;
+        i1++;
       }
       return;
     }
@@ -222,18 +222,18 @@ public class Grid extends Component
     if (this.GridOn)
     {
       paramGraphics.setColor(this.GridColor);
-      i = 0; for (j = 0; i <= this.GridSize.width; )
+      i = 0; for (j = 0; i <= this.GridSize.width; j += this.CellWidth)
       {
-        paramGraphics.drawLine(j, 0, j, super.getSize().height);
+        paramGraphics.drawLine(j, 0, j, getSize().height);
 
-        ++i; j += this.CellWidth;
+        i++;
       }
 
-      k = 0; for (l = 0; k <= this.GridSize.height; )
+      k = 0; for (m = 0; k <= this.GridSize.height; m += this.CellHeight)
       {
-        paramGraphics.drawLine(0, l, super.getSize().width, l);
+        paramGraphics.drawLine(0, m, getSize().width, m);
 
-        ++k; l += this.CellHeight;
+        k++;
       }
     }
   }

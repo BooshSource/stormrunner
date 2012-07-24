@@ -51,27 +51,27 @@ public class Launcher extends Assembly
   }
 
   public int getPolymetals() {
-    if (this.Carrying instanceof Salvage)
+    if ((this.Carrying instanceof Salvage))
       return ((Salvage)this.Carrying).getPolymetals();
     return 0;
   }
 
   public int getEnergyUnits() {
-    if (this.Carrying instanceof EnergyCell)
+    if ((this.Carrying instanceof EnergyCell))
       return ((EnergyCell)this.Carrying).getEnergyUnits();
-    return 0; }
-
-  public void setPolymetals(int paramInt) { }
-
-  public void setEnergyUnits(int paramInt) { }
-
+    return 0;
+  }
+  public void setPolymetals(int paramInt) {
+  }
+  public void setEnergyUnits(int paramInt) {
+  }
   public PhysicalObject transferOut(String paramString) { PhysicalObject localPhysicalObject = (PhysicalObject)this.Carrying;
     this.Carrying = null;
-    return localPhysicalObject;
-  }
+    return localPhysicalObject; }
 
-  public boolean transferIn(PhysicalObject paramPhysicalObject) {
-    if (paramPhysicalObject instanceof Satellite)
+  public boolean transferIn(PhysicalObject paramPhysicalObject)
+  {
+    if ((paramPhysicalObject instanceof Satellite))
     {
       this.Carrying = ((PortableObject)paramPhysicalObject);
       return true;
@@ -82,32 +82,32 @@ public class Launcher extends Assembly
   public Vector getInventory() {
     Vector localVector = new Vector(1, 1);
     localVector.addElement(this.Carrying);
-    return localVector; }
-
-  public boolean isEmpty() { return (this.Carrying == null); }
-
-  public int getPlacement() { return 1; }
-
+    return localVector;
+  }
+  public boolean isEmpty() { return this.Carrying == null; } 
+  public int getPlacement() {
+    return 1;
+  }
   public String getID() { return "Launcher"; }
 
   public String getDescription() {
-    return "Launcher\n\nPolymetals: 10\nEnergy Units: 5\nSecurity Level: 4\nWeight: 0.40\n\td4000]\nManufactured by Lockheed Martin, Bethesda, Maryland, 20817. The Aries VI multi-role linear magnetic launcher is designed for rapid, low-impact deployment of orbital and sub-orbital materials from the safety of a remotely controlled RCX unit. Compatible with all profile C and C2 devices, it is equipped with reflex magnetic shielding to minimize collateral electromagnetic emissions during firing, and a precision hydraulic impact dampening system."; }
-
+    return "Launcher\n\nPolymetals: 10\nEnergy Units: 5\nSecurity Level: 4\nWeight: 0.40\n\td4000]\nManufactured by Lockheed Martin, Bethesda, Maryland, 20817. The Aries VI multi-role linear magnetic launcher is designed for rapid, low-impact deployment of orbital and sub-orbital materials from the safety of a remotely controlled RCX unit. Compatible with all profile C and C2 devices, it is equipped with reflex magnetic shielding to minimize collateral electromagnetic emissions during firing, and a precision hydraulic impact dampening system.";
+  }
   public double getWeight() {
-    return 0.29999999999999999D; } 
+    return 0.3D; } 
   public int getEnergyCost() { return 5; } 
   public int getSalvageCost() { return 10; } 
   public int getSecurityLevel() { return 3; } 
   public String getIconAppearance() { return "assembly/bicon_launcher"; } 
-  public String getBayAppearance() { return "assembly/B_launcher.gif";
-  }
+  public String getBayAppearance() { return "assembly/B_launcher.gif"; }
 
-  public Image[] getCells(ImageRetriever paramImageRetriever, int paramInt1, int paramInt2) {
-    Image[] arrayOfImage;
+  public Image[] getCells(ImageRetriever paramImageRetriever, int paramInt1, int paramInt2)
+  {
     Integer localInteger = new Integer(paramInt1);
     if (animationList == null)
       animationList = new Hashtable();
     Object localObject = animationList.get(localInteger);
+    Image[] arrayOfImage;
     if (localObject == null)
     {
       Vector localVector = new Vector();
@@ -118,23 +118,23 @@ public class Launcher extends Assembly
       animationList.put(localInteger, arrayOfImage);
     }
     else {
-      arrayOfImage = (Image[])localObject; }
-    return arrayOfImage;
+      arrayOfImage = (Image[])localObject;
+    }return arrayOfImage;
   }
 
   public int[] getAnimationSequence(int paramInt) {
-    return animationSequences[0]; }
-
-  public int getAnimationFrames() { return 1;
+    return animationSequences[0];
   }
+  public int getAnimationFrames() { return 1; }
 
-  public String toString() {
+  public String toString()
+  {
     String str = "Launcher: ";
     if (this.Carrying == null)
       str = str + "Empty.\n";
-    else
+    else {
       str = str + "\n  " + this.Carrying.toString();
-
+    }
     return str;
   }
 }

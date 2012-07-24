@@ -44,22 +44,22 @@ public class CargoPod extends Assembly
   public void writeExternal(ObjectOutput paramObjectOutput) throws IOException {
     paramObjectOutput.writeInt(this.Polymetals);
     paramObjectOutput.writeInt(this.EnergyUnits);
-    paramObjectOutput.writeObject(this.Inventory); }
-
+    paramObjectOutput.writeObject(this.Inventory);
+  }
   public int getPolymetals() { return this.Polymetals; }
 
   public void setPolymetals(int paramInt) {
-    this.Polymetals = paramInt; }
-
+    this.Polymetals = paramInt;
+  }
   public int getEnergyUnits() {
-    return this.EnergyUnits; }
-
+    return this.EnergyUnits;
+  }
   public void setEnergyUnits(int paramInt) {
-    this.EnergyUnits = paramInt; }
-
+    this.EnergyUnits = paramInt;
+  }
   public boolean isEmpty() {
-    return (this.Inventory.size() == 0); }
-
+    return this.Inventory.size() == 0;
+  }
   public PhysicalObject transferOut(String paramString) {
     if ((paramString == null) || (paramString == ""))
     {
@@ -70,14 +70,13 @@ public class CargoPod extends Assembly
       return localPhysicalObject1;
     }
 
-    for (int i = 0; i < this.Inventory.size(); ++i)
+    for (int i = 0; i < this.Inventory.size(); i++)
     {
       PhysicalObject localPhysicalObject2 = (PhysicalObject)this.Inventory.elementAt(i);
-      if (paramString.compareTo(localPhysicalObject2.getID()) == 0)
-      {
-        this.Inventory.removeElementAt(i);
-        return localPhysicalObject2;
-      }
+      if (paramString.compareTo(localPhysicalObject2.getID()) != 0)
+        continue;
+      this.Inventory.removeElementAt(i);
+      return localPhysicalObject2;
     }
 
     return null;
@@ -85,16 +84,16 @@ public class CargoPod extends Assembly
 
   public boolean transferIn(PhysicalObject paramPhysicalObject) {
     this.Inventory.addElement(paramPhysicalObject);
-    if (paramPhysicalObject instanceof Salvage)
+    if ((paramPhysicalObject instanceof Salvage))
       this.Polymetals += ((Salvage)paramPhysicalObject).getPolymetals();
-    if (paramPhysicalObject instanceof EnergyCell)
+    if ((paramPhysicalObject instanceof EnergyCell))
       this.EnergyUnits += ((EnergyCell)paramPhysicalObject).getEnergyUnits();
-    return true; }
-
+    return true;
+  }
   public Vector getInventory() { return this.Inventory; } 
   public int getAnimationFrames() { return 3; } 
   public String getID() { return "CargoPod"; } 
-  public double getWeight() { return 0.39000000000000001D; } 
+  public double getWeight() { return 0.39D; } 
   public int getSalvageCost() { return 15; } 
   public int getEnergyCost() { return 1; } 
   public int getSecurityLevel() { return 2; } 
@@ -133,18 +132,18 @@ public class CargoPod extends Assembly
 
   public Image[] getCells(ImageRetriever paramImageRetriever, int paramInt1, int paramInt2)
   {
-    Image[] arrayOfImage;
     Integer localInteger = new Integer(paramInt1);
     if (animationList == null)
       animationList = new Hashtable();
     Object localObject = animationList.get(localInteger);
+    Image[] arrayOfImage;
     if (localObject == null)
     {
       Vector localVector = new Vector();
       localVector.addElement(paramImageRetriever.getImage("com/templar/games/stormrunner/media/images/robot/assembly/" + getID() + 
         "/" + stateName(0) + "_" + paramInt1 + ".gif"));
       if (paramInt1 % 90 == 0)
-        for (int i = 0; i < getAnimationFrames(); ++i)
+        for (int i = 0; i < getAnimationFrames(); i++)
           localVector.addElement(paramImageRetriever.getImage("com/templar/games/stormrunner/media/images/robot/assembly/" + getID() + 
             "/" + stateName(1) + i + "_" + paramInt1 + ".gif"));
       arrayOfImage = new Image[localVector.size()];
@@ -152,8 +151,8 @@ public class CargoPod extends Assembly
       animationList.put(localInteger, arrayOfImage);
     }
     else {
-      arrayOfImage = (Image[])localObject; }
-    return arrayOfImage;
+      arrayOfImage = (Image[])localObject;
+    }return arrayOfImage;
   }
 
   public int[] getAnimationSequence(int paramInt)

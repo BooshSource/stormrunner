@@ -28,7 +28,7 @@ public class ControllableBufferContainer extends SimpleContainer
   {
     this.BufferTainted = true;
 
-    if (!(this.TaintEntireScreen))
+    if (!this.TaintEntireScreen)
     {
       if (this.TaintArea == null)
       {
@@ -53,7 +53,7 @@ public class ControllableBufferContainer extends SimpleContainer
 
   public void addNotify()
   {
-    addNotify();
+    super.addNotify();
 
     if (this.BufferImage == null)
     {
@@ -65,25 +65,25 @@ public class ControllableBufferContainer extends SimpleContainer
 
   public void removeNotify()
   {
-    removeNotify();
+    super.removeNotify();
 
-    removeComponentListener(this); }
-
-  public void componentHidden(ComponentEvent paramComponentEvent) { }
-
-  public void componentShown(ComponentEvent paramComponentEvent) { }
-
-  public void componentMoved(ComponentEvent paramComponentEvent) { }
-
+    removeComponentListener(this);
+  }
+  public void componentHidden(ComponentEvent paramComponentEvent) {
+  }
+  public void componentShown(ComponentEvent paramComponentEvent) {
+  }
+  public void componentMoved(ComponentEvent paramComponentEvent) {
+  }
   public void componentResized(ComponentEvent paramComponentEvent) {
     initializeBuffer();
   }
 
   protected void initializeBuffer()
   {
-    if (this.BufferGraphics != null)
+    if (this.BufferGraphics != null) {
       this.BufferGraphics.dispose();
-
+    }
     if (this.BufferImage != null) {
       this.BufferImage.flush();
     }

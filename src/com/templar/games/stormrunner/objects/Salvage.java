@@ -25,8 +25,7 @@ public class Salvage extends PhysicalObject
   {
   }
 
-  public void readExternal(ObjectInput paramObjectInput)
-    throws ClassNotFoundException, IOException
+  public void readExternal(ObjectInput paramObjectInput) throws ClassNotFoundException, IOException
   {
     super.readExternal(paramObjectInput);
     this.value = paramObjectInput.readInt();
@@ -57,11 +56,12 @@ public class Salvage extends PhysicalObject
     if (this.value == -1)
     {
       Random localRandom = new Random(System.currentTimeMillis());
-      this.value = (Math.abs(localRandom.nextInt() % 14) + 17); } }
-
+      this.value = (Math.abs(localRandom.nextInt() % 14) + 17);
+    }
+  }
   public int getPolymetals() {
-    return this.value; }
-
+    return this.value;
+  }
   public String toString() {
     return "Salvage that will yield " + this.value + " PolyMetals";
   }

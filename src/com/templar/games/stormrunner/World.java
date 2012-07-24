@@ -56,7 +56,7 @@ public class World
     {
       try
       {
-        return ((Scene)this.scenes.elementAt(this.current));
+        return (Scene)this.scenes.elementAt(this.current);
       }
       catch (ArrayIndexOutOfBoundsException localArrayIndexOutOfBoundsException)
       {

@@ -58,33 +58,33 @@ public class ObstacleSensor extends Sensor
       {
         PhysicalObject localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
 
-        if ((!(localPhysicalObject instanceof Door)) && (paramBoolean))
+        if ((!(localPhysicalObject instanceof Door)) && (paramBoolean)) {
           return true;
-
+        }
         return ((Obstacle)localPhysicalObject).isObstructing(paramRobot);
       }
 
     }
 
-    if (paramRobot.checkBounds())
+    if (paramRobot.checkBounds()) {
       return true;
-
-    return (paramRobot.checkTerrain());
+    }
+    return paramRobot.checkTerrain();
   }
 
   public boolean check(Robot paramRobot)
   {
-    return check(paramRobot, true); }
-
+    return check(paramRobot, true);
+  }
   public String getID() {
     return "ObstacleSensor";
   }
 
   public String getDescription() {
-    return "Obstacle Sensor\n\nPolymetals: 3\nEnergy Units: 2\nSecurity Level: 1\nWeight: 0.06\n\td4000]\nManufactured by Brookhaven Instruments Corp. Holtsville, New York 11742. The Series 4 proximity detection system is an all-pupose control solution for giving an RCX unit the ability to navigate independently. Consisting of three millimeter wave radar arrays, supplemented by IR optical and low-intensity laser emitters, and coordinated by a Motorola G7-601 microcontroller, it allows the user the ability to easily create programs which react to obstacles intelligently, preventing collisions."; }
-
+    return "Obstacle Sensor\n\nPolymetals: 3\nEnergy Units: 2\nSecurity Level: 1\nWeight: 0.06\n\td4000]\nManufactured by Brookhaven Instruments Corp. Holtsville, New York 11742. The Series 4 proximity detection system is an all-pupose control solution for giving an RCX unit the ability to navigate independently. Consisting of three millimeter wave radar arrays, supplemented by IR optical and low-intensity laser emitters, and coordinated by a Motorola G7-601 microcontroller, it allows the user the ability to easily create programs which react to obstacles intelligently, preventing collisions.";
+  }
   public String toString() { return "Obstacle Sensor"; } 
-  public double getWeight() { return 0.059999999999999998D; } 
+  public double getWeight() { return 0.06D; } 
   public int getSalvageCost() { return 3; } 
   public int getEnergyCost() { return 2; } 
   public int getSecurityLevel() { return 1; } 

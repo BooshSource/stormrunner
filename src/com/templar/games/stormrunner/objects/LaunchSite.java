@@ -19,8 +19,8 @@ public class LaunchSite extends PhysicalObject
     throws IOException, ClassNotFoundException
   {
     super.readExternalWithoutImages(paramObjectInput);
-    ((String[])paramObjectInput.readObject());
-    setImages(null);
+    ////((String[])paramObjectInput.readObject());
+    ////setImages(null);
   }
 
   public void writeExternal(ObjectOutput paramObjectOutput) throws IOException

@@ -3,6 +3,7 @@ package com.templar.games.stormrunner;
 import com.templar.games.stormrunner.templarutil.audio.AudioManager;
 import com.templar.games.stormrunner.templarutil.gui.ImageContainer;
 import com.templar.games.stormrunner.templarutil.gui.SimpleContainer;
+import com.templar.games.stormrunner.templarutil.util.ImageRetriever;
 import com.templar.games.stormrunner.templarutil.util.OrderedTable;
 import java.awt.Component;
 import java.awt.Container;
@@ -36,6 +37,7 @@ public class Renderer extends ImageContainer
   protected GameState State;
   protected Vector ObjectList;
   protected OrderedTable Layers = new OrderedTable();
+
   protected boolean Visible = false;
   protected Vector Players = new Vector();
   protected Vector Loopers = new Vector();
@@ -52,12 +54,10 @@ public class Renderer extends ImageContainer
   protected Component InternalFocus;
   protected KeyHandler kh;
   private Object BlitLock = new Object();
-  ////
-  Object localObject;
 
   public Renderer(GameState paramGameState)
   {
-    super.setBufferSize(new Dimension(500, 400));
+    setBufferSize(new Dimension(500, 400));
 
     this.Surface = new ImageContainer();
     this.Surface.setBufferSize(new Dimension(500, 400));
@@ -66,7 +66,7 @@ public class Renderer extends ImageContainer
     this.State = paramGameState;
     this.Offset = new Point(0, 0);
 
-    this.kh = new KeyHandler(this);
+    this.kh = new KeyHandler();
     addKeyListener(this.kh);
 
     addFocusListener(this);
@@ -85,9 +85,9 @@ public class Renderer extends ImageContainer
     {
       if (this.GroundBufferGraphics != null)
         this.GroundBufferGraphics.dispose();
-      if (this.GroundBufferImage != null)
+      if (this.GroundBufferImage != null) {
         this.GroundBufferImage.flush();
-
+      }
       this.GroundBufferImage = createImage(500, 400);
       this.GroundBufferGraphics = this.GroundBufferImage.getGraphics();
     }
@@ -112,11 +112,11 @@ public class Renderer extends ImageContainer
 
   public void setScene(Scene paramScene)
   {
-    super.unregisterAll();
+    unregisterAll();
 
-    if (this.shroud != null)
+    if (this.shroud != null) {
       this.shroud.removeShroudListener(this);
-
+    }
     this.Surface.unregisterAll();
     this.Layers.clear();
     this.CurrentScene = paramScene;
@@ -133,7 +133,7 @@ public class Renderer extends ImageContainer
     this.shroud.setSize(new Dimension(480, 360));
     this.shroud.setLocation(0, 0);
     this.shroud.addShroudListener(this);
-    super.register(this.shroud);
+    register(this.shroud);
 
     Enumeration localEnumeration1 = paramScene.getLayers().elements();
     while (localEnumeration1.hasMoreElements()) {
@@ -148,11 +148,11 @@ public class Renderer extends ImageContainer
       addObject(localPhysicalObject);
     }
 
-    this.ground = new GroundComponent(this);
+    this.ground = new GroundComponent();
     this.ground.setBounds(getBounds());
     this.Surface.register(this.ground);
 
-    super.register(this.Surface);
+    register(this.Surface);
   }
 
   public void addObject(PhysicalObject paramPhysicalObject)
@@ -186,7 +186,7 @@ public class Renderer extends ImageContainer
     {
       localVector = paramPhysicalObject.getLoopList();
 
-      for (i = 0; i < localVector.size(); ++i)
+      for (i = 0; i < localVector.size(); i++)
       {
         String str = (String)localVector.elementAt(i);
         GameApplet.audio.stop(str, paramPhysicalObject);
@@ -201,7 +201,7 @@ public class Renderer extends ImageContainer
     {
       localVector = paramPhysicalObject.getPlayList();
 
-      for (i = 0; i < localVector.size(); ++i)
+      for (i = 0; i < localVector.size(); i++)
       {
         GameApplet.audio.stop((String)localVector.elementAt(i), paramPhysicalObject);
       }
@@ -218,7 +218,7 @@ public class Renderer extends ImageContainer
 
   private void addLayer(String paramString)
   {
-    if (!(this.Layers.containsKey(paramString)))
+    if (!this.Layers.containsKey(paramString))
     {
       if (paramString.compareTo("Robot") == 0)
         addLayer("Robot Effects");
@@ -252,43 +252,42 @@ public class Renderer extends ImageContainer
 
   public void setVisible(boolean paramBoolean)
   {
-	  Enumeration localEnumeration;
-    String str;
+    this.Visible = paramBoolean;
     PhysicalObject localPhysicalObject;
     int i;
-    this.Visible = paramBoolean;
-
+    String str;
     if (paramBoolean)
     {
-      localEnumeration = this.Loopers.elements();
+      Enumeration localEnumeration = this.Loopers.elements();////<Vector>
 
       while (localEnumeration.hasMoreElements())
       {
         localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
 
-        if (isInWindow(localPhysicalObject))
-        {
-          this.CurrentlyLooping.addElement(localPhysicalObject);
+        if (!isInWindow(localPhysicalObject)) {
+          continue;
+        }
+        this.CurrentlyLooping.addElement(localPhysicalObject);
 
-          localObject = localPhysicalObject.getLoopList();
-          for (i = 0; i < ((Vector)localObject).size(); ++i)
-          {
-            str = (String)((Vector)localObject).elementAt(i);
-            GameApplet.audio.loop(str, localPhysicalObject);
-          }
+        Vector localObject = localPhysicalObject.getLoopList();////
+
+        for (i = 0; i < ((Vector)localObject).size(); i++)
+        {
+          str = (String)((Vector)localObject).elementAt(i);
+          GameApplet.audio.loop(str, localPhysicalObject);
         }
       }
       return;
     }
 
-    localEnumeration = this.Players.elements();
+    Enumeration localEnumeration = this.Players.elements();
 
     while (localEnumeration.hasMoreElements())
     {
       localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
-      localObject = localPhysicalObject.getPlayList();
+      Vector localObject = localPhysicalObject.getPlayList();
 
-      for (i = 0; i < ((Vector)localObject).size(); ++i)
+      for (i = 0; i < ((Vector)localObject).size(); i++)
       {
         GameApplet.audio.stop((String)((Vector)localObject).elementAt(i), localPhysicalObject);
       }
@@ -303,7 +302,7 @@ public class Renderer extends ImageContainer
       localPhysicalObject = (PhysicalObject)((Enumeration)localObject).nextElement();
       Vector localVector = localPhysicalObject.getLoopList();
 
-      for (int j = 0; j < localVector.size(); ++j)
+      for (int j = 0; j < localVector.size(); j++)
       {
         str = (String)localVector.elementAt(j);
         GameApplet.audio.stop(str, localPhysicalObject);
@@ -319,8 +318,8 @@ public class Renderer extends ImageContainer
 
   public void setOffsetToCenter(Point paramPoint)
   {
-    int i = Math.round(WINDOWTILEWIDTH / 2F) - 1;
-    int j = Math.round(WINDOWTILEHEIGHT / 2F) - 1;
+    int i = Math.round(WINDOWTILEWIDTH / 2.0F) - 1;
+    int j = Math.round(WINDOWTILEHEIGHT / 2.0F) - 1;
 
     Point localPoint = new Point(paramPoint);
     localPoint.translate(-i, -j);
@@ -360,43 +359,39 @@ public class Renderer extends ImageContainer
 
       if ((i != 0) || (j != 0))
       {
-        String str;
-        PhysicalObject localPhysicalObject2;
         this.Offset = this.NewOffset;
 
-        if ((this.BufferImage != null) && (!(super.isEntireScreenTainted())) && (super.getBlit() == null) && (((Math.abs(i) < WINDOWTILEWIDTH) || (Math.abs(j) < WINDOWTILEHEIGHT))))
+        if ((this.BufferImage != null) && (!isEntireScreenTainted()) && (getBlit() == null) && ((Math.abs(i) < WINDOWTILEWIDTH) || (Math.abs(j) < WINDOWTILEHEIGHT)))
         {
-          int k;
-          int i1;
-          if (super.isBufferTainted())
+          if (isBufferTainted())
           {
-            super.translateTaintArea(i * 50, j * 50);
+            translateTaintArea(i * 50, j * 50);
             this.Surface.translateTaintArea(i * 50, j * 50);
           }
 
-          super.setBlit(i * 50, j * 50);
+          setBlit(i * 50, j * 50);
           this.Surface.setBlit(i * 50, j * 50);
           this.ground.setGroundBlit(i * 50, j * 50);
-
+          int k;
           if (i < 0)
             k = (WINDOWTILEWIDTH + i + 1) * 50;
           else
             k = 0;
-          int l = Math.abs(i) * 50;
-          localObject = new Rectangle(k, 0, l, 400);
-
+          int m = Math.abs(i) * 50;
+          Rectangle localObject = new Rectangle(k, 0, m, 400);
+          int n;
           if (j < 0)
-            i1 = (WINDOWTILEHEIGHT + j + 1) * 50;
+            n = (WINDOWTILEHEIGHT + j + 1) * 50;
           else
-            i1 = 0;
-          int i2 = Math.abs(j) * 50;
-          Rectangle localRectangle = new Rectangle(0, i1, 500, i2);
+            n = 0;
+          int i1 = Math.abs(j) * 50;
+          Rectangle localRectangle = new Rectangle(0, n, 500, i1);
 
           if ((i != 0) && (j != 0))
             ((Rectangle)localObject).add(localRectangle);
-          else if (j != 0)
+          else if (j != 0) {
             localObject = localRectangle;
-
+          }
           this.ground.taintGround((Rectangle)localObject);
           this.Surface.taintBuffer((Rectangle)localObject);
         }
@@ -416,15 +411,15 @@ public class Renderer extends ImageContainer
         Vector localVector1 = new Vector();
         Object localObject = this.CurrentScene.getObjects();
 
-        for (int i3 = 0; i3 < ((Vector)localObject).size(); ++i3)
+        for (int i2 = 0; i2 < ((Vector)localObject).size(); i2++)
         {
-          PhysicalObject localPhysicalObject1 = (PhysicalObject)((Vector)localObject).elementAt(i3);
+          PhysicalObject localPhysicalObject1 = (PhysicalObject)((Vector)localObject).elementAt(i2);
           SimpleContainer localSimpleContainer = (SimpleContainer)this.Layers.get(localPhysicalObject1.getLayer());
           if (isInWindow(localPhysicalObject1))
           {
-            if (!(this.VisibleObjects.contains(localPhysicalObject1)))
+            if (!this.VisibleObjects.contains(localPhysicalObject1)) {
               localSimpleContainer.add(localPhysicalObject1);
-
+            }
             localVector1.addElement(localPhysicalObject1);
           }
           else if (this.VisibleObjects.contains(localPhysicalObject1)) {
@@ -437,48 +432,47 @@ public class Renderer extends ImageContainer
 
         Enumeration localEnumeration2 = this.CurrentlyLooping.elements();
         Vector localVector2 = new Vector();
-
+        PhysicalObject localPhysicalObject2;
+        String str;
         while (localEnumeration2.hasMoreElements())
         {
           localPhysicalObject2 = (PhysicalObject)localEnumeration2.nextElement();
 
-          if (!(isInWindow(localPhysicalObject2)))
+          if (isInWindow(localPhysicalObject2))
+            continue;
+          Vector localVector3 = localPhysicalObject2.getLoopList();
+
+          for (int i4 = 0; i4 < localVector3.size(); i4++)
           {
-            Vector localVector3 = localPhysicalObject2.getLoopList();
-
-            for (int i5 = 0; i5 < localVector3.size(); ++i5)
-            {
-              str = (String)localVector3.elementAt(i5);
-              GameApplet.audio.stop(str, localPhysicalObject2);
-            }
-
-            localVector2.addElement(localPhysicalObject2);
+            str = (String)localVector3.elementAt(i4);
+            GameApplet.audio.stop(str, localPhysicalObject2);
           }
 
+          localVector2.addElement(localPhysicalObject2);
         }
 
-        for (int i4 = 0; i4 < localVector2.size(); ++i4)
+        for (int i3 = 0; i3 < localVector2.size(); i3++)
         {
-          this.CurrentlyLooping.removeElement(localVector2.elementAt(i4));
+          this.CurrentlyLooping.removeElement(localVector2.elementAt(i3));
         }
 
         localEnumeration2 = this.Loopers.elements();
         while (localEnumeration2.hasMoreElements())
         {
           localPhysicalObject2 = (PhysicalObject)localEnumeration2.nextElement();
-          if ((isInWindow(localPhysicalObject2)) && (!(this.CurrentlyLooping.contains(localPhysicalObject2))))
+          if ((!isInWindow(localPhysicalObject2)) || (this.CurrentlyLooping.contains(localPhysicalObject2)))
+            continue;
+          this.CurrentlyLooping.addElement(localPhysicalObject2);
+
+          Vector localVector4 = localPhysicalObject2.getLoopList();
+
+          for (int i5 = 0; i5 < localVector4.size(); i5++)
           {
-            this.CurrentlyLooping.addElement(localPhysicalObject2);
-
-            Vector localVector4 = localPhysicalObject2.getLoopList();
-
-            for (int i6 = 0; i6 < localVector4.size(); ++i6)
-            {
-              str = (String)localVector4.elementAt(i6);
-              GameApplet.audio.loop(str, localPhysicalObject2);
-            }
+            str = (String)localVector4.elementAt(i5);
+            GameApplet.audio.loop(str, localPhysicalObject2);
           }
         }
+
       }
 
       this.NewOffset = null;
@@ -511,45 +505,44 @@ public class Renderer extends ImageContainer
   {
     if (this.Visible)
     {
-      Vector localVector;
-      String str;
-      int i;
       if (this.FollowingObject == paramPhysicalObject)
       {
         setOffsetToCenter(paramPhysicalObject.getPosition().getMapPoint());
       }
-
+      Vector localVector;
+      int i;
+      String str;
       if (isInWindow(paramPhysicalObject))
       {
-        if (this.VisibleObjects.contains(paramPhysicalObject)) { return;
-        }
-
-        localVector = paramPhysicalObject.getLoopList();
-        if ((localVector.size() > 0) && (!(this.CurrentlyLooping.contains(paramPhysicalObject))))
+        if (!this.VisibleObjects.contains(paramPhysicalObject))
         {
-          this.CurrentlyLooping.addElement(paramPhysicalObject);
-
-          for (i = 0; i < localVector.size(); ++i)
+          localVector = paramPhysicalObject.getLoopList();
+          if ((localVector.size() > 0) && (!this.CurrentlyLooping.contains(paramPhysicalObject)))
           {
-            str = (String)localVector.elementAt(i);
-            GameApplet.audio.loop(str, paramPhysicalObject);
+            this.CurrentlyLooping.addElement(paramPhysicalObject);
+
+            for (i = 0; i < localVector.size(); i++)
+            {
+              str = (String)localVector.elementAt(i);
+              GameApplet.audio.loop(str, paramPhysicalObject);
+            }
+
           }
 
+          addObject(paramPhysicalObject);
+          this.VisibleObjects.addElement(paramPhysicalObject);
+
+          return;
         }
 
-        addObject(paramPhysicalObject);
-        this.VisibleObjects.addElement(paramPhysicalObject);
-
-        return;
       }
-
-      if (this.VisibleObjects.contains(paramPhysicalObject))
+      else if (this.VisibleObjects.contains(paramPhysicalObject))
       {
         if (this.CurrentlyLooping.contains(paramPhysicalObject))
         {
           localVector = paramPhysicalObject.getLoopList();
 
-          for (i = 0; i < localVector.size(); ++i)
+          for (i = 0; i < localVector.size(); i++)
           {
             str = (String)localVector.elementAt(i);
             GameApplet.audio.stop(str, paramPhysicalObject);
@@ -573,7 +566,7 @@ public class Renderer extends ImageContainer
     {
       localRectangle.setLocation(localRectangle.x * 50 - this.Offset.x * 50, localRectangle.y * 50 - this.Offset.y * 50);
       localRectangle.setSize(localRectangle.width * 50, localRectangle.height * 50);
-      super.taintBuffer(localRectangle);
+      taintBuffer(localRectangle);
       repaint(localRectangle.x, localRectangle.y, localRectangle.width, localRectangle.height);
     }
   }
@@ -641,8 +634,8 @@ public class Renderer extends ImageContainer
 
   public Dimension getSize()
   {
-    return new Dimension(480, 360); }
-
+    return new Dimension(480, 360);
+  }
   public Dimension getMinimumSize() {
     return getSize(); } 
   public Dimension getPreferredSize() { return getSize(); } 
@@ -690,19 +683,17 @@ public class Renderer extends ImageContainer
     localStringBuffer.append("@");
     localStringBuffer.append(hashCode());
     localStringBuffer.append("\n");
-    localStringBuffer.append(toString());
-    return localStringBuffer.toString(); }
-
+    localStringBuffer.append(super.toString());
+    return localStringBuffer.toString();
+  }
   public OrderedTable getLayers() { return this.Layers;
   }
-  
-  
-  class GroundComponent extends Component
+
+  protected class GroundComponent extends Component
   {
-    private final Renderer this$0;
-    private final Rectangle DEFAULT_GROUND_TAINT;
-    private boolean GroundBufferTainted;
-    private Rectangle GroundTaintArea;
+    private final Rectangle DEFAULT_GROUND_TAINT = new Rectangle(0, 0, 480, 360);
+    private boolean GroundBufferTainted = true;
+    private Rectangle GroundTaintArea = this.DEFAULT_GROUND_TAINT;
     private Point GroundBlit;
 
     public void taintGround()
@@ -749,112 +740,103 @@ public class Renderer extends ImageContainer
 
         if (this.GroundBlit != null)
         {
-          Rectangle localRectangle = this.this$0.GroundBufferGraphics.getClipBounds();
-          this.this$0.GroundBufferGraphics.setClip(0, 0, 500, 400);
-          this.this$0.GroundBufferGraphics.copyArea(0, 0, 500, 400, this.GroundBlit.x, this.GroundBlit.y);
-          this.this$0.GroundBufferGraphics.setClip(localRectangle);
+          Rectangle localRectangle = Renderer.this.GroundBufferGraphics.getClipBounds();
+          Renderer.this.GroundBufferGraphics.setClip(0, 0, 500, 400);
+          Renderer.this.GroundBufferGraphics.copyArea(0, 0, 500, 400, this.GroundBlit.x, this.GroundBlit.y);
+          Renderer.this.GroundBufferGraphics.setClip(localRectangle);
 
           this.GroundBlit = null;
         }
 
-        int i = this.this$0.Offset.x + (int)Math.floor(this.GroundTaintArea.x / 50.0F);
+        int i = Renderer.this.Offset.x + (int)Math.floor(this.GroundTaintArea.x / 50.0F);
         int j = i + (int)Math.ceil(this.GroundTaintArea.width / 50.0F);
-        int k = this.this$0.Offset.y + (int)Math.floor(this.GroundTaintArea.y / 50.0F);
-        int l = k + (int)Math.ceil(this.GroundTaintArea.height / 50.0F);
+        int k = Renderer.this.Offset.y + (int)Math.floor(this.GroundTaintArea.y / 50.0F);
+        int m = k + (int)Math.ceil(this.GroundTaintArea.height / 50.0F);
 
-        j = Math.min(this.this$0.MapSize.width - 1, j);
-        l = Math.min(this.this$0.MapSize.height - 1, l);
+        j = Math.min(Renderer.this.MapSize.width - 1, j);
+        m = Math.min(Renderer.this.MapSize.height - 1, m);
 
-        int i1 = (i - this.this$0.Offset.x) * 50;
-        int i2 = (k - this.this$0.Offset.y) * 50;
-        for (int i3 = k; i3 <= l; )
+        int n = (i - Renderer.this.Offset.x) * 50;
+        int i1 = (k - Renderer.this.Offset.y) * 50;
+        for (int i2 = k; i2 <= m; i1 += 50)
         {
-          for (int i4 = i; i4 <= j; )
+          for (int i3 = i; i3 <= j; n += 50)
           {
-            Image localImage = this.this$0.map.getCell(i4, i3).getAppearance();
+            Image localImage = Renderer.this.map.getCell(i3, i2).getAppearance();
             GameApplet.thisApplet.hitCache(localImage);
-            this.this$0.GroundBufferGraphics.drawImage(localImage, i1, i2, null);
+            Renderer.this.GroundBufferGraphics.drawImage(localImage, n, i1, null);
 
-            ++i4; i1 += 50;
+            i3++;
           }
 
-          i1 = (i - this.this$0.Offset.x) * 50;
+          n = (i - Renderer.this.Offset.x) * 50;
 
-          ++i3; i2 += 50;
+          i2++;
         }
 
         this.GroundBufferTainted = false;
         this.GroundTaintArea = null;
       }
 
-      paramGraphics.drawImage(this.this$0.GroundBufferImage, 0, 0, null);
+      paramGraphics.drawImage(Renderer.this.GroundBufferImage, 0, 0, null);
     }
 
-    protected GroundComponent(Renderer paramRenderer)
+    protected GroundComponent()
     {
-      this.this$0 = paramRenderer;
-
-      this.DEFAULT_GROUND_TAINT = new Rectangle(0, 0, 480, 360);
-      this.GroundBufferTainted = true;
-      this.GroundTaintArea = this.DEFAULT_GROUND_TAINT;
     }
   }
-  
-  
-  
-  class KeyHandler extends KeyAdapter
-  {
-    private final Renderer this$0;
 
+  protected class KeyHandler extends KeyAdapter
+  {
     public void keyPressed(KeyEvent paramKeyEvent)
     {
-      Point localPoint = new Point(this.this$0.getOffset());
+      Point localPoint = new Point(Renderer.this.getOffset());
       int i = 1;
       switch (paramKeyEvent.getKeyCode())
       {
       case 36:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(-i, -i);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 35:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(-i, i);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 33:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(i, -i);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 34:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(i, i);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 40:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(0, i);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 38:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(0, -i);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 37:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(-i, 0);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 39:
-        this.this$0.setObjectToFollow(null);
+        Renderer.this.setObjectToFollow(null);
         localPoint.translate(i, 0);
-        this.this$0.setOffset(localPoint);
+        Renderer.this.setOffset(localPoint);
         return;
       case 32:
-        if (this.this$0.State == null) return;
-        this.this$0.setObjectToFollow(this.this$0.State.getCurrentRobot());
+        if (Renderer.this.State == null) break;
+        Renderer.this.setObjectToFollow(Renderer.this.State.getCurrentRobot());
         return;
       case 71:
         GameApplet localGameApplet = GameApplet.thisApplet;
@@ -869,9 +851,8 @@ public class Renderer extends ImageContainer
       }
     }
 
-    protected KeyHandler(Renderer paramRenderer)
+    protected KeyHandler()
     {
-      this.this$0 = paramRenderer;
     }
   }
 }

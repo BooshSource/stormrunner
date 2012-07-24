@@ -21,7 +21,7 @@ public class AnimationManager extends ImageContainer
   protected Hashtable Layers;
   protected AudioManager Audio;
   protected transient ThreadGroup Running;
-  protected transient String LastActorName;
+  protected transient String LastActorName = "";
   protected transient ImageComponent LastActor;
 
   public AnimationManager()
@@ -31,8 +31,6 @@ public class AnimationManager extends ImageContainer
 
   public AnimationManager(AudioManager paramAudioManager)
   {
-    this.LastActorName = "";
-
     this.Sequences = new Hashtable();
     this.Actors = new Hashtable();
     this.Images = new Hashtable();
@@ -176,17 +174,17 @@ public class AnimationManager extends ImageContainer
 
   public void addLayer(String paramString, int paramInt)
   {
-    super.register((Component)this.Layers.get(paramString), paramInt);
+    register((Component)this.Layers.get(paramString), paramInt);
   }
 
   public void addLayer(String paramString)
   {
-    super.register((Component)this.Layers.get(paramString));
+    register((Component)this.Layers.get(paramString));
   }
 
   public void removeLayer(String paramString)
   {
-    super.unregister((Component)this.Layers.get(paramString));
+    unregister((Component)this.Layers.get(paramString));
   }
 
   public void moveLayer(String paramString, Point paramPoint)
@@ -199,27 +197,27 @@ public class AnimationManager extends ImageContainer
     Component localComponent1 = (Component)this.Layers.get(paramString1);
     Component localComponent2 = (Component)this.Layers.get(paramString2);
 
-    Component[] arrayOfComponent = super.getChildren();
+    Component[] arrayOfComponent = getChildren();
     int i = -1;
-    for (int j = 0; (j < arrayOfComponent.length) && (i < 0); ++j)
+    for (int j = 0; (j < arrayOfComponent.length) && (i < 0); j++)
     {
-      if (arrayOfComponent[j] == localComponent2)
+      if (arrayOfComponent[j] == localComponent2) {
         i = j;
-
+      }
     }
 
     if (i >= 0)
     {
-      super.unregister(localComponent1);
-      super.register(localComponent1, i);
+      unregister(localComponent1);
+      register(localComponent1, i);
     }
   }
 
   public void reorderLayer(String paramString, int paramInt)
   {
     Component localComponent = (Component)this.Layers.get(paramString);
-    super.unregister(localComponent);
-    super.register(localComponent, paramInt);
+    unregister(localComponent);
+    register(localComponent, paramInt);
   }
 
   public ImageComponent getActor(String paramString)

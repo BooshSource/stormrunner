@@ -17,12 +17,12 @@ public class ImageEvent
   public ImageEvent(Component paramComponent, int paramInt)
   {
     this.Source = paramComponent;
-    this.Type = paramInt; }
-
+    this.Type = paramInt;
+  }
   public Component getSource() {
     return this.Source; } 
-  public int getType() { return this.Type; }
-
-  public void setSource(Component paramComponent) { this.Source = paramComponent;
+  public int getType() { return this.Type; } 
+  public void setSource(Component paramComponent) {
+    this.Source = paramComponent;
   }
 }

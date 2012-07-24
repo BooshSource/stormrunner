@@ -39,15 +39,14 @@ public class CannonTrigger extends PhysicalObject
   {
     if (GameApplet.thisApplet != null)
     {
-      Enumeration localEnumeration = super.getEnvironment().getObjects().elements();
+      Enumeration localEnumeration = getEnvironment().getObjects().elements();
       while (localEnumeration.hasMoreElements())
       {
         Object localObject = localEnumeration.nextElement();
-        if (localObject instanceof Cannon)
-        {
-          this.shooter = ((Cannon)localObject);
-          return;
-        }
+        if (!(localObject instanceof Cannon))
+          continue;
+        this.shooter = ((Cannon)localObject);
+        return;
       }
     }
   }
@@ -80,11 +79,12 @@ public class CannonTrigger extends PhysicalObject
     if (this.shooter != null)
     {
       Debug.println("Robot " + paramRobot.getName() + " has activated CannonTrigger at " + paramRobot.getPosition());
-      this.shooter.shootAt(paramRobot, paramRobot.getPosition().getMapPoint()); } }
-
+      this.shooter.shootAt(paramRobot, paramRobot.getPosition().getMapPoint());
+    }
+  }
   public int activateOnEvent() {
-    return 4; }
-
+    return 4;
+  }
   public void setCannon(Cannon paramCannon) {
     this.shooter = paramCannon;
   }

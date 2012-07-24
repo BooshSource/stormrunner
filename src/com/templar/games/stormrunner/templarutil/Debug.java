@@ -16,6 +16,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
 
@@ -34,27 +35,28 @@ public class Debug
   {
     if (GameApplet.thisApplet != null)
     {
-      debugFlag = Debug.AWT_DEBUG = (GameApplet.thisApplet.getParameter("AWT_DEBUG") == null) ? 0 : 1;
-      if (!(debugFlag))
+      debugFlag = Debug.AWT_DEBUG = GameApplet.thisApplet.getParameter("AWT_DEBUG") == null ? false : true;
+      if (!debugFlag)
         debugFlag = GameApplet.thisApplet.getParameter("DEBUG") != null;
     }
     else
     {
       try {
-        debugFlag = Debug.AWT_DEBUG = (System.getProperty("AWT_DEBUG") == null) ? 0 : 1;
-        if (debugFlag) break label114;
-        debugFlag = System.getProperty("DEBUG") != null;
+        debugFlag = Debug.AWT_DEBUG = System.getProperty("AWT_DEBUG") == null ? false : true;
+        if (!debugFlag)
+          debugFlag = System.getProperty("DEBUG") != null;
       }
       catch (Exception localException)
       {
-        debugFlag = false; }
+        debugFlag = false;
+      }
     }
     if (AWT_DEBUG)
     {
-      label114: debugFrame = new Frame("Debug Output");
+      debugFrame = new Frame("Debug Output");
       if (debugFlag)
       {
-        handler = new ActionAdapter(this);
+        handler = new ActionAdapter();
         text = new TextArea();
         debugFrame.setLayout(new BorderLayout());
         debugFrame.add(text, "Center");
@@ -69,7 +71,7 @@ public class Debug
         debugFrame.setVisible(true);
         Dimension localDimension = Toolkit.getDefaultToolkit().getScreenSize();
         debugFrame.setLocation(0, localDimension.height - debugFrame.getSize().height - 12);
-        debugFrame.addWindowListener(new one());
+        debugFrame.addWindowListener(new WindowAdapter() { public void windowClosing(WindowEvent paramWindowEvent) { Debug.debugFrame.setVisible(false); Debug.debugFrame.dispose(); }  } );
       }
     }
   }
@@ -85,25 +87,28 @@ public class Debug
     {
       if (AWT_DEBUG)
       {
-        if (!(debugFrame.isVisible())) return;
-
-        String str = text.getText();
-        if (str.length() > 8192)
+        if (debugFrame.isVisible())
         {
-          text.setText(str.substring(paramString.indexOf("\n") + 1));
-          text.setCaretPosition(text.getText().length());
+          String str = text.getText();
+          if (str.length() > 8192)
+          {
+            text.setText(str.substring(paramString.indexOf("\n") + 1));
+            text.setCaretPosition(text.getText().length());
+          }
+          text.append(paramString + "\n");
+
+          return;
         }
-        text.append(paramString + "\n");
 
-        return;
       }
-
-      System.out.println("Debug> " + paramString);
+      else
+      {
+        System.out.println("Debug> " + paramString);
+      }
     }
   }
 
-  public static void println(Object paramObject)
-  {
+  public static void println(Object paramObject) {
     if (paramObject == null) {
       println("(null)");
 
@@ -113,7 +118,7 @@ public class Debug
     if (paramObject.getClass().isArray())
     {
       Object[] arrayOfObject = new Object[Array.getLength(paramObject)];
-      for (int i = 0; i < arrayOfObject.length; ++i)
+      for (int i = 0; i < arrayOfObject.length; i++)
         arrayOfObject[i] = Array.get(paramObject, i);
       println(arrayPrint(arrayOfObject));
 
@@ -128,13 +133,17 @@ public class Debug
     {
       if (AWT_DEBUG)
       {
-        if (!(debugFrame.isVisible())) return;
-        text.append(paramString + "\n");
+        if (debugFrame.isVisible()) {
+          text.append(paramString + "\n");
 
-        return;
+          return;
+        }
+
       }
-
-      System.out.print(paramString);
+      else
+      {
+        System.out.print(paramString);
+      }
     }
   }
 
@@ -152,7 +161,7 @@ public class Debug
     if (paramObject.getClass().isArray())
     {
       Object[] arrayOfObject = new Object[Array.getLength(paramObject)];
-      for (int i = 0; i < arrayOfObject.length; ++i)
+      for (int i = 0; i < arrayOfObject.length; i++)
         arrayOfObject[i] = Array.get(paramObject, i);
       return arrayPrint(arrayOfObject);
     }
@@ -167,7 +176,7 @@ public class Debug
     else {
       localStringBuffer.append(paramArrayOfObject.length);
       localStringBuffer.append(":");
-      for (int i = 0; i < paramArrayOfObject.length - 1; ++i)
+      for (int i = 0; i < paramArrayOfObject.length - 1; i++)
       {
         if (paramArrayOfObject[i] == null) {
           localStringBuffer.append("(null)");
@@ -175,13 +184,13 @@ public class Debug
         else if (paramArrayOfObject[i].getClass().isArray())
         {
           Object[] arrayOfObject1 = new Object[Array.getLength(paramArrayOfObject[i])];
-          for (int k = 0; k < arrayOfObject1.length; ++k)
+          for (int k = 0; k < arrayOfObject1.length; k++)
             arrayOfObject1[k] = Array.get(paramArrayOfObject[i], k);
           localStringBuffer.append(arrayPrint(arrayOfObject1));
         }
         else {
-          localStringBuffer.append(paramArrayOfObject[i]); }
-        localStringBuffer.append(",");
+          localStringBuffer.append(paramArrayOfObject[i]);
+        }localStringBuffer.append(",");
       }
       int j = paramArrayOfObject.length;
       if (j != 0)
@@ -192,47 +201,35 @@ public class Debug
         else if (paramArrayOfObject[(j - 1)].getClass().isArray())
         {
           Object[] arrayOfObject2 = new Object[Array.getLength(paramArrayOfObject[(j - 1)])];
-          for (int l = 0; l < arrayOfObject2.length; ++l)
-            arrayOfObject2[l] = Array.get(paramArrayOfObject[(j - 1)], l);
+          for (int m = 0; m < arrayOfObject2.length; m++)
+            arrayOfObject2[m] = Array.get(paramArrayOfObject[(j - 1)], m);
           localStringBuffer.append(arrayPrint(arrayOfObject2));
         }
         else {
-          localStringBuffer.append(paramArrayOfObject[(j - 1)]); }
+          localStringBuffer.append(paramArrayOfObject[(j - 1)]);
+        }
       }
     }
     localStringBuffer.append("]");
     return localStringBuffer.toString();
   }
-  
-  final class one extends WindowAdapter
+
+  class ActionAdapter implements ActionListener
   {
-    public void windowClosing()
+    public void actionPerformed(ActionEvent paramActionEvent) {
+      String str = paramActionEvent.getActionCommand();
+      if (str.compareTo("Close") == 0)
+      {
+        Debug.debugFrame.setVisible(false);
+      }
+      if (str.compareTo("Clear") == 0)
+      {
+        Debug.text.setText("");
+      }
+    }
+
+    ActionAdapter()
     {
-      Debug.debugFrame.setVisible(false); Debug.debugFrame.dispose();
     }
   }
-  class ActionAdapter
-  implements ActionListener
-{
-  private final Debug thisdebug;
-
-  public void actionPerformed(ActionEvent arg0)
-  {
-    String str = arg0.getActionCommand();
-    if (str.compareTo("Close") == 0)
-    {
-      Debug.debugFrame.setVisible(false);
-    }
-    if (str.compareTo("Clear") == 0)
-    {
-      Debug.text.setText("");
-    }
-  }
-
-  ActionAdapter(Debug paramDebug)
-  {
-    this.thisdebug = paramDebug;
-
-  }
-}
 }

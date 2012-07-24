@@ -50,8 +50,8 @@ public class FoundRobotPart extends PhysicalObject
   }
 
   public boolean isObstructing(Robot paramRobot) {
-    return true; }
-
+    return true;
+  }
   public RobotPart getRobotPart() { return this.thisPart; }
 
   public void initialize() {

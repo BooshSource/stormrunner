@@ -40,12 +40,12 @@ public class FoundArachnae extends FoundRobot
       String[] arrayOfString = { "sensor.VidSensor", "assembly.Launcher" };
       this.parts = arrayOfString;
       this.clearAnimations = new AnimationComponent[2];
-      for (int i = 0; i < 2; ++i)
+      for (int i = 0; i < 2; i++)
       {
         this.clearAnimations[i] = new AnimationComponent();
-        localObject = new Image[6 + i];
+        Image[] localObject = new Image[6 + i];
         int[] arrayOfInt = new int[6 + i];
-        for (int j = 0; j < 6 + i; ++j)
+        for (int j = 0; j < 6 + i; j++)
         {
           localObject[j] = GameApplet.thisApplet.getImage(
             "com/templar/games/stormrunner/media/images/robot/buried/buried" + (i + 1) + "_0" + (j + 1) + ".gif");
@@ -54,7 +54,7 @@ public class FoundArachnae extends FoundRobot
         this.clearAnimations[i].setCells(localObject);
         this.clearAnimations[i].setSequence(arrayOfInt, null, false);
       }
-      Object localObject = new ImageComponent[2];
+      ImageComponent[] localObject = new ImageComponent[2];
       localObject[1] = new ImageComponent(GameApplet.thisApplet.getImage("com/templar/games/stormrunner/media/images/robot/chassis/Arachnae/walk0_225.gif"), true, false);
       localObject[0] = this.clearAnimations[0];
 
@@ -64,6 +64,7 @@ public class FoundArachnae extends FoundRobot
 
   public FoundArachnae()
   {
+	  ////?
   }
 
   public FoundArachnae(Scene paramScene, Position paramPosition, boolean paramBoolean) {

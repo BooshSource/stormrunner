@@ -12,75 +12,39 @@ import java.util.Vector;
 public class ImageComponent extends Component
   implements ReportingComponent
 {
-  protected boolean SelfSizing;
-  protected boolean ProgressiveDraw;
+  protected boolean SelfSizing = false;
+  protected boolean ProgressiveDraw = false;
   protected ImageRetriever ir;
   protected String ImageFilename;
-  public boolean ImageError;
+  public boolean ImageError = false;
   protected Image PreviousImage;
   protected Dimension PreviousImageSize;
-  protected boolean PreviousImageAnimated;
-  protected boolean PreviousImageFlushed;
+  protected boolean PreviousImageAnimated = false;
+  protected boolean PreviousImageFlushed = true;
   protected Image CurrentImage;
   protected Dimension CurrentImageSize;
-  protected boolean CurrentImageAnimated;
-  protected boolean CurrentImageReady;
-  private boolean Stopped;
-  private boolean Added;
-  private boolean DisplayCompleted;
-  private boolean WaitingOnSize;
-  private Vector ImageListeners;
+  protected boolean CurrentImageAnimated = false;
+  protected boolean CurrentImageReady = false;
+
+  private boolean Stopped = false;
+  private boolean Added = false;
+
+  private boolean DisplayCompleted = false;
+
+  private boolean WaitingOnSize = false;
+
+  private Vector ImageListeners = new Vector();
   private static Vector ImagePaintListeners = new Vector();
   private Vector ReportingComponentListeners;
   private static ImageFilenameProvider ImageNamer = null;
 
   public ImageComponent()
   {
-    this.SelfSizing = false;
-    this.ProgressiveDraw = false;
-
-    this.ImageError = false;
-
-    this.PreviousImageAnimated = false;
-    this.PreviousImageFlushed = true;
-
-    this.CurrentImageAnimated = false;
-    this.CurrentImageReady = false;
-
-    this.Stopped = false;
-    this.Added = false;
-
-    this.DisplayCompleted = false;
-
-    this.WaitingOnSize = false;
-
-    this.ImageListeners = new Vector();
-
     setImage(null);
   }
 
   public ImageComponent(Image paramImage)
   {
-    this.SelfSizing = false;
-    this.ProgressiveDraw = false;
-
-    this.ImageError = false;
-
-    this.PreviousImageAnimated = false;
-    this.PreviousImageFlushed = true;
-
-    this.CurrentImageAnimated = false;
-    this.CurrentImageReady = false;
-
-    this.Stopped = false;
-    this.Added = false;
-
-    this.DisplayCompleted = false;
-
-    this.WaitingOnSize = false;
-
-    this.ImageListeners = new Vector();
-
     setImage(paramImage);
   }
 
@@ -94,26 +58,6 @@ public class ImageComponent extends Component
 
   public ImageComponent(Image paramImage, boolean paramBoolean1, boolean paramBoolean2)
   {
-    this.SelfSizing = false;
-    this.ProgressiveDraw = false;
-
-    this.ImageError = false;
-
-    this.PreviousImageAnimated = false;
-    this.PreviousImageFlushed = true;
-
-    this.CurrentImageAnimated = false;
-    this.CurrentImageReady = false;
-
-    this.Stopped = false;
-    this.Added = false;
-
-    this.DisplayCompleted = false;
-
-    this.WaitingOnSize = false;
-
-    this.ImageListeners = new Vector();
-
     this.SelfSizing = paramBoolean1;
     this.ProgressiveDraw = paramBoolean2;
     setImage(paramImage);
@@ -146,37 +90,37 @@ public class ImageComponent extends Component
         this.CurrentImageReady = false;
         this.CurrentImageAnimated = false;
 
-        if ((this.Added) && (!(this.Stopped)))
+        if ((this.Added) && (!this.Stopped))
         {
           int i;
-          if (ImagePaintListeners.size() > 0)
-            for (i = 0; i < ImagePaintListeners.size(); ++i)
+          if (ImagePaintListeners.size() > 0) {
+            for (i = 0; i < ImagePaintListeners.size(); i++)
             {
               ImagePaintListener localImagePaintListener = (ImagePaintListener)ImagePaintListeners.elementAt(i);
               localImagePaintListener.imagePainted(this, this.CurrentImage);
             }
-
-          if (!(this.ProgressiveDraw))
+          }
+          if (!this.ProgressiveDraw)
           {
-            if (!(super.prepareImage(this.CurrentImage, this)))
+            if (!prepareImage(this.CurrentImage, this))
             {
               try
               {
                 i = 0;
-                int j = super.checkImage(this.CurrentImage, this);
+                int j = checkImage(this.CurrentImage, this);
                 while ((j & 0xF0) == 0)
                 {
                   if (i > 2)
                   {
                     System.out.println("ImageComponent: Potential deadlock waiting for Image.");
-                    break label249:
+                    break;
                   }
 
-                  ++i;
+                  i++;
 
                   wait(1000L);
 
-                  j = super.checkImage(this.CurrentImage, this);
+                  j = checkImage(this.CurrentImage, this);
                 }
               }
               catch (InterruptedException localInterruptedException)
@@ -187,7 +131,7 @@ public class ImageComponent extends Component
 
             }
 
-            label249: this.CurrentImageReady = true;
+            this.CurrentImageReady = true;
           }
           else
           {
@@ -201,12 +145,12 @@ public class ImageComponent extends Component
         {
           Dimension localDimension = getSize();
           if ((localDimension.height != this.PreviousImageSize.height) || (localDimension.width != this.PreviousImageSize.width))
-            super.setSize(localDimension);
+            setSize(localDimension);
           else
-            super.repaint();
+            repaint();
         }
         else {
-          super.repaint();
+          repaint();
         }
 
         deliverImageEvent(2);
@@ -248,7 +192,7 @@ public class ImageComponent extends Component
 
   public boolean isDrawing()
   {
-    return (!(this.Stopped));
+    return !this.Stopped;
   }
 
   public boolean isCompleted()
@@ -285,27 +229,29 @@ public class ImageComponent extends Component
           System.err.println("Image Error! (\"" + ImageNamer.getImageFilename(paramImage) + "\")");
         else if (this.ImageFilename == null)
           System.err.println("Image Error! (Filename unknown)");
-        else
+        else {
           System.err.println("Image Error! (\"" + this.ImageFilename + "\")");
+        }
       }
-
       this.ImageError = true;
 
-      if (this.WaitingOnSize)
+      if (this.WaitingOnSize) {
         this.WaitingOnSize = false;
-
+      }
       notifyAll();
     }
 
-    if (((paramInt1 & 0x3) != 0) && 
-      (this.WaitingOnSize))
+    if ((paramInt1 & 0x3) != 0)
     {
-      this.WaitingOnSize = false;
-      notifyAll();
+      if (this.WaitingOnSize)
+      {
+        this.WaitingOnSize = false;
+        notifyAll();
+      }
     }
 
-    int i = ((paramInt1 & 0x20) != 0) ? 1 : 0;
-    int j = ((paramInt1 & 0x10) != 0) ? 1 : 0;
+    int i = (paramInt1 & 0x20) != 0 ? 1 : 0;
+    int j = (paramInt1 & 0x10) != 0 ? 1 : 0;
 
     if (j != 0)
     {
@@ -313,15 +259,15 @@ public class ImageComponent extends Component
       deliverImageEvent(1);
     }
 
-    if (!(this.Stopped))
+    if (!this.Stopped)
     {
-      k = ((j != 0) || (i != 0)) ? 1 : 0;
+      int k = (j != 0) || (i != 0) ? 1 : 0;
 
       if (k != 0)
       {
         this.CurrentImageReady = true;
 
-        if ((this.PreviousImage != null) && (this.PreviousImageAnimated) && (!(this.PreviousImageFlushed)))
+        if ((this.PreviousImage != null) && (this.PreviousImageAnimated) && (!this.PreviousImageFlushed))
         {
           this.PreviousImageFlushed = true;
           this.PreviousImage.flush();
@@ -329,18 +275,18 @@ public class ImageComponent extends Component
 
         notifyAll();
 
-        super.repaint();
+        repaint();
       }
       else if (this.ProgressiveDraw)
       {
         this.CurrentImageReady = true;
         deliverImageEvent(1);
-        super.repaint(500L);
+        repaint(500L);
       }
     }
-    int k = ((i != 0) || (this.ImageError)) ? 0 : 1;
+    boolean k = (i != 0) || (this.ImageError) ? false : true;
 
-    this.DisplayCompleted = (k == 0);
+    this.DisplayCompleted = (k == false);
 
     return k;
   }
@@ -367,7 +313,6 @@ public class ImageComponent extends Component
       {
         this.CurrentImageSize = new Dimension(0, 0);
         int i = 0; int j = 0;
-        label82: 
         do
         {
           try
@@ -376,7 +321,7 @@ public class ImageComponent extends Component
             j = this.CurrentImage.getHeight(this);
 
             if ((this.ImageError) || (i >= 1) || (j >= 1))
-              break label82;
+              continue;
             this.WaitingOnSize = true;
             wait();
           }
@@ -385,15 +330,15 @@ public class ImageComponent extends Component
           }
         }
 
-        while ((!(this.ImageError)) && (((i < 1) || (j < 1))));
+        while ((!this.ImageError) && ((i < 1) || (j < 1)));
 
         if ((i > 0) || (j > 0))
           this.CurrentImageSize = new Dimension(i, j);
       }
     }
-    else
+    else {
       this.CurrentImageSize = new Dimension(0, 0);
-
+    }
     return this.CurrentImageSize;
   }
 
@@ -404,7 +349,7 @@ public class ImageComponent extends Component
 
   public void paint(Graphics paramGraphics)
   {
-    if ((!(this.Stopped)) && (this.CurrentImage != null))
+    if ((!this.Stopped) && (this.CurrentImage != null))
     {
       deliverImagePaintedEvent();
 
@@ -441,7 +386,7 @@ public class ImageComponent extends Component
   public void deliverImageEvent(int paramInt)
   {
     if (this.ImageListeners.size() > 0)
-      for (int i = 0; i < this.ImageListeners.size(); ++i)
+      for (int i = 0; i < this.ImageListeners.size(); i++)
       {
         ImageListener localImageListener = (ImageListener)this.ImageListeners.elementAt(i);
         localImageListener.imageChanged(new ImageEvent(this, paramInt));
@@ -451,7 +396,7 @@ public class ImageComponent extends Component
   public void deliverImagePaintedEvent()
   {
     if (ImagePaintListeners.size() > 0)
-      for (int i = 0; i < ImagePaintListeners.size(); ++i)
+      for (int i = 0; i < ImagePaintListeners.size(); i++)
       {
         ImagePaintListener localImagePaintListener = (ImagePaintListener)ImagePaintListeners.elementAt(i);
         localImagePaintListener.imagePainted(this, this.CurrentImage);
@@ -460,9 +405,9 @@ public class ImageComponent extends Component
 
   public void addReportingComponentListener(ReportingComponentListener paramReportingComponentListener)
   {
-    if (this.ReportingComponentListeners == null)
+    if (this.ReportingComponentListeners == null) {
       this.ReportingComponentListeners = new Vector();
-
+    }
     this.ReportingComponentListeners.addElement(paramReportingComponentListener);
   }
 
@@ -474,7 +419,7 @@ public class ImageComponent extends Component
 
   protected void reportReshape(Rectangle paramRectangle1, Rectangle paramRectangle2)
   {
-    for (int i = 0; i < this.ReportingComponentListeners.size(); ++i)
+    for (int i = 0; i < this.ReportingComponentListeners.size(); i++)
     {
       ReportingComponentListener localReportingComponentListener = (ReportingComponentListener)this.ReportingComponentListeners.elementAt(i);
       localReportingComponentListener.componentReshaped(this, new Rectangle(paramRectangle1), new Rectangle(paramRectangle2));
@@ -485,7 +430,7 @@ public class ImageComponent extends Component
   {
     if (this.ReportingComponentListeners != null)
     {
-      Rectangle localRectangle1 = super.getBounds();
+      Rectangle localRectangle1 = getBounds();
       Rectangle localRectangle2 = new Rectangle(paramInt1, paramInt2, paramInt3, paramInt4);
       reportReshape(localRectangle1, localRectangle2);
     }

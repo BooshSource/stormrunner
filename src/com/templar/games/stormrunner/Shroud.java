@@ -26,6 +26,7 @@ public class Shroud extends Component
   private Dimension gridsize;
   private Dimension gridcellsize;
   private Point Offset = new Point(0, 0);
+
   protected transient Vector ShroudListeners = new Vector();
 
   public void readExternal(ObjectInput paramObjectInput)
@@ -68,7 +69,7 @@ public class Shroud extends Component
     this.TileImages = paramArrayOfImage;
 
     MediaTracker localMediaTracker = new MediaTracker(this);
-    for (int i = 0; i < paramArrayOfImage.length; ++i)
+    for (int i = 0; i < paramArrayOfImage.length; i++)
       localMediaTracker.addImage(paramArrayOfImage[i], 0); try {
       localMediaTracker.waitForAll(); } catch (InterruptedException localInterruptedException) { localInterruptedException.printStackTrace();
     }
@@ -93,10 +94,10 @@ public class Shroud extends Component
 
   public boolean isVisible(int paramInt1, int paramInt2)
   {
-    if ((paramInt1 < 0) || (paramInt1 >= this.gridsize.width) || (paramInt2 < 0) || (paramInt2 >= this.gridsize.height))
+    if ((paramInt1 < 0) || (paramInt1 >= this.gridsize.width) || (paramInt2 < 0) || (paramInt2 >= this.gridsize.height)) {
       return false;
-
-    return ((this.PermanentlyLit[paramInt1][paramInt2] != false) || (this.TransientLightCount[paramInt1][paramInt2] > 0));
+    }
+    return (this.PermanentlyLit[paramInt1][paramInt2] != false) || (this.TransientLightCount[paramInt1][paramInt2] > 0);
   }
 
   public int[][] getTileState()
@@ -129,7 +130,7 @@ public class Shroud extends Component
         return;
       }
 
-      if (!(paramBoolean3))
+      if (!paramBoolean3)
       {
         calculateEdgeTiles(paramPoint, paramInt + 1);
         calculateEdgeTiles(paramPoint, paramInt);
@@ -137,14 +138,14 @@ public class Shroud extends Component
         return;
       }
 
-      int k = 0; int l = this.gridsize.width - 1; int i1 = 0; int i2 = this.gridsize.height - 1;
-      int i3 = Math.max(k, paramPoint.x - paramInt + 1);
-      int i4 = Math.min(l, paramPoint.x + paramInt + 1);
-      int i5 = Math.max(i1, paramPoint.y - paramInt + 1);
-      int i6 = Math.min(i2, paramPoint.y + paramInt + 1);
-      for (int i7 = i3; i7 <= i4; ++i7)
-        for (int i8 = i5; i8 <= i6; ++i8)
-          calculateTile(i7, i8);
+      int k = 0; int m = this.gridsize.width - 1; int n = 0; int i1 = this.gridsize.height - 1;
+      int i2 = Math.max(k, paramPoint.x - (paramInt + 1));
+      int i3 = Math.min(m, paramPoint.x + (paramInt + 1));
+      int i4 = Math.max(n, paramPoint.y - (paramInt + 1));
+      int i5 = Math.min(i1, paramPoint.y + (paramInt + 1));
+      for (int i6 = i2; i6 <= i3; i6++)
+        for (int i7 = i4; i7 <= i5; i7++)
+          calculateTile(i6, i7);
     }
   }
 
@@ -172,7 +173,7 @@ public class Shroud extends Component
   {
     ShroudEvent localShroudEvent = new ShroudEvent(this, paramRectangle1, paramBoolean, paramRectangle2);
 
-    for (int i = 0; i < this.ShroudListeners.size(); ++i)
+    for (int i = 0; i < this.ShroudListeners.size(); i++)
     {
       ((ShroudListener)this.ShroudListeners.elementAt(i)).shroudChanged(localShroudEvent);
     }
@@ -182,99 +183,102 @@ public class Shroud extends Component
   {
     int i = 0;
 
-    int j = 0; int k = this.gridsize.width - 1; int l = 0; int i1 = this.gridsize.height - 1;
-    int i2 = Math.max(j, paramPoint.x - paramInt);
-    int i3 = Math.min(k, paramPoint.x + paramInt);
-    int i4 = Math.max(l, paramPoint.y - paramInt);
-    int i5 = Math.min(i1, paramPoint.y + paramInt);
+    int j = 0; int k = this.gridsize.width - 1; int m = 0; int n = this.gridsize.height - 1;
+    int i1 = Math.max(j, paramPoint.x - paramInt);
+    int i2 = Math.min(k, paramPoint.x + paramInt);
+    int i3 = Math.max(m, paramPoint.y - paramInt);
+    int i4 = Math.min(n, paramPoint.y + paramInt);
 
-    int i6 = Math.max(j, paramPoint.x - paramInt + 1);
-    int i7 = Math.min(k, paramPoint.x + paramInt + 1);
-    int i8 = Math.max(l, paramPoint.y - paramInt + 1);
-    int i9 = Math.min(i1, paramPoint.y + paramInt + 1);
+    int i5 = Math.max(j, paramPoint.x - (paramInt + 1));
+    int i6 = Math.min(k, paramPoint.x + (paramInt + 1));
+    int i7 = Math.max(m, paramPoint.y - (paramInt + 1));
+    int i8 = Math.min(n, paramPoint.y + (paramInt + 1));
 
-    for (int i10 = i2; i10 <= i3; ++i10)
+    for (int i9 = i1; i9 <= i2; i9++)
     {
-      for (int i11 = i4; i11 <= i5; ++i11)
+      for (int i10 = i3; i10 <= i4; i10++)
       {
         if (paramBoolean1)
         {
-          if ((i == 0) && (!(isVisible(i10, i11))))
+          if ((i == 0) && (!isVisible(i9, i10))) {
             i = 1;
-
+          }
           if (paramBoolean2)
           {
-            this.PermanentlyLit[i10][i11] = true;
+            this.PermanentlyLit[i9][i10] = true;
           }
 
-          this.TransientLightCount[i10][i11] += 1;
+          this.TransientLightCount[i9][i10] += 1;
 
-          this.Tile[i10][i11] = 15;
+          this.Tile[i9][i10] = 15;
         }
         else
         {
-          boolean bool1 = isVisible(i10, i11);
+          boolean bool1 = isVisible(i9, i10);
 
           if (paramBoolean2)
           {
-            this.PermanentlyLit[i10][i11] = false;
+            this.PermanentlyLit[i9][i10] = false;
           }
 
-          if (this.TransientLightCount[i10][i11] > 0)
+          if (this.TransientLightCount[i9][i10] > 0)
           {
-            this.TransientLightCount[i10][i11] -= 1;
+            this.TransientLightCount[i9][i10] -= 1;
           }
 
-          boolean bool2 = isVisible(i10, i11);
-          if ((i == 0) && (bool1) && (!(bool2))) {
+          boolean bool2 = isVisible(i9, i10);
+          if ((i == 0) && (bool1) && (!bool2)) {
             i = 1;
           }
 
-          if ((i10 > i2) && (i10 < i3) && (i11 > i4) && (i11 < i5) && 
-            (!(bool2)))
+          if ((i9 <= i1) || (i9 >= i2) || (i10 <= i3) || (i10 >= i4))
           {
-            this.Tile[i10][i11] = 0;
+            continue;
           }
+          if (bool2)
+            continue;
+          this.Tile[i9][i10] = 0;
         }
+
       }
 
     }
 
-    if (i != 0)
-      sendShroudEvent(new Rectangle(i2, i4, i3 - i2 + 1, i5 - i4 + 1), paramBoolean1, new Rectangle(i6, i8, i7 - i6 + 1, i9 - i8 + 1));
-if(i==0)
-    return false; else return true;
+    if (i != 0) {
+      sendShroudEvent(new Rectangle(i1, i3, i2 - i1 + 1, i4 - i3 + 1), paramBoolean1, new Rectangle(i5, i7, i6 - i5 + 1, i8 - i7 + 1));
+    }
+    if(i==1) return true; else return false;
   }
 
   protected void calculateEdgeTiles(Point paramPoint, int paramInt)
   {
-    int i = 0; int j = this.gridsize.width - 1; int k = 0; int l = this.gridsize.height - 1;
-    int i1 = Math.max(i, paramPoint.x - paramInt);
-    int i2 = Math.min(j, paramPoint.x + paramInt);
-    int i3 = Math.max(k, paramPoint.y - paramInt);
-    int i4 = Math.min(l, paramPoint.y + paramInt);
+    int i = 0; int j = this.gridsize.width - 1; int k = 0; int m = this.gridsize.height - 1;
+    int n = Math.max(i, paramPoint.x - paramInt);
+    int i1 = Math.min(j, paramPoint.x + paramInt);
+    int i2 = Math.max(k, paramPoint.y - paramInt);
+    int i3 = Math.min(m, paramPoint.y + paramInt);
 
-    int i7 = 0;
-    for (int i5 = i1; i7 == 0; i5 = i2)
+    int i6 = 0;
+    for (int i4 = n; i6 == 0; i4 = i1)
     {
-      for (int i6 = i3; i6 <= i4; ++i6)
+      for (int i5 = i2; i5 <= i3; i5++)
       {
-        calculateTile(i5, i6);
+        calculateTile(i4, i5);
       }
-      if (i5 == i2)
-        i7 = 1;
-
+      if (i4 == i1) {
+        i6 = 1;
+      }
     }
 
-    i7 = 0;
-    for (int i6 = i3; i7 == 0; i6 = i4)
+    i6 = 0;
+    for (int i5 = i2; i6 == 0; i5 = i3)
     {
-      for (int i5 = i1 + 1; i5 < i2; ++i5)
+      for (int i4 = n + 1; i4 < i1; i4++)
       {
-        calculateTile(i5, i6);
+        calculateTile(i4, i5);
       }
-      if (i6 == i4)
-        i7 = 1;
+      if (i5 == i3)
+        i6 = 1;
     }
   }
 
@@ -290,27 +294,27 @@ if(i==0)
     int i = 0;
     int j = 0;
     boolean[] arrayOfBoolean1 = new boolean[3]; boolean[] arrayOfBoolean2 = new boolean[3];
-    int k = paramInt1 - 1; int l = paramInt1 + 1; int i1 = paramInt2 - 1; int i2 = paramInt2 + 1;
-    int i3 = 0; int i4 = 0;
-    for (int i5 = i1; i5 <= i2; )
+    int k = paramInt1 - 1; int m = paramInt1 + 1; int n = paramInt2 - 1; int i1 = paramInt2 + 1;
+    int i2 = 0; int i3 = 0;
+    for (int i4 = n; i4 <= i1; i3++)
     {
-      for (int i6 = k; i6 <= l; )
+      for (int i5 = k; i5 <= m; i2++)
       {
-        boolean bool = isVisible(i6, i5);
-        i = ((i == 0) && (!(bool))) ? 0 : 1;
-        arrayOfBoolean1[i4] = (((arrayOfBoolean1[i4] == 0) && (!(bool))) ? 0 : true);
-        arrayOfBoolean2[i3] = (((arrayOfBoolean2[i3] == 0) && (!(bool))) ? 0 : true);
+        boolean bool = isVisible(i5, i4);
+        i = (i == 0) && (!bool) ? 0 : 1;
+        arrayOfBoolean1[i3] = ((arrayOfBoolean1[i3] == false) && (!bool) ? false : true);
+        arrayOfBoolean2[i2] = ((arrayOfBoolean2[i2] == false) && (!bool) ? false : true);
 
         if (bool)
-          ++j;
-        arrayOfBoolean[i3][i4] = bool;
+          j++;
+        arrayOfBoolean[i2][i3] = bool;
 
-        ++i6; ++i3;
+        i5++;
       }
 
-      i3 = 0;
+      i2 = 0;
 
-      ++i5; ++i4;
+      i4++;
     }
 
     if (i == 0) {
@@ -408,27 +412,27 @@ if(i==0)
     int i = this.Offset.x + (int)Math.floor(localRectangle.x / this.gridcellsize.width);
     int j = i + (int)Math.ceil(localRectangle.width / this.gridcellsize.width);
     int k = this.Offset.y + (int)Math.floor(localRectangle.y / this.gridcellsize.height);
-    int l = k + (int)Math.ceil(localRectangle.height / this.gridcellsize.height);
+    int m = k + (int)Math.ceil(localRectangle.height / this.gridcellsize.height);
 
     j = Math.min(this.gridsize.width - 1, j);
-    l = Math.min(this.gridsize.height - 1, l);
+    m = Math.min(this.gridsize.height - 1, m);
 
-    int i1 = (i - this.Offset.x) * this.gridcellsize.width;
-    int i2 = (k - this.Offset.y) * this.gridcellsize.height;
-    for (int i3 = k; i3 <= l; )
+    int n = (i - this.Offset.x) * this.gridcellsize.width;
+    int i1 = (k - this.Offset.y) * this.gridcellsize.height;
+    for (int i2 = k; i2 <= m; i1 += this.gridcellsize.height)
     {
-      for (int i4 = i; i4 <= j; )
+      for (int i3 = i; i3 <= j; n += this.gridcellsize.width)
       {
-        Image localImage = this.TileImages[this.Tile[i4][i3]];
+        Image localImage = this.TileImages[this.Tile[i3][i2]];
         GameApplet.thisApplet.hitCache(localImage);
-        paramGraphics.drawImage(localImage, i1, i2, this);
+        paramGraphics.drawImage(localImage, n, i1, this);
 
-        ++i4; i1 += this.gridcellsize.width;
+        i3++;
       }
 
-      i1 = (i - this.Offset.x) * this.gridcellsize.width;
+      n = (i - this.Offset.x) * this.gridcellsize.width;
 
-      ++i3; i2 += this.gridcellsize.height;
+      i2++;
     }
   }
 }

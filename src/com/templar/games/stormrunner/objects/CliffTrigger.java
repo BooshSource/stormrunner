@@ -43,8 +43,8 @@ public class CliffTrigger extends PhysicalObject
   }
 
   public CliffTrigger(Scene paramScene, Position paramPosition, Image[] paramArrayOfImage, boolean[][] paramArrayOfBoolean, boolean paramBoolean) {
-    super(paramScene, paramPosition, paramArrayOfImage, paramArrayOfBoolean, paramBoolean); }
-
+    super(paramScene, paramPosition, paramArrayOfImage, paramArrayOfBoolean, paramBoolean);
+  }
   public int getThreshold() { return 25; }
 
   public void setGameState(GameState paramGameState) {
@@ -58,14 +58,15 @@ public class CliffTrigger extends PhysicalObject
     if (paramRobot.getElevated())
     {
       paramRobot.setDeath(new Falling());
-      paramRobot.stop(); } }
-
+      paramRobot.stop();
+    }
+  }
   public int activateOnEvent() {
     return 0;
   }
 
   public boolean isObstructing(Robot paramRobot)
   {
-    return (!(paramRobot.getElevated()));
+    return !paramRobot.getElevated();
   }
 }

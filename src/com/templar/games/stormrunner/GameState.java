@@ -47,22 +47,24 @@ public class GameState
   public static final String GAMEOVER_URL = "gameover.html";
   public static final String VICTORY_URL = "victory.html";
   protected transient GameApplet appletRef;
-  protected transient BarGraph bargraph;
+  protected transient BarGraph bargraph = new BarGraph();
   protected transient Scene currentScene;
-  protected transient Renderer renderer;
+  protected transient Renderer renderer = new Renderer(this);
   protected transient Robot currentRobot;
-  protected World world;
-  protected OrderedTable ProgramLibrary;
+  protected World world = new World();
+
+  protected OrderedTable ProgramLibrary = new OrderedTable();
   protected String Username;
   protected String UserRank;
   protected int SecurityLevel;
   protected int Polymetals;
   protected int EnergyUnits;
-  protected Vector Inventory;
-  protected Vector RobotPartPatterns;
-  protected Vector SpecialProgramParts;
-  protected Vector ActiveRobots;
-  protected Vector StoredRobots;
+  protected Vector Inventory = new Vector();
+  protected Vector RobotPartPatterns = new Vector();
+  protected Vector SpecialProgramParts = new Vector();
+
+  protected Vector ActiveRobots = new Vector();
+  protected Vector StoredRobots = new Vector();
   protected long tickCount;
   protected transient Thread stateThread;
   protected transient boolean running;
@@ -71,20 +73,11 @@ public class GameState
 
   public GameState()
   {
-    this.bargraph = new BarGraph();
-
-    this.world = new World();
-    this.renderer = new Renderer(this);
-    this.ProgramLibrary = new OrderedTable();
-    this.ActiveRobots = new Vector();
-    this.StoredRobots = new Vector();
-    this.Inventory = new Vector();
-    this.RobotPartPatterns = new Vector();
-    this.SpecialProgramParts = new Vector();
   }
 
   public GameState(GameApplet paramGameApplet)
   {
+    this();
     this.appletRef = paramGameApplet;
 
     this.RobotPartPatterns.addElement(new VidSensor());
@@ -100,31 +93,32 @@ public class GameState
       this.RobotPartPatterns.addElement(new Arachnae());
       this.RobotPartPatterns.addElement(new Piledriver());
       this.RobotPartPatterns.addElement(new Launcher());
-      this.RobotPartPatterns.addElement(new GeolabSensor()); }
+      this.RobotPartPatterns.addElement(new GeolabSensor());
+    }
   }
 
   public String getUsername() {
-    return this.Username; }
-
+    return this.Username;
+  }
   public void setUsername(String paramString) {
     this.Username = paramString;
 
-    this.appletRef.getBuildPanel().setUsername(paramString); }
-
+    this.appletRef.getBuildPanel().setUsername(paramString);
+  }
   public String getUserRank() { return this.UserRank; }
 
   public void setUserRank(String paramString) {
     this.UserRank = paramString;
 
-    this.appletRef.getBuildPanel().setUserRank(paramString); }
-
+    this.appletRef.getBuildPanel().setUserRank(paramString);
+  }
   public int getSecurityLevel() { return this.SecurityLevel; }
 
   public void setSecurityLevel(int paramInt) {
     this.SecurityLevel = paramInt;
 
-    this.appletRef.getBuildPanel().setSecurityLevel(paramInt); }
-
+    this.appletRef.getBuildPanel().setSecurityLevel(paramInt);
+  }
   public int getPolymetals() { return this.Polymetals; }
 
   public void setPolymetals(int paramInt) {
@@ -132,32 +126,32 @@ public class GameState
 
     BuildPanel localBuildPanel = this.appletRef.getBuildPanel();
     if (localBuildPanel != null)
-      localBuildPanel.setPolymetals(paramInt);  }
-
+      localBuildPanel.setPolymetals(paramInt); 
+  }
   public int getEnergyUnits() {
-    return this.EnergyUnits; }
-
+    return this.EnergyUnits;
+  }
   public void setEnergyUnits(int paramInt) {
     this.EnergyUnits = paramInt;
 
     BuildPanel localBuildPanel = this.appletRef.getBuildPanel();
     if (localBuildPanel != null)
-      localBuildPanel.setEnergyUnits(paramInt);  }
-
+      localBuildPanel.setEnergyUnits(paramInt); 
+  }
   public boolean isEmpty() {
-    return (this.Inventory.size() == 0); } 
+    return this.Inventory.size() == 0; } 
   public Vector getInventory() { return this.Inventory; }
 
   public PhysicalObject transferOut(String paramString) {
-    for (int i = 0; i < this.Inventory.size(); ++i)
+    for (int i = 0; i < this.Inventory.size(); i++)
     {
       PhysicalObject localPhysicalObject = (PhysicalObject)this.Inventory.elementAt(i);
-      if (paramString.compareTo(localPhysicalObject.getID()) == 0)
-      {
-        this.Inventory.removeElementAt(i);
-        return localPhysicalObject;
-      }
+      if (paramString.compareTo(localPhysicalObject.getID()) != 0)
+        continue;
+      this.Inventory.removeElementAt(i);
+      return localPhysicalObject;
     }
+
     return null;
   }
 
@@ -196,13 +190,14 @@ public class GameState
         {
           PhysicalObject localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
 
-          if (localPhysicalObject instanceof Trigger)
-          {
-            ((Trigger)localPhysicalObject).setGameState(this);
+          if (!(localPhysicalObject instanceof Trigger)) {
+            continue;
           }
+          ((Trigger)localPhysicalObject).setGameState(this);
         }
       }
     }
+
     return this.currentScene;
   }
 
@@ -248,8 +243,8 @@ public class GameState
   {
     while (this.running)
     {
-      this.tickCount += 2497819989986246657L;
-      if (this.tickCount % 500L == 2497820642821275648L)
+      this.tickCount += 1L;
+      if (this.tickCount % 500L == 0L)
       {
         System.gc();
         Debug.println("gc() called, freeMemory(): " + Runtime.getRuntime().freeMemory());
@@ -260,9 +255,10 @@ public class GameState
       long l1 = System.currentTimeMillis();
       try
       {
-        long l2 = 200L - l1 - this.timestamp;
-        if (l2 <= 2497820093065461760L) break label100;
-        Thread.currentThread(); label100: Thread.sleep(l2);
+        long l2 = 200L - (l1 - this.timestamp);
+        if (l2 > 0L) {
+          Thread.currentThread(); Thread.sleep(l2);
+        }
       }
       catch (InterruptedException localInterruptedException)
       {
@@ -281,7 +277,7 @@ public class GameState
       {
         Actor localActor = (Actor)localEnumeration.nextElement();
 
-        if ((localActor instanceof Robot) && (((Robot)localActor).isDead()))
+        if (((localActor instanceof Robot)) && (((Robot)localActor).isDead()))
         {
           deactivateRobot((Robot)localActor);
         }
@@ -332,7 +328,7 @@ public class GameState
     {
       if (localVector.size() > 0)
       {
-        this.currentRobot = ((Robot)localVector.elementAt((paramBoolean) ? localVector.size() - 1 : 0));
+        this.currentRobot = ((Robot)localVector.elementAt(paramBoolean ? localVector.size() - 1 : 0));
         return this.currentRobot;
       }
       return null;
@@ -340,12 +336,12 @@ public class GameState
     int i = localVector.indexOf(this.currentRobot);
     if (i > -1)
     {
-      i += ((paramBoolean) ? -1 : 1);
+      i += (paramBoolean ? -1 : 1);
       if (i < 0)
         i = localVector.size() - 1;
       if (i == localVector.size())
         i = 0;
-      return ((Robot)localVector.elementAt(i));
+      return (Robot)localVector.elementAt(i);
     }
     return null;
   }
@@ -398,9 +394,9 @@ public class GameState
 
     getCurrentScene().addObject(paramRobot);
 
-    if (this.appletRef.getStatusPanel() != null)
+    if (this.appletRef.getStatusPanel() != null) {
       this.appletRef.getStatusPanel().populateRosterPanel();
-
+    }
     setCurrentRobot(paramRobot);
 
     return true;
@@ -417,7 +413,7 @@ public class GameState
       if (this.currentRobot == paramRobot)
       {
         setCurrentRobot(null);
-        if (!(paramRobot.isDead()))
+        if (!paramRobot.isDead())
         {
           this.appletRef.setState(0);
           this.appletRef.getBuildPanel().setDescription("RCX: " + paramRobot.getName() + 
@@ -428,22 +424,21 @@ public class GameState
       this.ActiveRobots.removeElement(paramRobot);
       paramRobot.getPosition();
       getCurrentScene().removeObject(paramRobot);
-      if (!(paramRobot.isDead()))
+      if (!paramRobot.isDead())
       {
-        Object localObject2;
-        Object localObject3;
         this.StoredRobots.addElement(paramRobot);
 
         Vector localVector = new Vector();
         int i = 0;
         RobotPart[] arrayOfRobotPart = paramRobot.getRobotParts();
-        for (int j = 0; j < arrayOfRobotPart.length; ++j)
+        Object localObject3;
+        for (int j = 0; j < arrayOfRobotPart.length; j++)
         {
-          if (arrayOfRobotPart[j] instanceof Assembly)
+          if ((arrayOfRobotPart[j] instanceof Assembly))
           {
-            localObject1 = (Assembly)arrayOfRobotPart[j];
+            Assembly localObject1 = (Assembly)arrayOfRobotPart[j];
 
-            if (localObject1 instanceof InventoryContainer)
+            if ((localObject1 instanceof InventoryContainer))
             {
               InventoryContainer localInventoryContainer = (InventoryContainer)localObject1;
 
@@ -452,16 +447,17 @@ public class GameState
               localInventoryContainer.setPolymetals(0);
               localInventoryContainer.setEnergyUnits(0);
 
-              while (!(localInventoryContainer.isEmpty()))
+              while (!localInventoryContainer.isEmpty())
               {
                 localObject3 = localInventoryContainer.transferOut(null);
 
-                if ((localObject3 instanceof EnergyCell) || (localObject3 instanceof Salvage)) {
+                if (((localObject3 instanceof EnergyCell)) || ((localObject3 instanceof Salvage))) {
                   localObject3 = null;
                 }
-                else {
-                  Object localObject4;
-                  if (localObject3 instanceof FoundRobotPart)
+                else
+                {
+                  FoundRobotPart localObject4;
+                  if ((localObject3 instanceof FoundRobotPart))
                   {
                     localObject4 = (FoundRobotPart)localObject3;
                     Enumeration localEnumeration = this.RobotPartPatterns.elements();
@@ -481,13 +477,13 @@ public class GameState
                     setEnergyUnits(((FoundRobotPart)localObject4).getRobotPart().getEnergyCost() + getEnergyUnits());
                     setPolymetals(((FoundRobotPart)localObject4).getRobotPart().getSalvageCost() + getPolymetals());
                   }
-                  else if (localObject3 instanceof Satellite)
+                  else if ((localObject3 instanceof Satellite))
                   {
                     i = 1;
-
-                    localObject4 = new Position(this.currentScene.getRobotStart());
-                    localObject4.y += 1;
-                    ((PhysicalObject)localObject3).setPosition((Position)localObject4);
+////
+                    Position  lo4 = new Position(this.currentScene.getRobotStart());
+                    lo4.y += 1;
+                    ((PhysicalObject)localObject3).setPosition(lo4);
                     this.currentScene.addObject((PhysicalObject)localObject3);
                   }
                   else {
@@ -501,34 +497,34 @@ public class GameState
 
           }
 
-          localObject1 = this.RobotPartPatterns.elements();
+          Enumeration localObject1 = this.RobotPartPatterns.elements();
           int k = 0;
           while (((Enumeration)localObject1).hasMoreElements())
           {
             localObject3 = ((Enumeration)localObject1).nextElement();
-            if ((localObject3 instanceof RobotPart) && 
-              (((RobotPart)localObject3).getID().compareTo(arrayOfRobotPart[j].getID()) == 0))
-            {
-              k = 1;
-              break;
-            }
+            if ((!(localObject3 instanceof RobotPart)) || 
+              (((RobotPart)localObject3).getID().compareTo(arrayOfRobotPart[j].getID()) != 0))
+              continue;
+            k = 1;
+            break;
           }
 
-          if (k == 0)
-            try
-            {
-              this.RobotPartPatterns.addElement(arrayOfRobotPart[j].getClass().newInstance());
-              localVector.addElement(arrayOfRobotPart[j].getID());
-            }
-            catch (IllegalAccessException localIllegalAccessException)
-            {
-            }
-            catch (InstantiationException localInstantiationException)
-            {
-            }
+          if (k != 0)
+            continue;
+          try {
+            this.RobotPartPatterns.addElement(arrayOfRobotPart[j].getClass().newInstance());
+            localVector.addElement(arrayOfRobotPart[j].getID());
+          }
+          catch (IllegalAccessException localIllegalAccessException)
+          {
+          }
+          catch (InstantiationException localInstantiationException)
+          {
+          }
         }
 
         Object localObject1 = null;
+        Object localObject2;
         if (localVector.size() > 0)
         {
           this.appletRef.getBuildPanel().clearPartsList();
@@ -537,7 +533,7 @@ public class GameState
           {
             localObject1 = 
               "RCX: " + paramRobot.getName() + " stored.\nNew Pattern recognized:\n" + 
-              ((String)localVector.elementAt(0)) + "\nIt is now available for building.";
+              (String)localVector.elementAt(0) + "\nIt is now available for building.";
           }
           else
           {
@@ -556,11 +552,11 @@ public class GameState
         {
           localObject2 = "Foreign object (Satellite) could not be scanned and remains outside the bay.\n";
           if (localObject1 != null)
-            localObject1 = localObject1 + ((String)localObject2);
-          else
+            localObject1 = localObject1 + (String)localObject2;
+          else {
             localObject1 = localObject2;
+          }
         }
-
         if (localObject1 != null) {
           this.appletRef.getBuildPanel().setDescription((String)localObject1);
         }
@@ -679,9 +675,9 @@ public class GameState
     while (localEnumeration.hasMoreElements())
     {
       PhysicalObject localPhysicalObject = (PhysicalObject)localEnumeration.nextElement();
-      if (localPhysicalObject instanceof Trigger)
-      {
-        ((Trigger)localPhysicalObject).setGameState(null); }
+      if (!(localPhysicalObject instanceof Trigger))
+        continue;
+      ((Trigger)localPhysicalObject).setGameState(null);
     }
   }
 

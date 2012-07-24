@@ -20,8 +20,7 @@ public class Repeat extends Instruction
   boolean random = false;
   int[] randomvals = new int[2];
 
-  public void readExternal(ObjectInput paramObjectInput)
-    throws IOException, ClassNotFoundException
+  public void readExternal(ObjectInput paramObjectInput) throws IOException, ClassNotFoundException
   {
     super.readExternal(paramObjectInput);
     this.destination = ((Instruction)paramObjectInput.readObject());
@@ -68,17 +67,17 @@ public class Repeat extends Instruction
 
   public String getParameterString()
   {
-    if (this.random)
+    if (this.random) {
       return Integer.toString(this.randomvals[0]) + "-" + Integer.toString(this.randomvals[1]);
-
+    }
     return Integer.toString(this.times);
   }
 
   public boolean setParameterString(String paramString)
   {
-    int i;
-    try {
-      i = Integer.parseInt(paramString);
+    try
+    {
+      int i = Integer.parseInt(paramString);
       if (i < 1) {
         return false;
       }
@@ -98,15 +97,15 @@ public class Repeat extends Instruction
         {
           arrayOfInt[j] = Integer.parseInt(localStringTokenizer.nextToken());
 
-          if (arrayOfInt[j] < 1)
+          if (arrayOfInt[j] < 1) {
             return false;
-
-          ++j;
+          }
+          j++;
         }
 
-        if (j != 2)
+        if (j != 2) {
           return false;
-
+        }
         if (arrayOfInt[0] == arrayOfInt[1])
         {
           setTimes(arrayOfInt[0]);
@@ -171,18 +170,18 @@ public class Repeat extends Instruction
 
   public boolean boundaryCheck(Robot paramRobot, int paramInt)
   {
-    return false; }
-
-  public boolean boundaryCheck(Robot paramRobot) { return false; }
-
-  public void terminate(Robot paramRobot) { }
+    return false;
+  }
+  public boolean boundaryCheck(Robot paramRobot) { return false; } 
+  public void terminate(Robot paramRobot) {
+  }
 
   public Instruction loopPeek() {
     if (this.times_counter < 0)
     {
-      if (this.random)
+      if (this.random) {
         genRandom();
-
+      }
       this.times_counter = this.times;
       return null;
     }
@@ -204,8 +203,8 @@ public class Repeat extends Instruction
       localStringBuffer.append(this.randomvals[1]);
     }
     else {
-      localStringBuffer.append(this.times); }
-    localStringBuffer.append(" times");
+      localStringBuffer.append(this.times);
+    }localStringBuffer.append(" times");
     return localStringBuffer.toString();
   }
 }

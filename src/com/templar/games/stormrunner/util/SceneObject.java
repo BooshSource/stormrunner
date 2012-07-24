@@ -16,7 +16,7 @@ public class SceneObject extends ImageComponent
   implements Externalizable
 {
   static final long serialVersionUID = 4886718345L;
-  public double VERSION;
+  public double VERSION = 0.2D;
   public String filename;
   public String name;
   public String classname;
@@ -30,8 +30,6 @@ public class SceneObject extends ImageComponent
 
   public SceneObject()
   {
-    this.VERSION = 0.20000000000000001D;
-
     this.filename = "";
     this.name = "";
     this.classname = "";
@@ -46,9 +44,6 @@ public class SceneObject extends ImageComponent
   public SceneObject(String paramString1, String paramString2, String paramString3, String paramString4, String paramString5, String paramString6, Image paramImage, Point paramPoint)
   {
     super(paramImage);
-
-    this.VERSION = 0.20000000000000001D;
-
     this.filename = paramString1;
     if (this.filename != null)
       this.filename = this.filename.replace(File.separatorChar, '/');
@@ -63,9 +58,10 @@ public class SceneObject extends ImageComponent
 
   public SceneObject(SceneObject paramSceneObject)
   {
+    this();
     if (paramSceneObject != null)
     {
-      super.setImage(paramSceneObject.getImage());
+      setImage(paramSceneObject.getImage());
       this.filename = new String(paramSceneObject.filename);
       if (this.filename != null)
         this.filename = this.filename.replace(File.separatorChar, '/');
@@ -79,8 +75,8 @@ public class SceneObject extends ImageComponent
       }
       else {
         this.shape = new boolean[paramSceneObject.shape.length][paramSceneObject.shape[0].length];
-        for (int i = 0; i < this.shape.length; ++i)
-          for (int j = 0; j < this.shape[0].length; ++j)
+        for (int i = 0; i < this.shape.length; i++)
+          for (int j = 0; j < this.shape[0].length; j++)
             this.shape[i][j] = paramSceneObject.shape[i][j];
       }
       this.coord = paramSceneObject.coord;
@@ -89,13 +85,13 @@ public class SceneObject extends ImageComponent
 
   public void addMouseListener(MouseListener paramMouseListener)
   {
-    addMouseListener(paramMouseListener);
+    super.addMouseListener(paramMouseListener);
     this.mlcount += 1;
     Debug.println("# of mouse listeners on " + this + ": " + this.mlcount);
   }
 
   public void removeMouseListener(MouseListener paramMouseListener) {
-    removeMouseListener(paramMouseListener);
+    super.removeMouseListener(paramMouseListener);
     this.mlcount -= 1;
   }
 

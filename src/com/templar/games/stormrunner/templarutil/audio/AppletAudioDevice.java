@@ -29,7 +29,7 @@ public class AppletAudioDevice extends AudioDevice
 
   public void loopMethod(SoundRecord paramSoundRecord) throws IllegalArgumentException
   {
-    if (paramSoundRecord.getSound() instanceof AppletSound)
+    if ((paramSoundRecord.getSound() instanceof AppletSound))
     {
       ((AppletSound)paramSoundRecord.getSound()).getAudioClip().loop();
 
@@ -40,7 +40,7 @@ public class AppletAudioDevice extends AudioDevice
   }
 
   public void playMethod(SoundRecord paramSoundRecord) throws IllegalArgumentException {
-    if (paramSoundRecord.getSound() instanceof AppletSound)
+    if ((paramSoundRecord.getSound() instanceof AppletSound))
     {
       ((AppletSound)paramSoundRecord.getSound()).getAudioClip().play();
 
@@ -51,7 +51,7 @@ public class AppletAudioDevice extends AudioDevice
   }
 
   public void stopMethod(SoundRecord paramSoundRecord) throws IllegalArgumentException {
-    if (paramSoundRecord.getSound() instanceof AppletSound)
+    if ((paramSoundRecord.getSound() instanceof AppletSound))
     {
       ((AppletSound)paramSoundRecord.getSound()).getAudioClip().stop();
 

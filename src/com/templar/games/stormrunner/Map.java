@@ -5,7 +5,7 @@ import java.awt.Point;
 
 public class Map
 {
-  public static final double VERSION = 0.20000000000000001D;
+  public static final double VERSION = 0.2D;
   MapCell[][] mapdata;
   Dimension mapsize;
 
@@ -13,8 +13,8 @@ public class Map
   {
     this.mapsize = paramDimension;
     this.mapdata = new MapCell[paramDimension.width][paramDimension.height];
-    for (int i = 0; i < paramDimension.width; ++i)
-      for (int j = 0; j < paramDimension.height; ++j)
+    for (int i = 0; i < paramDimension.width; i++)
+      for (int j = 0; j < paramDimension.height; j++)
         this.mapdata[i][j] = new MapCell();
   }
 
@@ -26,8 +26,8 @@ public class Map
   public void setSize(Dimension paramDimension)
   {
     MapCell[][] arrayOfMapCell = new MapCell[paramDimension.width][paramDimension.height];
-    for (int i = 0; i < paramDimension.width; ++i)
-      for (int j = 0; j < paramDimension.height; ++j)
+    for (int i = 0; i < paramDimension.width; i++)
+      for (int j = 0; j < paramDimension.height; j++)
         if ((i >= this.mapsize.width) || (j >= this.mapsize.height))
           arrayOfMapCell[i][j] = new MapCell();
         else

@@ -34,6 +34,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -65,9 +67,9 @@ public class Editor extends SimpleContainer
   protected Program CurrentProgram;
   protected GameApplet CurrentApplet;
   protected GameState state;
-  protected Hashtable ProgramPartImageNames;
+  protected Hashtable<String,String> ProgramPartImageNames;
   protected Hashtable ProgramPartImages;
-  protected Hashtable ProgramPartClassNames;
+  protected Hashtable<String,String> ProgramPartClassNames;
   protected Hashtable ClassNameProgramPartNames;
   protected DropTargetInfo[] InstructionDrops;
   protected DropTargetInfo[] ConditionalDrops;
@@ -115,7 +117,7 @@ public class Editor extends SimpleContainer
 
     setRobot(paramRobot);
 
-    this.kh = new KeyHandler(this);
+    this.kh = new KeyHandler();
     addKeyListener(this.kh);
 
     this.RobotNameIntro.setLocation(95, 8);
@@ -320,11 +322,11 @@ public class Editor extends SimpleContainer
   {
     Component[] arrayOfComponent = getComponents();
     int i = -1;
-    for (int j = 0; (j < arrayOfComponent.length) && (i < 0); ++j)
+    for (int j = 0; (j < arrayOfComponent.length) && (i < 0); j++)
     {
-      if (arrayOfComponent[j] == this.programlayer)
+      if (arrayOfComponent[j] == this.programlayer) {
         i = j;
-
+      }
     }
 
     remove(this.programlayer);
@@ -343,16 +345,14 @@ public class Editor extends SimpleContainer
   protected ProgramComponent showInstruction(Instruction paramInstruction, ProgramComponent paramProgramComponent)
   {
     DropTargetInfo[] arrayOfDropTargetInfo;
+    if ((paramInstruction instanceof Repeat))
+      arrayOfDropTargetInfo = this.TallStackDrops;
+    else if ((paramInstruction instanceof RepeatForever))
+      arrayOfDropTargetInfo = this.ShortStackDrops;
+    else
+      arrayOfDropTargetInfo = this.InstructionDrops;
     int i;
     Object localObject1;
-    if (paramInstruction instanceof Repeat)
-      arrayOfDropTargetInfo = this.TallStackDrops;
-    else if (paramInstruction instanceof RepeatForever)
-      arrayOfDropTargetInfo = this.ShortStackDrops;
-    else {
-      arrayOfDropTargetInfo = this.InstructionDrops;
-    }
-
     if (paramProgramComponent == null)
     {
       i = 0;
@@ -360,20 +360,20 @@ public class Editor extends SimpleContainer
     }
     else
     {
-      localObject2 = paramProgramComponent.getProgramPart();
+     Linkable localObject2 = paramProgramComponent.getProgramPart();
       localObject1 = paramProgramComponent;
 
-      if (localObject2 instanceof Conditional)
+      if ((localObject2 instanceof Conditional))
         i = 5;
-      else if (localObject2 instanceof Repeat)
+      else if ((localObject2 instanceof Repeat))
         i = 1;
-      else if (localObject2 instanceof RepeatForever)
+      else if ((localObject2 instanceof RepeatForever))
         i = 2;
-      else if (localObject2 instanceof RepeatEnd)
+      else if ((localObject2 instanceof RepeatEnd))
         i = 3;
-      else
+      else {
         i = 4;
-
+      }
     }
 
     Object localObject2 = getProgramComponent(paramInstruction);
@@ -386,9 +386,9 @@ public class Editor extends SimpleContainer
 
     this.programlayer.add((Component)localObject2);
 
-    if (paramInstruction instanceof Loop)
+    if ((paramInstruction instanceof Loop))
     {
-      localObject3 = (Loop)paramInstruction;
+      Loop localObject3 = (Loop)paramInstruction;
       Object localObject4 = localObject2;
       ProgramComponent localProgramComponent = ((ProgramComponent)localObject2).getBoundingComponent();
 
@@ -400,18 +400,18 @@ public class Editor extends SimpleContainer
       }
 
       this.programlayer.add(localProgramComponent);
-      if (!(localProgramComponent.dropAgainst((ProgramComponent)localObject4)))
+      if (!localProgramComponent.dropAgainst((ProgramComponent)localObject4)) {
         System.out.println("Editor: showInstruction(): Failure to find a DropTarget match while placing a BoundingComponent.");
-
+      }
       localObject2 = localProgramComponent;
     }
 
     Object localObject3 = paramInstruction.getNextInstruction();
 
-    if (localObject3 != null)
+    if (localObject3 != null) {
       return showInstruction((Instruction)localObject3, (ProgramComponent)localObject2);
-
-    return ((ProgramComponent)(ProgramComponent)(ProgramComponent)(ProgramComponent)localObject2);
+    }
+    return (ProgramComponent)(ProgramComponent)(ProgramComponent)(ProgramComponent)localObject2;
   }
 
   protected void showConditional(Conditional paramConditional, ProgramComponent paramProgramComponent)
@@ -458,7 +458,7 @@ public class Editor extends SimpleContainer
 
   protected void initProgramComponents()
   {
-    this.ProgramPartClassNames = new Hashtable();
+    this.ProgramPartClassNames = new Hashtable<String,String>();
     this.ProgramPartClassNames.put("Forward", "com.templar.games.stormrunner.program.MoveInstruction");
     this.ProgramPartClassNames.put("TurnLeft", "com.templar.games.stormrunner.program.TurnLeftInstruction");
     this.ProgramPartClassNames.put("TurnRight", "com.templar.games.stormrunner.program.TurnRightInstruction");
@@ -502,11 +502,11 @@ public class Editor extends SimpleContainer
     Enumeration localEnumeration = this.ProgramPartClassNames.keys();
     while (localEnumeration.hasMoreElements())
     {
-      localObject1 = localEnumeration.nextElement();
+      Object localObject1 = localEnumeration.nextElement();////
       this.ClassNameProgramPartNames.put(this.ProgramPartClassNames.get(localObject1), localObject1);
     }
 
-    this.ProgramPartImageNames = new Hashtable();
+    this.ProgramPartImageNames = new Hashtable<String,String>();
 
     this.ProgramPartImageNames.put("StartBlock", "com/templar/games/stormrunner/media/images/programblocks/block_program.gif");
     this.ProgramPartImageNames.put("Forward", "com/templar/games/stormrunner/media/images/programblocks/block_forward.gif");
@@ -540,7 +540,7 @@ public class Editor extends SimpleContainer
     Object localObject1 = this.ProgramPartImageNames.keys();
     while (((Enumeration)localObject1).hasMoreElements())
     {
-      localObject2 = (String)((Enumeration)localObject1).nextElement();
+      String localObject2 = (String)((Enumeration)localObject1).nextElement();
       this.ProgramPartImages.put(localObject2, this.theImageRetriever.getImage((String)this.ProgramPartImageNames.get(localObject2)));
     }
 
@@ -631,7 +631,7 @@ public class Editor extends SimpleContainer
       }
     }
 
-    return ((ProgramComponent)localProgramComponent);
+    return (ProgramComponent)localProgramComponent;
   }
 
   public ProgramComponent getProgramComponent(Linkable paramLinkable)
@@ -641,10 +641,9 @@ public class Editor extends SimpleContainer
 
   public ProgramComponent getProgramComponent(Linkable paramLinkable, EditorPalette paramEditorPalette)
   {
-    String str1;
     ProgramComponent localProgramComponent = null;
-
-    if (paramLinkable instanceof Conditional)
+    String str1;
+    if ((paramLinkable instanceof Conditional))
       str1 = ((Conditional)paramLinkable).getSensor().getClass().getName();
     else {
       str1 = paramLinkable.getClass().getName();
@@ -652,26 +651,20 @@ public class Editor extends SimpleContainer
 
     if (this.ClassNameProgramPartNames.containsKey(str1))
     {
+      String str2 = (String)this.ClassNameProgramPartNames.get(str1);
+
+      Image localImage1 = (Image)this.ProgramPartImages.get(str2);
       Image localImage2;
+      if (this.ProgramPartImages.containsKey(str2 + " (icon)"))
+        localImage2 = (Image)this.ProgramPartImages.get(str2 + " (icon)");
+      else
+        localImage2 = localImage1;
       Class localClass1;
       Class localClass2;
       Class localClass3;
       Class localClass4;
       Class localClass5;
-      EditorPalette localEditorPalette;
-      DropTargetInfo[] arrayOfDropTargetInfo;
-      String str2 = (String)this.ClassNameProgramPartNames.get(str1);
-
-      Image localImage1 = (Image)this.ProgramPartImages.get(str2);
-      if (this.ProgramPartImages.containsKey(str2 + " (icon)"))
-        localImage2 = (Image)this.ProgramPartImages.get(str2 + " (icon)");
-      else {
-        localImage2 = localImage1;
-      }
-
-      try
-      {
-        localClass1 = Class.forName("com.templar.games.stormrunner.program.Instruction");
+      try { localClass1 = Class.forName("com.templar.games.stormrunner.program.Instruction");
         localClass2 = Class.forName("com.templar.games.stormrunner.program.Conditional");
         localClass3 = Class.forName("com.templar.games.stormrunner.program.Repeat");
         localClass4 = Class.forName("com.templar.games.stormrunner.program.RepeatForever");
@@ -682,7 +675,7 @@ public class Editor extends SimpleContainer
         localClassNotFoundException.printStackTrace();
         localClass1 = localClass2 = localClass3 = localClass4 = localClass5 = null;
       }
-
+      EditorPalette localEditorPalette;
       if (paramEditorPalette == null)
         localEditorPalette = this.Palette;
       else {
@@ -691,12 +684,13 @@ public class Editor extends SimpleContainer
 
       int i = 0;
       Object localObject = null;
+      DropTargetInfo[] arrayOfDropTargetInfo;
       if (localClass3.isAssignableFrom(localClass5))
       {
         arrayOfDropTargetInfo = this.TallStackDrops;
 
         localObject = new RepeatEnd((Image)this.ProgramPartImages.get("Repeat (end)"), localEditorPalette);
-        for (int j = 0; j < this.RepeatEndDrops.length; ++j)
+        for (int j = 0; j < this.RepeatEndDrops.length; j++)
         {
           ((ProgramComponent)localObject).addDropTargetInfo(this.RepeatEndDrops[j]);
         }
@@ -706,7 +700,7 @@ public class Editor extends SimpleContainer
         arrayOfDropTargetInfo = this.ShortStackDrops;
 
         localObject = new RepeatForeverEnd((Image)this.ProgramPartImages.get("RepeatForever (end)"), localEditorPalette);
-        for (int j = 0; j < this.RepeatEndDrops.length; ++j)
+        for (int j = 0; j < this.RepeatEndDrops.length; j++)
         {
           ((ProgramComponent)localObject).addDropTargetInfo(this.RepeatEndDrops[j]);
         }
@@ -723,7 +717,7 @@ public class Editor extends SimpleContainer
       }
 
       localProgramComponent = new ProgramComponent(paramLinkable, localImage1, localImage2, ((Integer)this.ParameterDisplayOffsets.get(str2)).intValue(), localEditorPalette);
-      for (int j = 0; j < arrayOfDropTargetInfo.length; ++j)
+      for (int j = 0; j < arrayOfDropTargetInfo.length; j++)
       {
         localProgramComponent.addDropTargetInfo(arrayOfDropTargetInfo[j]);
       }
@@ -741,7 +735,7 @@ public class Editor extends SimpleContainer
     else {
       System.err.println("Editor: Unable to name class " + str1);
     }
-    return ((ProgramComponent)localProgramComponent);
+    return (ProgramComponent)localProgramComponent;
   }
 
   public Hashtable getProgramPartImages()
@@ -784,12 +778,12 @@ public class Editor extends SimpleContainer
       return true;
     }
 
-    int i = 0;
+    boolean b=false;
 
-    if ((verifyInstruction(paramProgram.getFirstInstruction())) && (verifyConditional(paramProgram.getFirstConditional())))
-      i = 1;
-
-    return i;
+    if ((verifyInstruction(paramProgram.getFirstInstruction())) && (verifyConditional(paramProgram.getFirstConditional()))) {
+      b=true;
+    }
+    return b;
   }
 
   public boolean verifyInstruction(Instruction paramInstruction)
@@ -802,12 +796,12 @@ public class Editor extends SimpleContainer
 
     bool = paramInstruction.verifyRobot(this.CurrentRobot);
 
-    if (paramInstruction instanceof Loop)
+    if ((paramInstruction instanceof Loop)) {
       bool = (bool) && (verifyInstruction(((Loop)paramInstruction).getDestination()));
-
-    if (bool)
+    }
+    if (bool) {
       bool = (bool) && (verifyInstruction(paramInstruction.getNextInstruction()));
-
+    }
     return bool;
   }
 
@@ -817,17 +811,17 @@ public class Editor extends SimpleContainer
       return true;
     }
 
-    int i = 0;
+    boolean b = false;
 
-    if (this.CurrentRobot.getSensor(paramConditional.getSensor().getID()) != null)
-      i = 1;
+    if (this.CurrentRobot.getSensor(paramConditional.getSensor().getID()) != null) {
+      b = true;    b = (b == false) || (!verifyInstruction(paramConditional.getNextInstruction())) ? false : true;
+    }
 
-    i = ((i == 0) || (!(verifyInstruction(paramConditional.getNextInstruction())))) ? 0 : 1;
 
-    if (i != 0)
-      i = ((i == 0) || (!(verifyConditional(paramConditional.getNextConditional())))) ? 0 : 1;
-
-    if(i==0) return false; else return true;
+    if (b != false) {
+      b = (b == false) || (!verifyConditional(paramConditional.getNextConditional())) ? false : true;
+    }
+    return b;
   }
 
   public void setLocation(Point paramPoint)
@@ -837,15 +831,15 @@ public class Editor extends SimpleContainer
 
   public void setLocation(int paramInt1, int paramInt2)
   {
-    if (getParent() == null)
+    if (getParent() == null) {
       this.LocationHolder = new Point(paramInt1, paramInt2);
-
-    setLocation(paramInt1, paramInt2);
+    }
+    super.setLocation(paramInt1, paramInt2);
   }
 
   public boolean isMinimized()
   {
-    return (!(this.ControlTab.getOn()));
+    return !this.ControlTab.getOn();
   }
 
   public void setMinimized(boolean paramBoolean)
@@ -855,7 +849,7 @@ public class Editor extends SimpleContainer
     GameApplet.audio.play("PanelZip");
     try
     {
-      if (!(paramBoolean))
+      if (!paramBoolean)
       {
         this.CurrentX = getLocation().x;
         this.Collapser = new UtilityThread(10, this, getClass().getMethod("maximizeStep", null), false);
@@ -863,7 +857,7 @@ public class Editor extends SimpleContainer
 
         this.CurrentApplet.getGrid().burnGridOn();
 
-        localRenderer = this.state.getRenderer();
+        Renderer localRenderer = this.state.getRenderer();
         localRenderer.setInternalFocus(this);
 
         return;
@@ -947,5 +941,37 @@ public class Editor extends SimpleContainer
   public void setGameState(GameState paramGameState)
   {
     this.state = paramGameState;
+  }
+
+  public class KeyHandler extends KeyAdapter
+  {
+    public void keyPressed(KeyEvent paramKeyEvent)
+    {
+      switch (paramKeyEvent.getKeyCode())
+      {
+      case 38:
+        if (Editor.this.programlayer.getLocation().y >= 0) break;
+        Editor.this.programlayer.setLocation(Editor.this.programlayer.getLocation().x, Math.min(Editor.this.programlayer.getLocation().y + 20, 0));
+        return;
+      case 40:
+        int i = Editor.this.getSize().height - Editor.this.programlayer.getSize().height;
+        if (Editor.this.programlayer.getLocation().y <= i) break;
+        Editor.this.programlayer.setLocation(Editor.this.programlayer.getLocation().x, Math.max(Editor.this.programlayer.getLocation().y - 20, i));
+        return;
+      case 37:
+        if (Editor.this.programlayer.getLocation().x >= 0) break;
+        Editor.this.programlayer.setLocation(Math.min(Editor.this.programlayer.getLocation().x + 20, 0), Editor.this.programlayer.getLocation().y);
+        return;
+      case 39:
+        int j = Editor.this.getSize().width - Editor.this.programlayer.getSize().width;
+        if (Editor.this.programlayer.getLocation().x <= j) break;
+        Editor.this.programlayer.setLocation(Math.max(Editor.this.programlayer.getLocation().x - 20, j), Editor.this.programlayer.getLocation().y);
+        return;
+      }
+    }
+
+    public KeyHandler()
+    {
+    }
   }
 }

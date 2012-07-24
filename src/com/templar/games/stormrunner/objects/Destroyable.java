@@ -54,10 +54,10 @@ public class Destroyable extends PhysicalObject
     return 16;
   }
 
-  public void activate(Robot paramRobot, int paramInt) {
-    UtilityThread localUtilityThread;
+  public void activate(Robot paramRobot, int paramInt)
+  {
     try {
-      localUtilityThread = new UtilityThread(100, this, getClass().getMethod("goAway", null), false);
+      UtilityThread localUtilityThread = new UtilityThread(100, this, getClass().getMethod("goAway", null), false);
       localUtilityThread.start();
 
       return;
@@ -82,7 +82,7 @@ public class Destroyable extends PhysicalObject
     arrayOfAnimationComponent[0] = new AnimationComponent(arrayOfImage);
     arrayOfAnimationComponent[0].setSequence(arrayOfInt, null, false);
     setImages(arrayOfAnimationComponent);
-    for (int i = 0; i < 4; )
+    for (int i = 0; i < 4; arrayOfAnimationComponent[0].nextImage())
     {
       try {
         Thread.currentThread(); Thread.sleep(100L);
@@ -90,11 +90,11 @@ public class Destroyable extends PhysicalObject
       catch (InterruptedException localInterruptedException)
       {
       }
-      ++i; arrayOfAnimationComponent[0].nextImage();
+      i++;
     }
 
-    super.getEnvironment().removeObject(this);
-    super.setVisible(false);
+    getEnvironment().removeObject(this);
+    setVisible(false);
     return false;
   }
 

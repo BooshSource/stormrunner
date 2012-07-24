@@ -20,6 +20,7 @@ public class SunSound
   protected InputStream rawdata;
   protected AudioData ad;
   protected boolean Valid = false;
+
   Hashtable playing = new Hashtable();
 
   public SunSound(InputStream paramInputStream)
@@ -58,16 +59,16 @@ public class SunSound
       AudioDataStream localAudioDataStream = (AudioDataStream)localEnumeration.nextElement();
       SoundRecord localSoundRecord = (SoundRecord)this.playing.get(localAudioDataStream);
 
-      if (localSoundRecord == paramSoundRecord)
-      {
-        AudioPlayer.player.stop(localAudioDataStream);
-
-        this.playing.remove(localAudioDataStream);
-
-        paramSoundRecord.getAudioManager().notifyStopped(paramSoundRecord, true);
-
-        return;
+      if (localSoundRecord != paramSoundRecord) {
+        continue;
       }
+      AudioPlayer.player.stop(localAudioDataStream);
+
+      this.playing.remove(localAudioDataStream);
+
+      paramSoundRecord.getAudioManager().notifyStopped(paramSoundRecord, true);
+
+      return;
     }
   }
 
@@ -95,24 +96,23 @@ public class SunSound
 
   public boolean load()
   {
-    if (!(this.Valid)) {
+    if (!this.Valid) {
       return false;
     }
 
-    int i3 = 24;
+    int i2 = 24;
     try
     {
-      int i4;
       DataInputStream localDataInputStream = new DataInputStream(this.rawdata);
 
       int i = localDataInputStream.readInt();
       int j = localDataInputStream.readInt();
       int k = localDataInputStream.readInt();
-      int l = localDataInputStream.readInt();
+      int m = localDataInputStream.readInt();
+      int n = localDataInputStream.readInt();
       int i1 = localDataInputStream.readInt();
-      int i2 = localDataInputStream.readInt();
 
-      byte[] arrayOfByte1 = new byte[j - i3];
+      byte[] arrayOfByte1 = new byte[j - i2];
       localDataInputStream.read(arrayOfByte1);
 
       if (i != 779316836)
@@ -120,7 +120,7 @@ public class SunSound
         throw new IOException("Not an audio file");
       }
 
-      if (l != 1)
+      if (m != 1)
       {
         throw new IOException("Not correct encoding");
       }
@@ -128,10 +128,10 @@ public class SunSound
       ByteArrayOutputStream localByteArrayOutputStream = new ByteArrayOutputStream();
 
       byte[] arrayOfByte2 = new byte[4096];
-
-      while ((i4 = localDataInputStream.read(arrayOfByte2)) > 0)
+      int i3;
+      while ((i3 = localDataInputStream.read(arrayOfByte2)) > 0)
       {
-        localByteArrayOutputStream.write(arrayOfByte2, 0, i4);
+        localByteArrayOutputStream.write(arrayOfByte2, 0, i3);
       }
 
       this.ad = new AudioData(localByteArrayOutputStream.toByteArray());

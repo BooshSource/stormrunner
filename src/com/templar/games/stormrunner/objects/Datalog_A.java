@@ -45,12 +45,13 @@ public class Datalog_A extends Datalog
 
   public void activate(Robot paramRobot, int paramInt)
   {
-    if ((this.state != null) && 
-      (this.state.getSecurityLevel() < 2))
-      this.state.setSecurityLevel(2);
-
-    super.activate(paramRobot, paramInt); }
-
+    if (this.state != null)
+    {
+      if (this.state.getSecurityLevel() < 2)
+        this.state.setSecurityLevel(2);
+    }
+    super.activate(paramRobot, paramInt);
+  }
   public int activateOnEvent() { return 1; } 
   public void setGameState(GameState paramGameState) { this.state = paramGameState; } 
   public String toString() { return "Datalog A";

@@ -21,7 +21,7 @@ public abstract class TurnInstruction
     case 90:
     case 135:
     case 180:
-      paramRobot.setOrientation((i + 45 == 360) ? 0 : i + 45);
+      paramRobot.setOrientation(i + 45 == 360 ? 0 : i + 45);
       return true;
     case -180:
     case -135:
@@ -30,7 +30,7 @@ public abstract class TurnInstruction
     case 225:
     case 270:
     case 315:
-      paramRobot.setOrientation((i - 45 < 0) ? 315 : i - 45);
+      paramRobot.setOrientation(i - 45 < 0 ? 315 : i - 45);
       return true;
     }
     return false;

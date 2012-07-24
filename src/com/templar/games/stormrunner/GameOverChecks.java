@@ -14,15 +14,15 @@ public abstract class GameOverChecks
 {
   public static boolean check(Robot paramRobot)
   {
-    return ((robotContainsBeacon(paramRobot)) || (lostOnlyPart(paramRobot, new Hermes().getClass())) || 
+    return (robotContainsBeacon(paramRobot)) || (lostOnlyPart(paramRobot, new Hermes().getClass())) || 
       (lostOnlyPart(paramRobot, new Launcher().getClass())) || 
       (lostOnlyPart(paramRobot, new Arachnae().getClass())) || (
-      (noRobotsLeft()) && (cantMakeACompleteRobot())));
+      (noRobotsLeft()) && (cantMakeACompleteRobot()));
   }
 
   public static boolean noRobotsLeft()
   {
-    return (GameApplet.thisApplet.getGameState().getAllRobots().size() == 0);
+    return GameApplet.thisApplet.getGameState().getAllRobots().size() == 0;
   }
 
   public static boolean cantMakeACompleteRobot() {
@@ -33,42 +33,42 @@ public abstract class GameOverChecks
     {
       i += 20;
       j += 45;
-      localObject = localRobot.getRobotParts();
-      for (k = 0; k < localObject.length; ++k)
+      RobotPart[] localObject = localRobot.getRobotParts();
+      for (int k = 0; k < localObject.length; k++)
       {
         j += localObject[k].getEnergyCost();
         i += localObject[k].getSalvageCost();
       }
     }
     Object localObject = new GrabberArm();
-    int k = 999; int l = 999;
+    int k = 999; int m = 999;
     Enumeration localEnumeration = GameApplet.thisApplet.getGameState().getRobotPartPatterns().elements();
     while (localEnumeration.hasMoreElements())
     {
       RobotPart localRobotPart = (RobotPart)localEnumeration.nextElement();
-      if ((localRobotPart instanceof Chassis) && 
-        (localRobotPart.getSecurityLevel() <= GameApplet.thisApplet.getGameState().getSecurityLevel()) && 
-        (localRobotPart.getEnergyCost() <= l) && (localRobotPart.getSalvageCost() <= k))
-      {
-        l = localRobotPart.getEnergyCost();
-        k = localRobotPart.getSalvageCost();
-      }
+      if ((!(localRobotPart instanceof Chassis)) || 
+        (localRobotPart.getSecurityLevel() > GameApplet.thisApplet.getGameState().getSecurityLevel()))
+        continue;
+      if ((localRobotPart.getEnergyCost() > m) || (localRobotPart.getSalvageCost() > k))
+        continue;
+      m = localRobotPart.getEnergyCost();
+      k = localRobotPart.getSalvageCost();
     }
 
-    return ((i < 20 + ((GrabberArm)localObject).getSalvageCost() + k) || 
-      (j < 45 + ((GrabberArm)localObject).getEnergyCost() + l));
+    return (i < 20 + ((GrabberArm)localObject).getSalvageCost() + k) || 
+      (j < 45 + ((GrabberArm)localObject).getEnergyCost() + m);
   }
 
   public static boolean robotContainsBeacon(Robot paramRobot) {
     RobotPart[] arrayOfRobotPart = paramRobot.getRobotParts();
-    for (int i = 0; i < arrayOfRobotPart.length; ++i)
+    for (int i = 0; i < arrayOfRobotPart.length; i++)
     {
-      if (arrayOfRobotPart[i] instanceof InventoryContainer)
-      {
-        Enumeration localEnumeration = ((InventoryContainer)arrayOfRobotPart[i]).getInventory().elements();
-        while (localEnumeration.hasMoreElements())
-          if (localEnumeration.nextElement() instanceof Satellite)
-            return true;
+      if (!(arrayOfRobotPart[i] instanceof InventoryContainer))
+        continue;
+      Enumeration localEnumeration = ((InventoryContainer)arrayOfRobotPart[i]).getInventory().elements();
+      while (localEnumeration.hasMoreElements()) {
+        if ((localEnumeration.nextElement() instanceof Satellite))
+          return true;
       }
     }
     return false;
@@ -80,7 +80,7 @@ public abstract class GameOverChecks
       if (paramClass.isInstance(localEnumeration.nextElement()))
         return false;
     RobotPart[] arrayOfRobotPart = paramRobot.getRobotParts();
-    for (int i = 0; i < arrayOfRobotPart.length; ++i)
+    for (int i = 0; i < arrayOfRobotPart.length; i++)
       if (paramClass.isInstance(arrayOfRobotPart[i]))
         return true;
     return false;
